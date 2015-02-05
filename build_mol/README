@@ -1,0 +1,16 @@
+Rough Protocol for PSFGEN:
+1. Determine the exact structure you want to make, need residue sequences for each protein and/or nucleic acid
+2. Get some starting coordinates (as close to what you actually want typically is easiest).  Need two PDBs for each chain (now seg), backbone is enough (load PDB into VMD and save the backbone selection):
+   a. Sequence PDB, 1 atom/residue is sufficient, coordinates do not matter (can use this for multiple chains)
+   b. Coordinate PDB, will force these coordinate into the final structure
+3. Generate the patches
+   a. DNA patches: PYRIMIDINES vs PURINES 
+   b. other special chemical bonds, e.g. Di-Sulfide, etc (need to know the molecule)
+4. Insert all this into the psfgen file then run psfgen to generate the paired psf and pdb files
+
+Note: If missing intermediate residues, best way is to generate in sections with overlapping regions that can be aligned.  SASSIE has effective (little confusing) align functions.  Then cut and past pdb files together (not sure how/if patching is done in SASSIE).
+
+See here for more info: 
+http://www.smallangles.net/sassie/mdschool/mdschool/mdschool.html
+http://www.smallangles.net/sassie/mdschool/mdschool/mdschool_files/talk_3_coordinates_to_structure_JEC.pdf
+http://www.smallangles.net/sassie/mdschool/mdschool/mdschool_files/talk_6_MD_INTERM_BUILDING_JEC.pdf
