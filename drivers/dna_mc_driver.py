@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Molecule Specific Input
     svariables['n_flex_regions']        = ('1', 'int')
     svariables['theta_max']             = ('15', 'float_array')
-    svariables['theta_z_max']           = ('5', 'float_array') # provide 's_theta_z_max' to use a different theta max for twisting vs bending
+    svariables['theta_z_max']           = ('0.1', 'float_array') # provide 's_theta_z_max' to use a different theta max for twisting vs bending
     svariables['first_res_per_region']  = ('16', 'int_array')
     svariables['n_cont_res_per_region'] = ('30', 'int_array')
     svariables['align_low_res']         = ('1', 'int')  # not yet implemented
@@ -52,10 +52,10 @@ if __name__ == "__main__":
     svariables['seed']          = ('0', 'int') # goback random seed
     svariables['temperature']   = ('300', 'float') # may be incorperated for electrostatics
     svariables['debug']         = ('False', 'bool') # 'True' will display debug output
-    svariables['write_flex']    = ('False', 'bool') # 'True' will generate a file labeling paird DNA base pairs for all flexible beads (useful for calculating dihedral angles)
+    svariables['write_flex']    = ('True', 'bool') # 'True' will generate a file labeling paird DNA base pairs for all flexible beads (useful for calculating dihedral angles)
     svariables['keep_cg_files'] = ('True', 'bool') # 'True' will keep the coarse-grain DNA and protein pdb and dcd files
     svariables['keep_unique']   = ('True', 'bool') # 'False' will keep duplicate structure when move fails
-    svariables['rm_pkl']        = ('False', 'bool') # 'True' will remove the coarse-grain pkl file forcing a re-coarse-graining (can be time consuming often necessary)
+    svariables['rm_pkl']        = ('True', 'bool') # 'True' will remove the coarse-grain pkl file forcing a re-coarse-graining (can be time consuming often necessary)
     svariables['openmm_min']    = ('False', 'bool') # 'True' will remove the coarse-grain pkl file forcing a re-coarse-graining (can be time consuming often necessary)
 
     error, variables = input_filter.type_check_and_convert(svariables)
