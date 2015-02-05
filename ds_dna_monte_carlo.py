@@ -42,6 +42,7 @@ except:
 import sassie.sasconfig as sasconfig
 # import sys,locale,subprocess
 # from sys import stdout, exit, stderr
+
 try:
     import sassie.simulate.openmm.openmm as omm
     from simtk.openmm.app import *
