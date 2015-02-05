@@ -7,6 +7,7 @@ Rough Protocol for PSFGEN:
    a. DNA patches: PYRIMIDINES vs PURINES 
    b. other special chemical bonds, e.g. Di-Sulfide, etc (need to know the molecule)
 4. Insert all this into the psfgen file then run psfgen to generate the paired psf and pdb files
+5. Inspect psfgen output for "failed to assign coordinates" and warnings (often deleting the coordinates for that atom will allow it to detremine new coordinates using the topology file
 
 Note: If missing intermediate residues, best way is to generate in sections with overlapping regions that can be aligned.  SASSIE has effective (little confusing) align functions.  Then cut and past pdb files together (not sure how/if patching is done in SASSIE).
 
