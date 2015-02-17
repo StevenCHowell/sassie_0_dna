@@ -1,4 +1,4 @@
-topology /home/schowell/Dropbox/gw_phd/code/pylib/sassie/bin/toppar/top_all27_prot_na.inp
+topology /home/programs/sassie_bin/toppar/top_all27_prot_na.inp
 
 alias residue DG GUA
 alias residue DA ADE
