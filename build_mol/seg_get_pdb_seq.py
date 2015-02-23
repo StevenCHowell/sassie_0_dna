@@ -33,7 +33,7 @@ def parse():
     parser = argparse.ArgumentParser(
         #prog='',
         #usage='',
-        description = 'test functionality of the cgDNA move module',
+        description = 'Separate the PDB into individual PDB and Sequence files by segname',
         #epilog = 'no epilog found'
     )
 
