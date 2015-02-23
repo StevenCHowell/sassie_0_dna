@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import sassie.interface.input_filter as input_filter
 import sassie.calculate.gcrysol as gcrysol
@@ -20,8 +22,6 @@ def parse():
 
     return parser.parse_args()
 
-
-
 class Drv():
 
     module = 'crysol'
@@ -42,7 +42,7 @@ class Drv():
 
         # system defaults
         #cryexe='/share/apps/bin/crysol.exe'
-        cryexe='/usr/local/bin/crysol.exe'
+        cryexe='/home/programs/sassie_bin/crysol.exe'
         delafs='1'
 
         # my defaults
@@ -63,18 +63,16 @@ class Drv():
         #### END USER EDIT
         #### END USER EDIT
 
-        uname = os.popen("whoami").read()
-        if 'schowell\n' == uname:
-            ARGS = parse()
-            if ARGS.dcdfile != None and ARGS.runname != None:
-                print 'loading parameters from command line'
-                runname = ARGS.runname
-                dcdpath = ARGS.dcdpath
-                dcdfile = ARGS.dcdfile
-                pdbpath = ARGS.pdbpath
-                pdbfile = ARGS.pdbfile
-            else:
-                print 'using parameters from driver script'
+        ARGS = parse()
+        if ARGS.dcdfile != None and ARGS.pdbfile != None:
+            print 'loading parameters from command line'
+            runname = ARGS.runname
+            dcdpath = ARGS.dcdpath
+            dcdfile = ARGS.dcdfile
+            pdbpath = ARGS.pdbpath
+            pdbfile = ARGS.pdbfile
+        else:
+            print 'using parameters from driver script'
 
         svariables={}
 
@@ -106,7 +104,7 @@ class Drv():
         runname=self.variables['runname'][0]
 
         import multiprocessing
-        import sassie.tools.center as center
+        #        import sassie.tools.center as center
 
         txtQueue=multiprocessing.JoinableQueue()
         gcrysol.gcrysol(self.variables,txtQueue)
@@ -142,6 +140,7 @@ class Drv():
 
 if __name__=='__main__':
     import argparse
+    ARGS = parse()
     o=Drv()
     o.run_me()
     # o.verify_me()
