@@ -18,159 +18,72 @@ import subprocess
 import logging
 import sassie.sasmol.sasmol as sasmol
 import numpy as np
-
-class residue:
-    def __init__(self, resid, resname):
-        self.resid = resid
-        self.resname = resname
-    def __repr__(self):
-        return repr((self.resid, self.resname))
-        
-
-def parse():
-    ''' Returns arguments in parser'''
-
-    parser = argparse.ArgumentParser(
-        #prog='',
-        #usage='',
-        description = 'Separate the PDB into individual PDB and Sequence files by segname',
-        #epilog = 'no epilog found'
-    )
-
-    parser.add_argument("-p", "--pdb", help="all atom pdb file")
-    parser.add_argument("-s", "--segnames", nargs='+', help="segnames to extract")
-
-    return parser.parse_args()
+import pdb_get_sequence
 
 def main():
-    # aa_pdb = '../1zbb_tetra_uncombined.pdb'
-    # aa_pdb = '1zbb_original.pdb'
-
-    aa = sasmol.SasMol(0)
-    aa.read_pdb(ARGS.pdb)
-    segname_mols = []
-    errors = []
-
-    amino_acids = {'ALA': 'A',
-                   'ARG': 'R',
-                   'ASN': 'N',
-                   'ASP': 'D',
-                   'CYS': 'C',
-                   'GLU': 'E',
-                   'GLN': 'Q',
-                   'GLY': 'G',
-                   'HIS': 'H',
-                   'ILE': 'I',
-                   'LEU': 'L',
-                   'LYS': 'K',
-                   'MET': 'M',
-                   'PHE': 'F',
-                   'PRO': 'P',
-                   'SER': 'S',
-                   'THR': 'T',
-                   'TRP': 'W',
-                   'TYR': 'Y',
-                   'VAL': 'V',
-                   'HSE': 'H'}
-    
-    dna = {'G': 'G',
-           'A': 'A',
-           'T': 'T',
-           'C': 'C',
-           'DG': 'G',
-           'DA': 'A',
-           'DT': 'T',
-           'DC': 'C',           
-           'GUA': 'G', 
-           'ADE': 'A', 
-           'THY': 'T', 
-           'CYT': 'C'}
-    
-    # segnames = ['I','J']
-    # print 'segnames =', segnames
-    print 'ARGS.segnames =', ARGS.segnames
-    
-    
-    for segname in ARGS.segnames:
-        if segname.lower() == segname:
-            segname_name = '_seg_' + segname + '0'
-        else:
-            segname_name = '_seg_' + segname + '1'
-        segname_name = ARGS.pdb[:-4] + segname_name
-        basis_filter = "(segname[i] == '" + segname + "')"
-        error, mask = aa.get_subset_mask(basis_filter)
-        if error: print error
-        segname_mol = sasmol.SasMol(0)
-        error = aa.copy_molecule_using_mask(segname_mol, mask, 0)
-        if error: print error
-        segname_mol.write_pdb(segname_name+'.pdb', 0, 'w')
-        segname_mols.append(segname_mol)
-    
-        # resids.sort()
-        resA = 0
-        res_min = np.min(segname_mol.resids())
-        res_max = np.max(segname_mol.resids())
-        print 'min resid:', res_min
-        
-        resA = 0
-        residue_list = []
-        
-        # create a sorted list of the residues
-        for (i, resB) in enumerate(segname_mol.resid()):
-            if resB != resA:
-                # print 'segname_mol.resname()[i]:', segname_mol.resname()[i]
-                # print 'segname_mol.resid()[i]:', segname_mol.resid()[i]
-                residue_list.append(residue(resB, segname_mol.resname()[i]))
-                resA = resB
-            
-        residue_sequence = sorted(residue_list, key=lambda residue: residue.resid)
-        #with open(segname_name+'.txt', 'w') as outFile:
-            #for res in residue_sequence:
-                #outFile.write(str(res.resid) + '\t' + res.resname + '\n')
-        if 'rna' in segname_mol.moltypes():
-            segname_mol.moltypes().remove('rna')
-            print "removed 'rna' from moltypes"
-            if len(segname_mol.moltypes()) == 0:
-                segname_mol.moltypes().append('dna')
-                print "appended 'dna' to moltypes"
-                
-        with open(segname_name+'.seq', 'w') as outFile:
-            print outFile.closed
-            if segname_mol.moltypes() == ['protein']:
-                for (i, res) in enumerate(residue_sequence):
-                    outFile.write(amino_acids[res.resname])
-                    if 0 == (i + 1) % 50:
-                        outFile.write('\n')
-            elif segname_mol.moltypes() == ['dna']:
-                for (i, res) in enumerate(residue_sequence):
-                    outFile.write(dna[res.resname])
-                    # print 'printed', dna[res.resname], 'to', segname_name, '.seq'
-                    if 0 == (i + 1) % 50:
-                        outFile.write('\n')
-            else:
-                print 'ERROR, unexpected molecule type'
-            
-        #s for resB in resids:
-        #s     if resB != resA + 1:
-        #s         print 'missing residue/s, skipped segname', segname, 'btwn residues:', resA, resB
-        #s     resA = resB
-        print 'max resid:', res_max
-        
-        print 'finished segname', segname_name
-        print outFile.closed
-    
-    print 'COMPLETE'
-
-if __name__ == "__main__":
-
+    ''' preprocessing for commandline executions'''
+    import logging
     import argparse
     if '-v' in sys.argv:
         logging.basicConfig(filename='_log-%s' %__name__, level=logging.DEBUG)
     else:
         logging.basicConfig()
 
-    # make ARGS global
-    ARGS = parse()
+    parser = argparse.ArgumentParser(#prog='', #usage='',
+        description = 'Separate the PDB into individual PDB and Sequence files by segname',
+    )
+
+    parser.add_argument("-p", "--pdbfile", help="all atom pdb file")
+    parser.add_argument("-o", "--outfile", nargs='?', help="prefix of outfile to save")
+    parser.add_argument("-g", "--get_seq", default=True, action='store_true', help="whether get sequence")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-s", "--segnames", nargs='+', help="segnames to extract")
+    group.add_argument("-c", "--chainids", nargs='+', help="segnames to extract")
+
+    args = parser.parse_args()
+    return pdb_get_chains(args.pdbfile, outfile=args.outfile, 
+                          segnames=args.segnames, chainids=args.chainids, get_seq=args.get_seq)
+
+def pdb_get_chains(pdbobj=None, outfile='seg_', segnames=None, chainids=None, get_seq=True):
+    ''' get the sequence of a sasmol object '''
+
+    # filename is passed, read it
+    if isinstance(pdbobj, basestring):
+        pdbfile = pdbobj
+        pdbobj = sasmol.SasMol(0)
+        pdbobj.read_pdb(pdbfile)
+
+    # set the filter prefix (chainid has priority)
+    if segnames != None:
+        filter_name = segnames
+        filter_tmpl = "(segname[i] == '{}')"
+    if chainids != None:
+        filter_name = chainids
+        filter_tmpl = "(chain[i] == '{}')"
+
+    # a single string is passed, convert it to a list
+    if isinstance(filter_name, basestring):
+        filter_name = [filter_name]
+
+    seg_mols = []
+    for eachfilter in filter_name:
+        print "Filter pdb by: ", filter_tmpl.format(eachfilter)
+        error, mask = pdbobj.get_subset_mask(filter_tmpl.format(eachfilter))
+        if error: print error
+
+        eachfilter_mol = sasmol.SasMol(0)
+        error = pdbobj.copy_molecule_using_mask(eachfilter_mol, mask, 0)
+        if error: print error
+
+        #eachfilter_mol.setSegname(eachfilter)
+        eachfilter_mol.write_pdb(outfile+'.pdb', 0, 'w')
+        seg_mols.append(eachfilter_mol)
+        
+        if get_seq:
+            pdb_get_sequence.pdb_get_sequence(eachfilter_mol)
+        
+        print 'COMPLETE'
+    return seg_mols
+
+if __name__ == "__main__":
     main()
-    
-    print '!!! \m/ >.< \m/ !!!'

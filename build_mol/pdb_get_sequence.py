@@ -13,6 +13,7 @@ It also creates a sequence file for the residue sequence of that chain
 import sys
 import os
 import sassie.sasmol.sasmol as sasmol
+import numpy as np
 
 def main():
     ''' preprocessing for commandline executions'''
