@@ -9,17 +9,17 @@ ncp.read_pdb('1KX5tailfold_167bp.pdb')
 
 
 # protein chains
-# A, E # E will conflict with the gH5 protein, try aligning A instead
-# B, F
-# C, G
-# D, H
+# H3: A, E # E will conflict with the gH5 protein, try aligning A instead
+# H4: B, F
+# H2A: C, G # Missing an A residue at the end
+# H2B: D, H
 #
 # dna chains
 # I, J, K, L, M, N
 
 # todo:
 # 1. align the 1KX5 proteins to the correct positions
-# 2. re-confirm the sequence files from before, rename their chain names to:
+# X. re-confirm the sequence files from before, rename their chain names to:
 #    A: H2A
 #    B: H2B
 #    T: H3
