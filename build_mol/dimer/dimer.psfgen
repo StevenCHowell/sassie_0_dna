@@ -22,32 +22,32 @@ alias atom ILE CD1 CD
 segment 1H3 {  
   first NTER
   last CTER
-  pdb segPDB/histone_E0.pdb
+  pdb seq_pdb/H3_1kx5.pdb
 }
-coordpdb segPDB/histone_E0.pdb 1H3
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_E1.pdb 1H3
 
 segment 2H3 {  
   first NTER
   last CTER
-  pdb segPDB/histone_A0.pdb
+  pdb seq_pdb/H3_1kx5.pdb
 }
-coordpdb segPDB/histone_A0.pdb 2H3
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_A1.pdb 2H3
 
 patch DISU 1H3:110 2H3:110
 
 segment 3H3 {  
   first NTER
   last CTER
-  pdb segPDB/histone_E1.pdb
+  pdb seq_pdb/H3_1kx5.pdb
 }
-coordpdb segPDB/histone_E1.pdb 3H3
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_E1.pdb 3H3
 
 segment 4H3 {  
   first NTER
   last CTER
-  pdb segPDB/histone_A1.pdb
+  pdb seq_pdb/H3_1kx5.pdb
 }
-coordpdb segPDB/histone_A1.pdb 4H3
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_A1.pdb 4H3
 
 patch DISU 3H3:110 4H3:110
 
@@ -56,31 +56,31 @@ patch DISU 3H3:110 4H3:110
 segment 1H4 {  
   first NTER
   last CTER
-  pdb segPDB/histone_B0.pdb
+  pdb seq_pdb/H4_1kx5.pdb
 }
-coordpdb segPDB/histone_B0.pdb 1H4
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_B1.pdb 1H4
 
 segment 2H4 {  
   first NTER
   last CTER
-  pdb segPDB/histone_B1.pdb
+  pdb seq_pdb/H4_1kx5.pdb
 }
-coordpdb segPDB/histone_B1.pdb 2H4
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_F1.pdb 2H4
 
 
 segment 3H4 {  
   first NTER
   last CTER
-  pdb segPDB/histone_F0.pdb
+  pdb seq_pdb/H4_1kx5.pdb
 }
-coordpdb segPDB/histone_F0.pdb 3H4
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_B1.pdb 3H4
 
 segment 4H4 {  
   first NTER
   last CTER
-  pdb segPDB/histone_F1.pdb
+  pdb seq_pdb/H4_1kx5.pdb
 }
-coordpdb segPDB/histone_F1.pdb 4H4
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_F1.pdb 4H4
 
 
 # H2A histones
@@ -88,60 +88,60 @@ coordpdb segPDB/histone_F1.pdb 4H4
 segment 1H2A {  
   first NTER
   last CTER
-  pdb segPDB/histone_C0.pdb
+  pdb seq_pdb/H2A_1kx5_corrected.pdb
 }
-coordpdb segPDB/histone_C0.pdb 1H2A
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_C1.pdb 1H2A
 
 segment 2H2A {  
   first NTER
   last CTER
-  pdb segPDB/histone_C1.pdb
+  pdb seq_pdb/H2A_1kx5_corrected.pdb
 }
-coordpdb segPDB/histone_C1.pdb 2H2A
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_G1.pdb 2H2A
  
- segment 3H2A {  
-   first NTER
-   last CTER
-   pdb segPDB/histone_G0.pdb
- }
- coordpdb segPDB/histone_G0.pdb 3H2A
+segment 3H2A {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H2A_1kx5_corrected.pdb
+}
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_C1.pdb 3H2A
  
- segment 4H2A {  
-   first NTER
-   last CTER
-   pdb segPDB/histone_G1.pdb
- }
- coordpdb segPDB/histone_G1.pdb 4H2A
+segment 4H2A {  
+  first NTER
+  last CTER
+ pdb seq_pdb/H2A_1kx5_corrected.pdb
+}
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_G1.pdb 4H2A
 
 # H2B histones
 
 segment 1H2B {  
   first NTER
   last CTER
-  pdb segPDB/histone_D0.pdb
+  pdb seq_pdb/H2B_1kx5.pdb
 }
-coordpdb segPDB/histone_D0.pdb 1H2B
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_D1.pdb 1H2B
 
 segment 2H2B {  
   first NTER
   last CTER
-  pdb segPDB/histone_D1.pdb
+  pdb seq_pdb/H2B_1kx5.pdb
 }
-coordpdb segPDB/histone_D1.pdb 2H2B
+coordpdb seg_pdb/dimer_ncp1/dimer_ncp1_ch_H1.pdb 2H2B
 
 segment 3H2B {  
   first NTER
   last CTER
-  pdb segPDB/histone_H0.pdb
+  pdb seq_pdb/H2B_1kx5.pdb
 }
-coordpdb segPDB/histone_H0.pdb 3H2B
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_D1.pdb 3H2B
 
 segment 4H2B {  
   first NTER
   last CTER
-  pdb segPDB/histone_H1.pdb
+  pdb seq_pdb/H2B_1kx5.pdb
 }
-coordpdb segPDB/histone_H1.pdb 4H2B
+coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_H1.pdb 4H2B
 
 
 segment DNA2 {

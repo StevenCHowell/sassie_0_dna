@@ -36,8 +36,11 @@ def parse():
     parser.add_argument("-msc", "--move_seg_or_chain", help="matching a segname or chain")
     parser.add_argument("-gsc", "--goal_seg_or_chain", help="matching a segname or chain")
     parser.add_argument("-p",  "--path",    help="output path")
-    parser.add_argument("-mn", "--min",    help="minimun residue to match")
-    parser.add_argument("-mx", "--max",    help="minimun residue to match")
+    parser.add_argument("-gmn", "--goal_min",    help="minimun residue to match on goal molecule")
+    parser.add_argument("-gmx", "--goal_max",    help="maximum residue to match on goal molecule")
+    parser.add_argument("-mmn", "--move_min",    help="minimun residue to match on move molecule")
+    parser.add_argument("-mmx", "--move_max",    help="miximum residue to match on move molecule")
+    parser.add_argument("-ba", "--basis_atoms",  help="basis_atoms to match")
 
     return parser.parse_args()
 
@@ -57,14 +60,28 @@ def align(inputs):
     aa_move_pdb    = inputs.ref
     aa_move_file   = inputs.move
     save_file      = inputs.out
-    move_segname   = inputs.move_seg_chain
-    goal_segname   = inputs.goal_seg_chain
-    move_seg_or_ch = inputs.move_seg_or_ch
-    goal_seg_or_ch = inputs.goal_seg_or_ch
     path           = inputs.path
-    match_res_max  = inputs.max
-    match_res_min  = inputs.min
     
+    try:
+        goal_filter = inputs.goal_filter
+    except:
+        basis_atoms    = inputs.basis_atoms
+        goal_seg_or_ch = inputs.goal_seg_or_chain
+        goal_segname   = inputs.goal_seg_chain
+        goal_res_max   = inputs.goal_max
+        goal_res_min   = inputs.goal_min
+        goal_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (goal_seg_or_ch, goal_segname, basis_atoms, goal_res_min, goal_res_max)
+
+    try:
+        move_filter = inputs.move_filter            
+    except:
+        basis_atoms    = inputs.basis_atoms
+        move_seg_or_ch = inputs.move_seg_or_chain
+        move_segname   = inputs.move_seg_chain
+        move_res_max   = inputs.move_max
+        move_res_min   = inputs.move_min
+        move_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (move_seg_or_ch, move_segname, basis_atoms, move_res_min, move_res_max)
+        
     # create the SasMol objects
     aa_move  = sasmol.SasMol(0)
     sub_goal = sasmol.SasMol(0)
@@ -93,9 +110,6 @@ def align(inputs):
         dcd_out_file = aa_move.open_dcd_write(path+save_file)
     elif 'pdb' == out_type:
         dcd_out_file = None        
-
-    goal_filter = "((%s[i] == '%s') and (name[i] == 'CA') and (resid[i] >= %s) and (resid[i] <= %s))" % (goal_seg_or_ch, goal_segname, match_res_min, match_res_max)
-    move_filter = "((%s[i] == '%s') and (name[i] == 'CA') and (resid[i] >= %s) and (resid[i] <= %s))" % (move_seg_or_ch, move_segname, match_res_min, match_res_max)
 
     error, goal_seg_mask = aa_goal.get_subset_mask(goal_filter)
     error, move_seg_mask = aa_move.get_subset_mask(move_filter)

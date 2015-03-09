@@ -42,12 +42,12 @@ def parse():
 
     return parser.parse_args()
 
-def main():
+def main(inputs):
     # aa_pdb = '../1zbb_tetra_uncombined.pdb'
     # aa_pdb = '1zbb_original.pdb'
 
     aa = sasmol.SasMol(0)
-    aa.read_pdb(ARGS.pdb)
+    aa.read_pdb(inputs.pdb)
     segname_mols = []
     errors = []
 
@@ -89,15 +89,15 @@ def main():
     
     # segnames = ['I','J']
     # print 'segnames =', segnames
-    print 'ARGS.segnames =', ARGS.segnames
+    print 'inputs.segnames =', inputs.segnames
     
     
-    for segname in ARGS.segnames:
+    for segname in inputs.segnames:
         if segname.lower() == segname:
             segname_name = '_seg_' + segname + '0'
         else:
             segname_name = '_seg_' + segname + '1'
-        segname_name = ARGS.pdb[:-4] + segname_name
+        segname_name = inputs.pdb[:-4] + segname_name
         basis_filter = "(segname[i] == '" + segname + "')"
         error, mask = aa.get_subset_mask(basis_filter)
         if error: print error
@@ -171,8 +171,8 @@ if __name__ == "__main__":
         logging.basicConfig()
 
     # make ARGS global
-    ARGS = parse()
-    main()
+    inputs = parse()
+    main(inputs)
     
     print '!!! \m/ >.< \m/ !!!'
 

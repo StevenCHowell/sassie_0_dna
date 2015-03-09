@@ -42,12 +42,12 @@ def parse():
 
     return parser.parse_args()
 
-def main():
+def main(inputs):
     # aa_pdb = '../1zbb_tetra_uncombined.pdb'
     # aa_pdb = '1zbb_original.pdb'
 
     aa = sasmol.SasMol(0)
-    aa.read_pdb(ARGS.pdb)
+    aa.read_pdb(inputs.pdb)
     chain_mols = []
     errors = []
 
@@ -88,15 +88,15 @@ def main():
     
     # chains = ['I','J']
     # print 'chains =', chains
-    print 'ARGS.chains =', ARGS.chains
+    print 'inputs.chains =', inputs.chains
     
     
-    for chain in ARGS.chains:
+    for chain in inputs.chains:
         if chain.lower() == chain:
             chain_name = '_chain_' + chain + '0'
         else:
             chain_name = '_chain_' + chain + '1'
-        chain_name = ARGS.pdb[:-4] + chain_name
+        chain_name = inputs.pdb[:-4] + chain_name
         basis_filter = "(chain[i] == '" + chain + "')"
         error, mask = aa.get_subset_mask(basis_filter)
         if error: print error
@@ -170,8 +170,8 @@ if __name__ == "__main__":
         logging.basicConfig()
 
     # make ARGS global
-    ARGS = parse()
-    main()
+    inputs = parse()
+    main(inputs)
 
     
     
