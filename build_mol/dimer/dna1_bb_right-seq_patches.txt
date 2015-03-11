@@ -1,6 +1,6 @@
-# created on 05 February 2015 by 'pdb2psfgen.py'
+# created on 10 March 2015 by 'pdb2psfgen.py'
 # dna1: segname DNA1
-# dna2: segname DNA2
+# dna2: segname dummy
 patch DEO1 dna1:1
 patch DEO1 dna1:2
 patch DEO2 dna1:3
