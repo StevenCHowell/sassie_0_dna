@@ -21,13 +21,13 @@ import logging
 import sassie.sasmol.sasmol as sasmol
 import numpy as np
 
-chain1_out = 'dimer/dna2_bb_right-seq.pdb'
-chain1_pdb = 'dimer/dna2_bb_wrong-seq.pdb'
+chain1_out = 'dimer/dna2_right_seq.pdb'
+chain1_pdb = 'dimer/dna2_wrong_seq.pdb'
 chain1 = sasmol.SasMol(0)
 chain1.read_pdb(chain1_pdb)
 
-chain2_out = 'dimer/dummy.pdb'
-chain2_pdb = 'dimer/dna2_bb_wrong-seq.pdb'
+chain2_out = 'dimer/dummy_out.pdb'
+chain2_pdb = 'dimer/dummy.pdb'
 chain2 = sasmol.SasMol(0)
 chain2.read_pdb(chain2_pdb)
 
