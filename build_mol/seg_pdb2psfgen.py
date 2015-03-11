@@ -33,14 +33,14 @@ def parse():
 
     return parser.parse_args()
 
-def main():
+def main(inputs):
     m1 = sasmol.SasMol(0)
-    m1.read_pdb(ARGS.pdb)
+    m1.read_pdb(inputs.pdb)
     
-    print ARGS.segnames    
+    print inputs.segnames    
     
-    segname1 = ARGS.segnames[0]
-    segname2 = ARGS.segnames[1]
+    segname1 = inputs.segnames[0]
+    segname2 = inputs.segnames[1]
         
     print 'segname 1: ', segname1
     print 'segname 2: ', segname2
@@ -49,7 +49,7 @@ def main():
     ids = m1.resid()
     c = m1.segname()
     
-    psfgenFile = ARGS.pdb[:-4] + '_patches.txt'
+    psfgenFile = inputs.pdb[:-4] + '_patches.txt'
     
     outfile = open(psfgenFile, 'w')      # open the file
     timestr = time.strftime("# created on %d %B %Y by 'pdb2psfgen.py'\n")
@@ -103,4 +103,4 @@ if __name__ == "__main__":
 
     # make ARGS global
     ARGS = parse()
-    main()
+    main(ARGS)
