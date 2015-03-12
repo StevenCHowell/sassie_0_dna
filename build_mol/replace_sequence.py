@@ -21,18 +21,23 @@ import logging
 import sassie.sasmol.sasmol as sasmol
 import numpy as np
 
+# chain1_out = 'dimer/dna1_right_seq.pdb'
+# chain1_pdb = 'dimer/dna1_wrong_seq.pdb'
+# chain1 = sasmol.SasMol(0)
+# chain1.read_pdb(chain1_pdb)
+# sequenceFile = 'dimer/dimer_dna1_correct.seq'
+
 chain1_out = 'dimer/dna2_right_seq.pdb'
 chain1_pdb = 'dimer/dna2_wrong_seq.pdb'
 chain1 = sasmol.SasMol(0)
 chain1.read_pdb(chain1_pdb)
+sequenceFile = 'dimer/dimer_dna2_correct.seq'
 
 chain2_out = 'dimer/dummy_out.pdb'
 chain2_pdb = 'dimer/dummy.pdb'
 chain2 = sasmol.SasMol(0)
 chain2.read_pdb(chain2_pdb)
 
-# sequenceFile = 'dimer/dimer_dna1_correct.seq'
-sequenceFile = 'dimer/dimer_dna2_correct.seq'
 with open(sequenceFile) as f:
     lines = f.read().splitlines()
 sequence = lines[0]

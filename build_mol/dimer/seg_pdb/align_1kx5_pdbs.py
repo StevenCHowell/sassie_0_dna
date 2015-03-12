@@ -138,11 +138,11 @@ def verify_dna_sequence():
     in_vars = inputs()
 
     in_vars.segnames = ['DNA1']
-    in_vars.pdb = '../dna1_bb_right-seq.pdb'
+    in_vars.pdb = '../dna1_right_seq.pdb'
     get_seq.main(in_vars)
 
     in_vars.segnames = ['DNA2']
-    in_vars.pdb = '../dna2_bb_right-seq.pdb'
+    in_vars.pdb = '../dna2_right_seq.pdb'
     get_seq.main(in_vars)
     # this one was completely wrong !!!
     
@@ -167,6 +167,69 @@ def generate_psfgen_patches():
     in_vars.segnames = ['DNA1','dummy']
     pdb2psfgen.main(in_vars)
     
+def replace_N_atoms():
+    '''
+    swap N9-N1 atoms in rename DNA residues
+    GUA or ADE N1 -> N9
+    CYT or THY N1 -> N9    
+    '''
+    dna1_file = '../dna1_right_seq.pdb'
+    dna2_file = '../dna2_right_seq.pdb'
+    dna1 = sasmol.SasMol(0)
+    dna2 = sasmol.SasMol(0)
+    dna1.read_pdb(dna1_file)
+    dna2.read_pdb(dna2_file)    
+    
+    natoms = []
+    pyrimidines = ['CYT', 'THY']
+    purines = ['ADE', 'GUA']
+    n1_basis = basis_to_python.parse_basis('name N1')
+    residue = sasmol.SasMol(0)
+    for resid in dna1.resids():
+        res_basis = basis_to_python.parse_basis('resid %d' % resid)
+        error, res_mask = dna1.get_subset_mask(res_basis)
+        natoms.append(res_mask.sum())
+        if res_mask.sum() < 20:
+            dna1.copy_molecule_using_mask(residue, res_mask, 0)
+            if residue.resnames()[0] in purines:
+                names = residue.name()
+                for (i, name) in enumerate(names):
+                    if name == 'N1':
+                        
+                        names[i] = 'N9'
+                residue.setName(names)
+            elif residue.resnames()[0] in pyrimidines:
+                names = residue.name()
+                for (i, name) in enumerate(names):
+                    if name == 'N9':
+                        names[i] = 'N1'
+                residue.setName(names)
+            dna1.set_
+
+    N_atoms = []
+    current_resid = 0
+    natoms_in_current_res = 0
+    np.zeros(len(r))  #populate this <---
+    natoms_in_res = []
+    for i in dna1.index()[:40]:
+        if dna1.resid()[i] == current_resid:
+            natoms_in_current_res += 1
+        else:
+            natoms_in_res.append(n_atoms_in_current_res)
+            current_resid = dna1.resid()[i]
+            natoms_in_current_res = 1
+            
+        if dna1.name()[i] in ['N1', 'N9']:
+            N_atoms.append(i)
+        
+            
+
+                
+    dna1_out = '../dna1_right.pdb'    
+    dna2_out = '../dna2_right.pdb'    
+    dna1.write_pdb(dna1_out, 0, 'w')
+    dna2.write_pdb(dna2_out, 0, 'w')
+    return
     
 if __name__ == "__main__":
     
@@ -175,6 +238,7 @@ if __name__ == "__main__":
     # verify_dna_sequence()
     # replace_dna_sequence()
     # generate_psfgen_patches()
-    main()
+    # main()
+    replace_N_atoms()
     
     print 'done'
