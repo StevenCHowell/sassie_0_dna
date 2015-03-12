@@ -6,13 +6,17 @@ how to use several of the libraries called within.
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.basis_to_python as basis_to_python
 import numpy as np
-
+import x_dna.drivers.myAlign as align
+    
 class inputs():
     def __init__(self, parent = None):
         pass
 
 def main():
-    import x_dna.drivers.myAlign as align
+    ''' 
+    this did not work well, there histones to not match well 
+    in the NCP so there was overlap btwn the aligned versions
+    '''
     in_vars = inputs()
     
     goals = ['histone_A0.pdb', 'histone_B0.pdb', 'histone_C0.pdb', 'histone_D0.pdb', 
@@ -97,7 +101,7 @@ def align_1kx5():
     align the 1kx5 to the dimer then save pdbs for psfgen
     '''
     mono_file = '1KX5tailfold_fxd.pdb'
-    dimer_file = '../dimer.pdb'
+    dimer_file = '../150205dimer.pdb'
 
     in_vars = inputs()
     in_vars.goal = dimer_file
