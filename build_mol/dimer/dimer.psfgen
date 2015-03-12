@@ -145,11 +145,11 @@ coordpdb seg_pdb/dimer_ncp2/dimer_ncp2_ch_H1.pdb 4H2B
 
 
 segment DNA2 {
- first 5TER
- pdb ./dna2_bb_right-seq.pdb
- last 3TER
+  first 5TER
+  pdb ./dna2_right.pdb
+  last 3TER
 }
-coordpdb ./dna2_bb_right-seq.pdb DNA2
+coordpdb ./dna2_right.pdb DNA2
 
 patch DEO2 dna2:1
 patch DEO2 dna2:2
@@ -501,13 +501,12 @@ patch DEO1 dna2:347
 patch DEO2 dna2:348
 patch DEO1 dna2:349
 
-
 segment DNA1 {
  first 5TER
- pdb ./dna1_bb_right-seq.pdb
+ pdb ./dna1_right.pdb
  last 3TER
 }
-coordpdb ./dna1_bb_right-seq.pdb DNA1
+coordpdb ./dna1_right.pdb DNA1
 
 patch DEO1 dna1:1
 patch DEO1 dna1:2

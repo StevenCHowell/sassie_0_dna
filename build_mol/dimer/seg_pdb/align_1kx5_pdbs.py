@@ -5,6 +5,7 @@ how to use several of the libraries called within.
 '''
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.basis_to_python as basis_to_python
+import numpy as np
 
 class inputs():
     def __init__(self, parent = None):
@@ -159,11 +160,11 @@ def generate_psfgen_patches():
     '''
     import x_dna.build_mol.seg_pdb2psfgen as pdb2psfgen
     in_vars = inputs()
-    in_vars.pdb = '../dna2_bb_right-seq.pdb'
+    in_vars.pdb = '../dna2_right.pdb'
     in_vars.segnames = ['dummy','DNA2']
     pdb2psfgen.main(in_vars)
 
-    in_vars.pdb = '../dna1_bb_right-seq.pdb'
+    in_vars.pdb = '../dna1_right.pdb'
     in_vars.segnames = ['DNA1','dummy']
     pdb2psfgen.main(in_vars)
     
@@ -174,62 +175,95 @@ def replace_N_atoms():
     CYT or THY N1 -> N9    
     '''
     dna1_file = '../dna1_right_seq.pdb'
-    dna2_file = '../dna2_right_seq.pdb'
+    dna1_out = '../dna1_right.pdb'
     dna1 = sasmol.SasMol(0)
-    dna2 = sasmol.SasMol(0)
     dna1.read_pdb(dna1_file)
+
+
+    dna2_file = '../dna2_right_seq.pdb'
+    dna2_out = '../dna2_right.pdb'
+    dna2 = sasmol.SasMol(0)
     dna2.read_pdb(dna2_file)    
     
-    natoms = []
+    '''
+    Count the number of resids for each resid
+    Loop over each resid with <13 atoms 
+    .  Use enumerate to get the indices for the atoms the residue 
+    .  Iterate over those indices to find the N1 or N9 atom
+    .  Depending on which base type it is, replace the atom name 
+    Store the names in the Sasmol object 
+    Save the pdb
+
+    Loop over every atom,
+    add 1 to the number of some in that residue (can use count instead) 
+    Store the index for the n9 and n1 atoms 
+    Then loop over just the group s to for n atoms 
+    '''
+
+    replace_n1_n9(dna1, dna1_out)
+    replace_n1_n9(dna2, dna2_out)
+
+    return
+
+def replace_n1_n9(dna_mol, dna_out):
+    import pandas as pd
+
     pyrimidines = ['CYT', 'THY']
     purines = ['ADE', 'GUA']
-    n1_basis = basis_to_python.parse_basis('name N1')
-    residue = sasmol.SasMol(0)
-    for resid in dna1.resids():
-        res_basis = basis_to_python.parse_basis('resid %d' % resid)
-        error, res_mask = dna1.get_subset_mask(res_basis)
-        natoms.append(res_mask.sum())
-        if res_mask.sum() < 20:
-            dna1.copy_molecule_using_mask(residue, res_mask, 0)
-            if residue.resnames()[0] in purines:
-                names = residue.name()
-                for (i, name) in enumerate(names):
-                    if name == 'N1':
-                        
-                        names[i] = 'N9'
-                residue.setName(names)
-            elif residue.resnames()[0] in pyrimidines:
-                names = residue.name()
-                for (i, name) in enumerate(names):
-                    if name == 'N9':
-                        names[i] = 'N1'
-                residue.setName(names)
-            dna1.set_
+    n_atoms = [(dna_mol.resid()==resid).sum() for resid in dna_mol.resids()]
+    i_res_min = []
+    i_res_max = []
+    for j in dna_mol.resids():
+        i_res = [i for i, resid in enumerate(dna_mol.resid()) if resid == j]
+        i_res_min.append(min(i_res))
+        i_res_max.append(max(i_res))
+    
+    resname = [dna_mol.resname()[i] for i in i_res_min]
+    zeros = np.zeros(len(n_atoms),dtype=int)
+    dna_dict = {'n_atoms': n_atoms, 'resid': dna_mol.resids(), 'resname': resname,
+                 'i_N9': zeros, 'i_N1': zeros, 'i_min': i_res_min, 
+                 'i_max': i_res_max, 'i_replace': zeros}
+    headers = ['resid', 'n_atoms', 'resname', 'i_min',
+               'i_max', 'i_N9', 'i_N1', 'i_replace']
+    dna_frame = pd.DataFrame(dna_dict, columns=headers)
+    
+    N_frame = dna_frame[dna_frame['n_atoms'] < 13].reset_index()
+    names = dna_mol.name()
+    before = dna_mol.name()
+    for i in xrange(len(N_frame)):
+        i_min = N_frame['i_min'][i]
+        i_max = N_frame['i_max'][i] + 1
+        try:
+            N_frame['i_N1'][i] = names[i_min:i_max].index('N1')
+            N_frame['i_N9'][i] = -1
+            N_frame['i_replace'][i] = N_frame['i_N1'][i] + N_frame['i_min'][i]
+        except:
+            N_frame['i_N9'][i] = names[i_min:i_max].index('N9')
+            N_frame['i_N1'][i] = -1
+            N_frame['i_replace'][i] = N_frame['i_N9'][i] + N_frame['i_min'][i]
 
-    N_atoms = []
-    current_resid = 0
-    natoms_in_current_res = 0
-    np.zeros(len(r))  #populate this <---
-    natoms_in_res = []
-    for i in dna1.index()[:40]:
-        if dna1.resid()[i] == current_resid:
-            natoms_in_current_res += 1
-        else:
-            natoms_in_res.append(n_atoms_in_current_res)
-            current_resid = dna1.resid()[i]
-            natoms_in_current_res = 1
             
-        if dna1.name()[i] in ['N1', 'N9']:
-            N_atoms.append(i)
+        if N_frame['resname'][i] in pyrimidines and N_frame['i_N9'][i] >= 0:
+            names[N_frame['i_replace'][i]] = 'N1'
+            # print 'did switch %s, N1(%d), N9(%d)' % (N_frame['resname'][i],
+                                                         # N_frame['i_N1'][i],
+                                                         # N_frame['i_N9'][i])
+
+        elif N_frame['resname'][i] in purines and N_frame['i_N1'][i] >= 0:
+            names[N_frame['i_replace'][i]] = 'N9'
+            # print 'did switch %s, N1(%d), N9(%d)' % (N_frame['resname'][i],
+                                                         # N_frame['i_N1'][i],
+                                                         # N_frame['i_N9'][i])
         
-            
+        else:
+            print 'did not switch %s, N1(%d), N9(%d)' % (N_frame['resname'][i],
+                                                         N_frame['i_N1'][i],
+                                                         N_frame['i_N9'][i])
 
-                
-    dna1_out = '../dna1_right.pdb'    
-    dna2_out = '../dna2_right.pdb'    
-    dna1.write_pdb(dna1_out, 0, 'w')
-    dna2.write_pdb(dna2_out, 0, 'w')
-    return
+    dna_mol.setName(names)
+    after = dna_mol.name()
+    if dna_mol.write_pdb(dna_out, 0, 'w'):
+        print 'sucessfully wrote %s' % dna_out
     
 if __name__ == "__main__":
     
@@ -237,8 +271,8 @@ if __name__ == "__main__":
     # separate_1kx5()
     # verify_dna_sequence()
     # replace_dna_sequence()
-    # generate_psfgen_patches()
+    generate_psfgen_patches()
     # main()
-    replace_N_atoms()
+    # replace_N_atoms()
     
     print 'done'
