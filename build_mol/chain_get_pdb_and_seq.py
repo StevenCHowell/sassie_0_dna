@@ -93,9 +93,9 @@ def main(inputs):
     
     for chain in inputs.chains:
         if chain.lower() == chain:
-            chain_name = '_chain_' + chain + '0'
+            chain_name = '_ch_' + chain + '0'
         else:
-            chain_name = '_chain_' + chain + '1'
+            chain_name = '_ch_' + chain + '1'
         chain_name = inputs.pdb[:-4] + chain_name
         basis_filter = "(chain[i] == '" + chain + "')"
         error, mask = aa.get_subset_mask(basis_filter)

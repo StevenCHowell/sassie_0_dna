@@ -7,6 +7,7 @@ import sassie.sasmol.sasmol as sasmol
 import x_dna.util.basis_to_python as basis_to_python
 import numpy as np
 import x_dna.drivers.myAlign as align
+import x_dna.build_mol.chain_get_pdb_and_seq as get_pdb
 
 class inputs():
     def __init__(self, parent = None):
@@ -96,7 +97,7 @@ def align_1kx5():
     '''
     align the 1kx5 to the dimer then save pdbs for psfgen
     '''
-    mono_file = '1KX5tailfold_fxd.pdb'
+    mono_file = '1KX5tailfold_fx_CG.pdb'
     # goal_file = 'new_c11_tetramer.pdb'
     goal_file = 'c11_folded_tails.pdb'
     
@@ -107,39 +108,45 @@ def align_1kx5():
     in_vars.move_filter = '((chain[i] == "I") and (name[i] == "C1\'"))'
 
     # NCP 1
-    in_vars.out = '1KX5_v2_4mer_ncp1.pdb'
+    in_vars.out = '4mer_ncp1/1KX5_4mer_ncp1.pdb'
     in_vars.goal_filter = '((segname[i] == "DNA1") and (name[i] == "C1\'") and (resid[i] > 22) and (resid[i] < 170))'
     align.align(in_vars)
 
     # NCP 2    
-    in_vars.out = '1KX5_v2_4mer_ncp2.pdb'
+    in_vars.out = '4mer_ncp2/1KX5_4mer_ncp2.pdb'
     in_vars.goal_filter = '((segname[i] == "DNA1") and (name[i] == "C1\'") and (resid[i] > 189) and (resid[i] < 337))'
     align.align(in_vars)
 
     # NCP 3
-    in_vars.out = '1KX5_v2_4mer_ncp3.pdb'
+    in_vars.out = '4mer_ncp3/1KX5_4mer_ncp3.pdb'
     in_vars.goal_filter = '((segname[i] == "DNA1") and (name[i] == "C1\'") and (resid[i] > 356) and (resid[i] < 504))'
     align.align(in_vars)
 
     # NCP 4    
-    in_vars.out = '1KX5_v2_4mer_ncp4.pdb'
+    in_vars.out = '4mer_ncp4/1KX5_4mer_ncp4.pdb'
     in_vars.goal_filter = '((segname[i] == "DNA1") and (name[i] == "C1\'") and (resid[i] > 523) and (resid[i] < 671))'
     align.align(in_vars)
-    
+
 def separate_1kx5():
     '''
     create separate pdb files of all the histones
     '''
-    import x_dna.build_mol.chain_get_pdb_and_seq as get_pdb
     in_vars = inputs()
     in_vars.chains = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    in_vars.chains = ['C', 'G']
+    # in_vars.chains = ['C', 'G']
 
-    in_vars.pdb = 'dimer_ncp1/1KX5tailfold_dimer_ncp1.pdb'
+    in_vars.pdb = '4mer_ncp1/1KX5_4mer_ncp1.pdb'
     get_pdb.main(in_vars)
 
-    in_vars.pdb = 'dimer_ncp2/1KX5tailfold_dimer_ncp2.pdb'
+    in_vars.pdb = '4mer_ncp2/1KX5_4mer_ncp2.pdb'
     get_pdb.main(in_vars)
+
+    in_vars.pdb = '4mer_ncp3/1KX5_4mer_ncp3.pdb'
+    get_pdb.main(in_vars)
+
+    in_vars.pdb = '4mer_ncp4/1KX5_4mer_ncp4.pdb'
+    get_pdb.main(in_vars)
+
     
 def verify_dna_sequence():
     '''
@@ -148,13 +155,12 @@ def verify_dna_sequence():
     import x_dna.build_mol.seg_get_pdb_and_seq as get_seq
 
     in_vars = inputs()
+    in_vars.pdb = 'c11_folded_tails.pdb'
 
     in_vars.segnames = ['DNA1']
-    in_vars.pdb = '../dna1_right_seq.pdb'
     get_seq.main(in_vars)
 
     in_vars.segnames = ['DNA2']
-    in_vars.pdb = '../dna2_right_seq.pdb'
     get_seq.main(in_vars)
     # this one was completely wrong !!!
     
@@ -171,12 +177,9 @@ def generate_psfgen_patches():
     '''
     import x_dna.build_mol.seg_pdb2psfgen as pdb2psfgen
     in_vars = inputs()
-    in_vars.pdb = '../dna2_right.pdb'
-    in_vars.segnames = ['dummy','DNA2']
-    pdb2psfgen.main(in_vars)
-
-    in_vars.pdb = '../dna1_right.pdb'
-    in_vars.segnames = ['DNA1','dummy']
+    
+    in_vars.pdb = 'c11_folded_tails.pdb'
+    in_vars.segnames = ['DNA1','DNA2']
     pdb2psfgen.main(in_vars)
     
 def replace_N_atoms():
@@ -279,7 +282,7 @@ def replace_n1_n9(dna_mol, dna_out):
 if __name__ == "__main__":
     
     align_1kx5()
-    # separate_1kx5()
+    separate_1kx5()
     # verify_dna_sequence()
     # replace_dna_sequence()
     # generate_psfgen_patches()

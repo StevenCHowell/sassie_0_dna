@@ -34,8 +34,8 @@ def parse():
     return parser.parse_args()
 
 def main(inputs):
-    m1 = sasmol.SasMol(0)
-    m1.read_pdb(inputs.pdb)
+    mol_all = sasmol.SasMol(0)
+    mol_all.read_pdb(inputs.pdb)
     
     print inputs.segnames    
     
@@ -45,10 +45,6 @@ def main(inputs):
     print 'segname 1: ', segname1
     print 'segname 2: ', segname2
     
-    names = m1.resname()
-    ids = m1.resid()
-    c = m1.segname()
-    
     psfgenFile = inputs.pdb[:-4] + '_patches.txt'
     
     outfile = open(psfgenFile, 'w')      # open the file
@@ -57,6 +53,15 @@ def main(inputs):
     outfile.write('# dna1: segname ' + segname1 + '\n')
     outfile.write('# dna2: segname ' + segname2 + '\n')
     
+    mol_segs = sasmol.SasMol(0)
+    basis_filter = "( (segname[i]=='%s') or (segname[i]=='%s') )" % (segname1, segname2)
+    error, mask = mol_all.get_subset_mask(basis_filter)
+    error = mol_all.copy_molecule_using_mask(mol_segs, mask, 0)
+
+    names = mol_segs.resname()
+    ids   = mol_segs.resid()
+    c     = mol_segs.segname()
+        
     pyr = ['C','T','DC', 'DT', 'CYT', 'THY']
     pur = ['A','G','DA', 'DG', 'ADE', 'GUA']
     pyrStr = 'patch DEO1 '
@@ -68,25 +73,25 @@ def main(inputs):
         if n != i:
             n = i
             # print 'adding line %d' % i
-            
+            skip = False
             if c[j] in segname1:
                 dna = 'dna1:%d\n' %i
             elif c[j] in segname2:
                 dna = 'dna2:%d\n' %i
             else:
                 print 'Skipping residue from unspecified segname: ', c[j]
-                break
-                #s dna = 'protein:%d\n' % i
+                skip = True
                 
-            if names[j] in pyr:
-                outfile.write(pyrStr + dna)
-                # print pyrStr + dna
-            elif names[j] in pur:
-                outfile.write(purStr + dna)
-                # print purStr + dna
-            else:
-                print 'ERROR!!! unknown resname in specified segname: ', names[j]
-                print '\n'
+            if not skip:
+                if names[j] in pyr:
+                    outfile.write(pyrStr + dna)
+                    # print pyrStr + dna
+                elif names[j] in pur:
+                    outfile.write(purStr + dna)
+                    # print purStr + dna
+                else:
+                    print 'ERROR!!! unknown resname in specified segname: ', names[j]
+                    print '\n'
     
     outfile.close()            
     
