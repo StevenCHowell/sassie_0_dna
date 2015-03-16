@@ -155,11 +155,12 @@ def verify_dna_sequence():
     import x_dna.build_mol.seg_get_pdb_and_seq as get_seq
 
     in_vars = inputs()
-    in_vars.pdb = 'c11_folded_tails.pdb'
 
+    in_vars.pdb = '3x167_dna1_right_seq.pdb'
     in_vars.segnames = ['DNA1']
     get_seq.main(in_vars)
 
+    in_vars.pdb = '3x167_dna2_right_seq.pdb'
     in_vars.segnames = ['DNA2']
     get_seq.main(in_vars)
     # this one was completely wrong !!!
@@ -188,14 +189,14 @@ def replace_N_atoms():
     GUA or ADE N1 -> N9
     CYT or THY N1 -> N9    
     '''
-    dna1_file = '../dna1_right_seq.pdb'
-    dna1_out = '../dna1_right.pdb'
+    dna1_file = '3x167_dna1_right_seq.pdb'
+    dna1_out = 'dna1.pdb'
     dna1 = sasmol.SasMol(0)
     dna1.read_pdb(dna1_file)
 
 
-    dna2_file = '../dna2_right_seq.pdb'
-    dna2_out = '../dna2_right.pdb'
+    dna2_file = '3x167_dna2_right_seq.pdb'
+    dna2_out = 'dna2.pdb'
     dna2 = sasmol.SasMol(0)
     dna2.read_pdb(dna2_file)    
     
@@ -281,12 +282,12 @@ def replace_n1_n9(dna_mol, dna_out):
     
 if __name__ == "__main__":
     
-    align_1kx5()
-    separate_1kx5()
+    # align_1kx5()
+    # separate_1kx5()
     # verify_dna_sequence()
     # replace_dna_sequence()
     # generate_psfgen_patches()
     # main()
-    # replace_N_atoms()
+    replace_N_atoms()
     
     print 'done'
