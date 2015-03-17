@@ -1,0 +1,3604 @@
+PSFGEN 1.6.2 from NAMD 2.10 for Linux-x86_64-multicore
+psfgen) reading topology file /home/myPrograms/sassie_bin/toppar/top_all27_prot_na.inp
+
+psfgen) >>>>>> Combined CHARMM All-Hydrogen Topology File for <<<<<<<<<
+psfgen) >>>>>>> CHARMM22 Proteins and CHARMM27 Nucleic Acids <<<<<<<<<<
+psfgen) from
+psfgen) >>>> CHARMM22 All-Hydrogen Topology File for Proteins <<<<<<<<
+psfgen) >>>>>>>>>>>>>>>>>>>>>>> August 1999 <<<<<<<<<<<<<<<<<<<<<<<<<<<
+psfgen) >>>>>>> Direct comments to Alexander D. MacKerell Jr. <<<<<<<<<
+psfgen) >>>>>> 410-706-7442 or email: alex,mmiris.ab.umd.edu  <<<<<<<<<
+psfgen) and
+psfgen)   \\\\ CHARMM27 All-Hydrogen Nucleic Acid Topology File ////
+psfgen)   \\\\\\\\\\\\\\\\\\ Developmental ////////////////////////
+psfgen)         Alexander D. MacKerell Jr. and Nicolas Foloppe
+psfgen)                         August 1999
+psfgen)      All comments to ADM jr.  email: alex,mmiris.ab.umd.edu
+psfgen)                  telephone: 410-706-7442
+psfgen) 
+psfgen) Created by CHARMM version 27 1
+psfgen) duplicate residue key CAL will be ignored
+psfgen) duplicate residue key DUM will be ignored
+psfgen) aliasing residue DG to GUA
+psfgen) aliasing residue DA to ADE
+psfgen) aliasing residue DT to THY
+psfgen) aliasing residue DC to CYT
+psfgen) aliasing residue THY atom O5* to O5'
+psfgen) aliasing residue THY atom C5* to C5'
+psfgen) aliasing residue ADE atom O5* to O5'
+psfgen) aliasing residue ADE atom C5* to C5'
+psfgen) aliasing residue GUA atom O5* to O5'
+psfgen) aliasing residue GUA atom C5* to C5'
+psfgen) aliasing residue CYT atom O5* to O5'
+psfgen) aliasing residue CYT atom C5* to C5'
+psfgen) aliasing residue HIS to HSE
+psfgen) aliasing residue ILE atom CD1 to CD
+psfgen) building segment 1H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_E1.pdb for segment 1H3
+psfgen) building segment 2H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_A1.pdb for segment 2H3
+psfgen) applying patch DISU to 2 residues
+psfgen) building segment 3H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_E1.pdb for segment 3H3
+psfgen) building segment 4H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_A1.pdb for segment 4H3
+psfgen) applying patch DISU to 2 residues
+psfgen) building segment 5H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_E1.pdb for segment 5H3
+psfgen) building segment 6H3
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H3_1kx5.pdb
+psfgen) extracted 135 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_A1.pdb for segment 6H3
+psfgen) applying patch DISU to 2 residues
+psfgen) building segment 1H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_B1.pdb for segment 1H4
+psfgen) building segment 2H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_F1.pdb for segment 2H4
+psfgen) building segment 3H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_B1.pdb for segment 3H4
+psfgen) building segment 4H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_F1.pdb for segment 4H4
+psfgen) building segment 5H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_B1.pdb for segment 5H4
+psfgen) building segment 6H4
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H4_1kx5.pdb
+psfgen) extracted 102 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_F1.pdb for segment 6H4
+psfgen) building segment 1H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_C1.pdb for segment 1H2A
+psfgen) building segment 2H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_G1.pdb for segment 2H2A
+psfgen) building segment 3H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_C1.pdb for segment 3H2A
+psfgen) building segment 4H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_G1.pdb for segment 4H2A
+psfgen) building segment 5H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_C1.pdb for segment 5H2A
+psfgen) building segment 6H2A
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2A_1kx5_corrected.pdb
+psfgen) extracted 129 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_G1.pdb for segment 6H2A
+psfgen) building segment 1H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_D1.pdb for segment 1H2B
+psfgen) building segment 2H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp1/1KX5_4mer_ncp1_ch_H1.pdb for segment 2H2B
+psfgen) building segment 3H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_D1.pdb for segment 3H2B
+psfgen) building segment 4H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp2/1KX5_4mer_ncp2_ch_H1.pdb for segment 4H2B
+psfgen) building segment 5H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_D1.pdb for segment 5H2B
+psfgen) building segment 6H2B
+psfgen) setting patch for first residue to NTER
+psfgen) setting patch for last residue to CTER
+psfgen) reading residues from pdb file seq_pdb/H2B_1kx5.pdb
+psfgen) extracted 122 residues from pdb file
+psfgen) Info: generating structure...psfgen) Info: skipping improper N-C-CA-HN at beginning of segment.
+psfgen) Info: skipping conformation C-N-CA-C at beginning of segment.
+psfgen) Info: skipping conformation C-CA-N-HN at beginning of segment.
+psfgen) Info: skipping bond C-N at end of segment.
+psfgen) Info: skipping improper C-CA-N-O at end of segment.
+psfgen) Info: skipping conformation CA-C-N-CA at end of segment.
+psfgen) Info: skipping conformation N-CA-C-O at end of segment.
+psfgen) Info: skipping conformation N-CA-C-N at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file 4mer_ncp3/1KX5_4mer_ncp3_ch_H1.pdb for segment 6H2B
+psfgen) building segment DNA2
+psfgen) setting patch for first residue to 5TER
+psfgen) reading residues from pdb file ./dna2.pdb
+psfgen) extracted 527 residues from pdb file
+psfgen) setting patch for last residue to 3TER
+psfgen) Info: generating structure...psfgen) Info: skipping conformation O3'-O5'-P-O2P at beginning of segment.
+psfgen) Info: skipping conformation O3'-O5'-P-O1P at beginning of segment.
+psfgen) Info: skipping conformation O3'-P-O5'-C5' at beginning of segment.
+psfgen) Info: skipping bond O3'-P at end of segment.
+psfgen) Info: skipping conformation C3'-O3'-P-O5' at end of segment.
+psfgen) Info: skipping conformation C4'-C3'-O3'-P at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file ./dna2.pdb for segment DNA2
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+1H3:1 
+1H3:135 
+2H3:1 
+2H3:135 
+1H3:110 2H3:110 
+3H3:1 
+3H3:135 
+4H3:1 
+4H3:135 
+3H3:110 4H3:110 
+5H3:1 
+5H3:135 
+6H3:1 
+6H3:135 
+5H3:110 6H3:110 
+1H4:1 
+1H4:102 
+2H4:1 
+2H4:102 
+3H4:1 
+3H4:102 
+4H4:1 
+4H4:102 
+5H4:1 
+5H4:102 
+6H4:1 
+6H4:102 
+1H2A:1 
+1H2A:129 
+2H2A:1 
+2H2A:129 
+3H2A:1 
+3H2A:129 
+4H2A:1 
+4H2A:129 
+5H2A:1 
+5H2A:129 
+6H2A:1 
+6H2A:129 
+1H2B:1 
+1H2B:122 
+2H2B:1 
+2H2B:122 
+3H2B:1 
+3H2B:122 
+4H2B:1 
+4H2B:122 
+5H2B:1 
+5H2B:122 
+6H2B:1 
+6H2B:122 
+DNA2:1 
+DNA2:527 
+DNA2:1 
+DNA2:2 
+DNA2:3 
+DNA2:4 
+DNA2:5 
+DNA2:6 
+DNA2:7 
+DNA2:8 
+DNA2:9 
+DNA2:10 
+DNA2:11 
+DNA2:12 
+DNA2:13 
+DNA2:14 
+DNA2:15 
+DNA2:16 
+DNA2:17 
+DNA2:18 
+DNA2:19 
+DNA2:20 
+DNA2:21 
+DNA2:22 
+DNA2:23 
+DNA2:24 
+DNA2:25 
+DNA2:26 
+DNA2:27 
+DNA2:28 
+DNA2:29 
+DNA2:30 
+DNA2:31 
+DNA2:32 
+DNA2:33 
+DNA2:34 
+DNA2:35 
+DNA2:36 
+DNA2:37 
+DNA2:38 
+DNA2:39 
+DNA2:40 
+DNA2:41 
+DNA2:42 
+DNA2:43 
+DNA2:44 
+DNA2:45 
+DNA2:46 
+DNA2:47 
+DNA2:48 
+DNA2:49 
+DNA2:50 
+DNA2:51 
+DNA2:52 
+DNA2:53 
+DNA2:54 
+DNA2:55 
+DNA2:56 
+DNA2:57 
+DNA2:58 
+DNA2:59 
+DNA2:60 
+DNA2:61 
+DNA2:62 
+DNA2:63 
+DNA2:64 
+DNA2:65 
+DNA2:66 
+DNA2:67 
+DNA2:68 
+DNA2:69 
+DNA2:70 
+DNA2:71 
+DNA2:72 
+DNA2:73 
+DNA2:74 
+DNA2:75 
+DNA2:76 
+DNA2:77 
+DNA2:78 
+DNA2:79 
+DNA2:80 
+DNA2:81 
+DNA2:82 
+DNA2:83 
+DNA2:84 
+DNA2:85 
+DNA2:86 
+DNA2:87 
+DNA2:88 
+DNA2:89 
+DNA2:90 
+DNA2:91 
+DNA2:92 
+DNA2:93 
+DNA2:94 
+DNA2:95 
+DNA2:96 
+DNA2:97 
+DNA2:98 
+DNA2:99 
+DNA2:100 
+DNA2:101 
+DNA2:102 
+DNA2:103 
+DNA2:104 
+DNA2:105 
+DNA2:106 
+DNA2:107 
+DNA2:108 
+DNA2:109 
+DNA2:110 
+DNA2:111 
+DNA2:112 
+DNA2:113 
+DNA2:114 
+DNA2:115 
+DNA2:116 
+DNA2:117 
+DNA2:118 
+DNA2:119 
+DNA2:120 
+DNA2:121 
+DNA2:122 
+DNA2:123 
+DNA2:124 
+DNA2:125 
+DNA2:126 
+DNA2:127 
+DNA2:128 
+DNA2:129 
+DNA2:130 
+DNA2:131 
+DNA2:132 
+DNA2:133 
+DNA2:134 
+DNA2:135 
+DNA2:136 
+DNA2:137 
+DNA2:138 
+DNA2:139 
+DNA2:140 
+DNA2:141 
+DNA2:142 
+DNA2:143 
+DNA2:144 
+DNA2:145 
+DNA2:146 
+DNA2:147 
+DNA2:148 
+DNA2:149 
+DNA2:150 
+DNA2:151 
+DNA2:152 
+DNA2:153 
+DNA2:154 
+DNA2:155 
+DNA2:156 
+DNA2:157 
+DNA2:158 
+DNA2:159 
+DNA2:160 
+DNA2:161 
+DNA2:162 
+DNA2:163 
+DNA2:164 
+DNA2:165 
+DNA2:166 
+DNA2:167 
+DNA2:168 
+DNA2:169 
+DNA2:170 
+DNA2:171 
+DNA2:172 
+DNA2:173 
+DNA2:174 
+DNA2:175 
+DNA2:176 
+DNA2:177 
+DNA2:178 
+DNA2:179 
+DNA2:180 
+DNA2:181 
+DNA2:182 
+DNA2:183 
+DNA2:184 
+DNA2:185 
+DNA2:186 
+DNA2:187 
+DNA2:188 
+DNA2:189 
+DNA2:190 
+DNA2:191 
+DNA2:192 
+DNA2:193 
+DNA2:194 
+DNA2:195 
+DNA2:196 
+DNA2:197 
+DNA2:198 
+DNA2:199 
+DNA2:200 
+DNA2:201 
+DNA2:202 
+DNA2:203 
+DNA2:204 
+DNA2:205 
+DNA2:206 
+DNA2:207 
+DNA2:208 
+DNA2:209 
+DNA2:210 
+DNA2:211 
+DNA2:212 
+DNA2:213 
+DNA2:214 
+DNA2:215 
+DNA2:216 
+DNA2:217 
+DNA2:218 
+DNA2:219 
+DNA2:220 
+DNA2:221 
+DNA2:222 
+DNA2:223 
+DNA2:224 
+DNA2:225 
+DNA2:226 
+DNA2:227 
+DNA2:228 
+DNA2:229 
+DNA2:230 
+DNA2:231 
+DNA2:232 
+DNA2:233 
+DNA2:234 
+DNA2:235 
+DNA2:236 
+DNA2:237 
+DNA2:238 
+DNA2:239 
+DNA2:240 
+DNA2:241 
+DNA2:242 
+DNA2:243 
+DNA2:244 
+DNA2:245 
+DNA2:246 
+DNA2:247 
+DNA2:248 
+DNA2:249 
+DNA2:250 
+DNA2:251 
+DNA2:252 
+DNA2:253 
+DNA2:254 
+DNA2:255 
+DNA2:256 
+DNA2:257 
+DNA2:258 
+DNA2:259 
+DNA2:260 
+DNA2:261 
+DNA2:262 
+DNA2:263 
+DNA2:264 
+DNA2:265 
+DNA2:266 
+DNA2:267 
+DNA2:268 
+DNA2:269 
+DNA2:270 
+DNA2:271 
+DNA2:272 
+DNA2:273 
+DNA2:274 
+DNA2:275 
+DNA2:276 
+DNA2:277 
+DNA2:278 
+DNA2:279 
+DNA2:280 
+DNA2:281 
+DNA2:282 
+DNA2:283 
+DNA2:284 
+DNA2:285 
+DNA2:286 
+DNA2:287 
+DNA2:288 
+DNA2:289 
+DNA2:290 
+DNA2:291 
+DNA2:292 
+DNA2:293 
+DNA2:294 
+DNA2:295 
+DNA2:296 
+DNA2:297 
+DNA2:298 
+DNA2:299 
+DNA2:300 
+DNA2:301 
+DNA2:302 
+DNA2:303 
+DNA2:304 
+DNA2:305 
+DNA2:306 
+DNA2:307 
+DNA2:308 
+DNA2:309 
+DNA2:310 
+DNA2:311 
+DNA2:312 
+DNA2:313 
+DNA2:314 
+DNA2:315 
+DNA2:316 
+DNA2:317 
+DNA2:318 
+DNA2:319 
+DNA2:320 
+DNA2:321 
+DNA2:322 
+DNA2:323 
+DNA2:324 
+DNA2:325 
+DNA2:326 
+DNA2:327 
+DNA2:328 
+DNA2:329 
+DNA2:330 
+DNA2:331 
+DNA2:332 
+DNA2:333 
+DNA2:334 
+DNA2:335 
+DNA2:336 
+DNA2:337 
+DNA2:338 
+DNA2:339 
+DNA2:340 
+DNA2:341 
+DNA2:342 
+DNA2:343 
+DNA2:344 
+DNA2:345 
+DNA2:346 
+DNA2:347 
+DNA2:348 
+DNA2:349 
+DNA2:350 
+DNA2:351 
+DNA2:352 
+DNA2:353 
+DNA2:354 
+DNA2:355 
+DNA2:356 
+DNA2:357 
+DNA2:358 
+DNA2:359 
+DNA2:360 
+DNA2:361 
+DNA2:362 
+DNA2:363 
+DNA2:364 
+DNA2:365 
+DNA2:366 
+DNA2:367 
+DNA2:368 
+DNA2:369 
+DNA2:370 
+DNA2:371 
+DNA2:372 
+DNA2:37psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) building segment DNA1
+psfgen) setting patch for first residue to 5TER
+psfgen) reading residues from pdb file ./dna1.pdb
+psfgen) extracted 527 residues from pdb file
+psfgen) setting patch for last residue to 3TER
+psfgen) Info: generating structure...psfgen) Info: skipping conformation O3'-O5'-P-O2P at beginning of segment.
+psfgen) Info: skipping conformation O3'-O5'-P-O1P at beginning of segment.
+psfgen) Info: skipping conformation O3'-P-O5'-C5' at beginning of segment.
+psfgen) Info: skipping bond O3'-P at end of segment.
+psfgen) Info: skipping conformation C3'-O3'-P-O5' at end of segment.
+psfgen) Info: skipping conformation C4'-C3'-O3'-P at end of segment.
+segment complete.
+psfgen) reading coordinates from pdb file ./dna1.pdb for segment DNA1
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+3 
+DNA2:374 
+DNA2:375 
+DNA2:376 
+DNA2:377 
+DNA2:378 
+DNA2:379 
+DNA2:380 
+DNA2:381 
+DNA2:382 
+DNA2:383 
+DNA2:384 
+DNA2:385 
+DNA2:386 
+DNA2:387 
+DNA2:388 
+DNA2:389 
+DNA2:390 
+DNA2:391 
+DNA2:392 
+DNA2:393 
+DNA2:394 
+DNA2:395 
+DNA2:396 
+DNA2:397 
+DNA2:398 
+DNA2:399 
+DNA2:400 
+DNA2:401 
+DNA2:402 
+DNA2:403 
+DNA2:404 
+DNA2:405 
+DNA2:406 
+DNA2:407 
+DNA2:408 
+DNA2:409 
+DNA2:410 
+DNA2:411 
+DNA2:412 
+DNA2:413 
+DNA2:414 
+DNA2:415 
+DNA2:416 
+DNA2:417 
+DNA2:418 
+DNA2:419 
+DNA2:420 
+DNA2:421 
+DNA2:422 
+DNA2:423 
+DNA2:424 
+DNA2:425 
+DNA2:426 
+DNA2:427 
+DNA2:428 
+DNA2:429 
+DNA2:430 
+DNA2:431 
+DNA2:432 
+DNA2:433 
+DNA2:434 
+DNA2:435 
+DNA2:436 
+DNA2:437 
+DNA2:438 
+DNA2:439 
+DNA2:440 
+DNA2:441 
+DNA2:442 
+DNA2:443 
+DNA2:444 
+DNA2:445 
+DNA2:446 
+DNA2:447 
+DNA2:448 
+DNA2:449 
+DNA2:450 
+DNA2:451 
+DNA2:452 
+DNA2:453 
+DNA2:454 
+DNA2:455 
+DNA2:456 
+DNA2:457 
+DNA2:458 
+DNA2:459 
+DNA2:460 
+DNA2:461 
+DNA2:462 
+DNA2:463 
+DNA2:464 
+DNA2:465 
+DNA2:466 
+DNA2:467 
+DNA2:468 
+DNA2:469 
+DNA2:470 
+DNA2:471 
+DNA2:472 
+DNA2:473 
+DNA2:474 
+DNA2:475 
+DNA2:476 
+DNA2:477 
+DNA2:478 
+DNA2:479 
+DNA2:480 
+DNA2:481 
+DNA2:482 
+DNA2:483 
+DNA2:484 
+DNA2:485 
+DNA2:486 
+DNA2:487 
+DNA2:488 
+DNA2:489 
+DNA2:490 
+DNA2:491 
+DNA2:492 
+DNA2:493 
+DNA2:494 
+DNA2:495 
+DNA2:496 
+DNA2:497 
+DNA2:498 
+DNA2:499 
+DNA2:500 
+DNA2:501 
+DNA2:502 
+DNA2:503 
+DNA2:504 
+DNA2:505 
+DNA2:506 
+DNA2:507 
+DNA2:508 
+DNA2:509 
+DNA2:510 
+DNA2:511 
+DNA2:512 
+DNA2:513 
+DNA2:514 
+DNA2:515 
+DNA2:516 
+DNA2:517 
+DNA2:518 
+DNA2:519 
+DNA2:520 
+DNA2:521 
+DNA2:522 
+DNA2:523 
+DNA2:524 
+DNA2:525 
+DNA2:526 
+DNA2:527 
+DNA1:1 
+DNA1:527 
+DNA1:1 
+DNA1:2 
+DNA1:3 
+DNA1:4 
+DNA1:5 
+DNA1:6 
+DNA1:7 
+DNA1:8 
+DNA1:9 
+DNA1:10 
+DNA1:11 
+DNA1:12 
+DNA1:13 
+DNA1:14 
+DNA1:15 
+DNA1:16 
+DNA1:17 
+DNA1:18 
+DNA1:19 
+DNA1:20 
+DNA1:21 
+DNA1:22 
+DNA1:23 
+DNA1:24 
+DNA1:25 
+DNA1:26 
+DNA1:27 
+DNA1:28 
+DNA1:29 
+DNA1:30 
+DNA1:31 
+DNA1:32 
+DNA1:33 
+DNA1:34 
+DNA1:35 
+DNA1:36 
+DNA1:37 
+DNA1:38 
+DNA1:39 
+DNA1:40 
+DNA1:41 
+DNA1:42 
+DNA1:43 
+DNA1:44 
+DNA1:45 
+DNA1:46 
+DNA1:47 
+DNA1:48 
+DNA1:49 
+DNA1:50 
+DNA1:51 
+DNA1:52 
+DNA1:53 
+DNA1:54 
+DNA1:55 
+DNA1:56 
+DNA1:57 
+DNA1:58 
+DNA1:59 
+DNA1:60 
+DNA1:61 
+DNA1:62 
+DNA1:63 
+DNA1:64 
+DNA1:65 
+DNA1:66 
+DNA1:67 
+DNA1:68 
+DNA1:69 
+DNA1:70 
+DNA1:71 
+DNA1:72 
+DNA1:73 
+DNA1:74 
+DNA1:75 
+DNA1:76 
+DNA1:77 
+DNA1:78 
+DNA1:79 
+DNA1:80 
+DNA1:81 
+DNA1:82 
+DNA1:83 
+DNA1:84 
+DNA1:85 
+DNA1:86 
+DNA1:87 
+DNA1:88 
+DNA1:89 
+DNA1:90 
+DNA1:91 
+DNA1:92 
+DNA1:93 
+DNA1:94 
+DNA1:95 
+DNA1:96 
+DNA1:97 
+DNA1:98 
+DNA1:99 
+DNA1:100 
+DNA1:101 
+DNA1:102 
+DNA1:103 
+DNA1:104 
+DNA1:105 
+DNA1:106 
+DNA1:107 
+DNA1:108 
+DNA1:109 
+DNA1:110 
+DNA1:111 
+DNA1:112 
+DNA1:113 
+DNA1:114 
+DNA1:115 
+DNA1:116 
+DNA1:117 
+DNA1:118 
+DNA1:119 
+DNA1:120 
+DNA1:121 
+DNA1:122 
+DNA1:123 
+DNA1:124 
+DNA1:125 
+DNA1:126 
+DNA1:127 
+DNA1:128 
+DNA1:129 
+DNA1:130 
+DNA1:131 
+DNA1:132 
+DNA1:133 
+DNA1:134 
+DNA1:135 
+DNA1:136 
+DNA1:137 
+DNA1:138 
+DNA1:139 
+DNA1:140 
+DNA1:141 
+DNA1:142 
+DNA1:143 
+DNA1:144 
+DNA1:145 
+DNA1:146 
+DNA1:147 
+DNA1:148 
+DNA1:149 
+DNA1:150 
+DNA1:151 
+DNA1:152 
+DNA1:153 
+DNA1:154 
+DNA1:155 
+DNA1:156 
+DNA1:157 
+DNA1:158 
+DNA1:159 
+DNA1:160 
+DNA1:161 
+DNA1:162 
+DNA1:163 
+DNA1:164 
+DNA1:165 
+DNA1:166 
+DNA1:167 
+DNA1:168 
+DNA1:169 
+DNA1:170 
+DNA1:171 
+DNA1:172 
+DNA1:173 
+DNA1:174 
+DNA1:175 
+DNA1:176 
+DNA1:177 
+DNA1:178 
+DNA1:179 
+DNA1:180 
+DNA1:181 
+DNA1:182 
+DNA1:183 
+DNA1:184 
+DNA1:185 
+DNA1:186 
+DNA1:187 
+DNA1:188 
+DNA1:189 
+DNA1:190 
+DNA1:191 
+DNA1:192 
+DNA1:193 
+DNA1:194 
+DNA1:195 
+DNA1:196 
+DNA1:197 
+DNA1:198 
+DNA1:199 
+DNA1:200 
+DNA1:201 
+DNA1:202 
+DNA1:203 
+DNA1:204 
+DNA1:205 
+DNA1:206 
+DNA1:207 
+DNA1:208 
+DNA1:209 
+DNA1:210 
+DNA1:211 
+DNA1:212 
+DNA1:213 
+DNA1:214 
+DNA1:215 
+DNA1:216 
+DNA1:217 
+DNA1:218 
+DNA1:219 
+DNA1:220 
+DNA1:221 
+DNA1:222 
+DNA1:223 
+DNA1:224 
+DNA1:225 
+DNA1:226 
+DNA1:227 
+DNA1:228 
+DNA1:229 
+DNA1:230 
+DNA1:231 
+DNA1:232 
+DNA1:233 
+DNA1:234 
+DNA1:235 
+DNA1:236 
+DNA1:237 
+DNA1:238 
+DNA1:239 
+DNA1:240 
+DNA1:241 
+DNA1:242 
+DNA1:243 
+DNA1:244 
+DNA1:245 
+DNA1:246 
+DNA1:247 
+DNA1:248 
+DNA1:249 
+DNA1:250 
+DNA1:251 
+DNA1:252 
+DNA1:253 
+DNA1:254 
+DNA1:255 
+DNA1:256 
+DNA1:257 
+DNA1:258 
+DNA1:259 
+DNA1:260 
+DNA1:261 
+DNA1:262 
+DNA1:263 
+DNA1:264 
+DNApsfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO2 to 1 residues
+psfgen) applying patch DEO1 to 1 residues
+psfgen) Info: guessing coordinates for 25067 atoms (331 non-hydrogen)
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CG CB HB1
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: failed to guess coordinate due to bad angle CD CG HG2
+psfgen) Warning: failed to guess coordinate due to bad angle CB CG HG
+psfgen) Warning: poorly guessed coordinates for 683 atoms (72 non-hydrogen):
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  1H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  1H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  1H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:121	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  2H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  2H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  2H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  3H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  3H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  3H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:121	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  4H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  4H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  4H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  5H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  5H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  5H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:16	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:20	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:38	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:43	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:48	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:60	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:61	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:66	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:70	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:82	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:92	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:100	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:109	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:121	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:121	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:126	  6H3
+psfgen) Warning: poorly guessed coordinate for atom OT1	 ALA:135	  6H3
+psfgen) Warning: poorly guessed coordinate for atom OT2	 ALA:135	  6H3
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  1H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  1H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  1H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:32	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  2H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  2H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  2H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  3H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  3H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  3H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:32	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  4H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  4H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  4H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  5H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  5H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  5H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:10	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:22	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:32	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:37	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:49	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:62	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:90	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  6H4
+psfgen) Warning: poorly guessed coordinate for atom OT1	 GLY:102	  6H4
+psfgen) Warning: poorly guessed coordinate for atom OT2	 GLY:102	  6H4
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  1H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:109	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:117	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  2H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  3H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:109	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:117	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  4H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  5H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 SER:1	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HT2	 SER:1	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HT3	 SER:1	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:23	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:33	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:34	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:51	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:55	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:58	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:63	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:65	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:80	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:83	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:85	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:93	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:96	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:108	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HB1	 PRO:109	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:109	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:115	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:116	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:117	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:129	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:129	  6H2A
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  1H2B
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:100	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  2H2B
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  3H2B
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:100	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  4H2B
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  5H2B
+psfgen) Warning: poorly guessed coordinate for atom HT1	 ALA:1	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HT2	 ALA:1	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HT3	 ALA:1	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:5	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:42	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:47	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:77	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:97	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:98	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:99	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG2	 PRO:100	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom HG	 LEU:103	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom OT1	 LYS:122	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom OT2	 LYS:122	  6H2B
+psfgen) Warning: poorly guessed coordinate for atom H5T	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:1	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:2	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H6	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 CYT:3	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 GUA:4	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:5	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:6	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 GUA:7	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:8	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H6	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 CYT:9	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:10	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5''	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H4'	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H1'	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H8	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2''	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H2'	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H3'	 GUA:11	  DNA2
+psfgen) Warning: poorly guessed coordinate for atom H5'	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 CYT:517	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:518	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H8	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 GUA:519	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:520	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 CYT:521	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:522	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:523	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 CYT:524	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H8	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 GUA:525	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H8	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom N1	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom C2	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom C6	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom N6	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H61	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H62	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 ADE:526	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5'	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H5''	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H4'	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H1'	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H6	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H51	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H52	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H53	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2''	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H2'	 THY:527	  DNA1
+psfgen) Warning: poorly guessed coordinate for atom H3'	 THY:527	  DNA1
+psfgen) Info: writing psf file psfgen_result/3x167.psf
+psfgen) total of 80704 atoms
+psfgen) total of 83610 bonds
+psfgen) total of 151836 angles
+psfgen) total of 220941 dihedrals
+psfgen) total of 10341 impropers
+psfgen) total of 0 cross-terms
+psfgen) Info: psf file complete.
+psfgen) Info: writing pdb file psfgen_result/3x167.pdb
+psfgen) Info: Atoms with guessed coordinates will have occupancy of 0.0.
+psfgen) Info: pdb file complete.
+1:265 
+DNA1:266 
+DNA1:267 
+DNA1:268 
+DNA1:269 
+DNA1:270 
+DNA1:271 
+DNA1:272 
+DNA1:273 
+DNA1:274 
+DNA1:275 
+DNA1:276 
+DNA1:277 
+DNA1:278 
+DNA1:279 
+DNA1:280 
+DNA1:281 
+DNA1:282 
+DNA1:283 
+DNA1:284 
+DNA1:285 
+DNA1:286 
+DNA1:287 
+DNA1:288 
+DNA1:289 
+DNA1:290 
+DNA1:291 
+DNA1:292 
+DNA1:293 
+DNA1:294 
+DNA1:295 
+DNA1:296 
+DNA1:297 
+DNA1:298 
+DNA1:299 
+DNA1:300 
+DNA1:301 
+DNA1:302 
+DNA1:303 
+DNA1:304 
+DNA1:305 
+DNA1:306 
+DNA1:307 
+DNA1:308 
+DNA1:309 
+DNA1:310 
+DNA1:311 
+DNA1:312 
+DNA1:313 
+DNA1:314 
+DNA1:315 
+DNA1:316 
+DNA1:317 
+DNA1:318 
+DNA1:319 
+DNA1:320 
+DNA1:321 
+DNA1:322 
+DNA1:323 
+DNA1:324 
+DNA1:325 
+DNA1:326 
+DNA1:327 
+DNA1:328 
+DNA1:329 
+DNA1:330 
+DNA1:331 
+DNA1:332 
+DNA1:333 
+DNA1:334 
+DNA1:335 
+DNA1:336 
+DNA1:337 
+DNA1:338 
+DNA1:339 
+DNA1:340 
+DNA1:341 
+DNA1:342 
+DNA1:343 
+DNA1:344 
+DNA1:345 
+DNA1:346 
+DNA1:347 
+DNA1:348 
+DNA1:349 
+DNA1:350 
+DNA1:351 
+DNA1:352 
+DNA1:353 
+DNA1:354 
+DNA1:355 
+DNA1:356 
+DNA1:357 
+DNA1:358 
+DNA1:359 
+DNA1:360 
+DNA1:361 
+DNA1:362 
+DNA1:363 
+DNA1:364 
+DNA1:365 
+DNA1:366 
+DNA1:367 
+DNA1:368 
+DNA1:369 
+DNA1:370 
+DNA1:371 
+DNA1:372 
+DNA1:373 
+DNA1:374 
+DNA1:375 
+DNA1:376 
+DNA1:377 
+DNA1:378 
+DNA1:379 
+DNA1:380 
+DNA1:381 
+DNA1:382 
+DNA1:383 
+DNA1:384 
+DNA1:385 
+DNA1:386 
+DNA1:387 
+DNA1:388 
+DNA1:389 
+DNA1:390 
+DNA1:391 
+DNA1:392 
+DNA1:393 
+DNA1:394 
+DNA1:395 
+DNA1:396 
+DNA1:397 
+DNA1:398 
+DNA1:399 
+DNA1:400 
+DNA1:401 
+DNA1:402 
+DNA1:403 
+DNA1:404 
+DNA1:405 
+DNA1:406 
+DNA1:407 
+DNA1:408 
+DNA1:409 
+DNA1:410 
+DNA1:411 
+DNA1:412 
+DNA1:413 
+DNA1:414 
+DNA1:415 
+DNA1:416 
+DNA1:417 
+DNA1:418 
+DNA1:419 
+DNA1:420 
+DNA1:421 
+DNA1:422 
+DNA1:423 
+DNA1:424 
+DNA1:425 
+DNA1:426 
+DNA1:427 
+DNA1:428 
+DNA1:429 
+DNA1:430 
+DNA1:431 
+DNA1:432 
+DNA1:433 
+DNA1:434 
+DNA1:435 
+DNA1:436 
+DNA1:437 
+DNA1:438 
+DNA1:439 
+DNA1:440 
+DNA1:441 
+DNA1:442 
+DNA1:443 
+DNA1:444 
+DNA1:445 
+DNA1:446 
+DNA1:447 
+DNA1:448 
+DNA1:449 
+DNA1:450 
+DNA1:451 
+DNA1:452 
+DNA1:453 
+DNA1:454 
+DNA1:455 
+DNA1:456 
+DNA1:457 
+DNA1:458 
+DNA1:459 
+DNA1:460 
+DNA1:461 
+DNA1:462 
+DNA1:463 
+DNA1:464 
+DNA1:465 
+DNA1:466 
+DNA1:467 
+DNA1:468 
+DNA1:469 
+DNA1:470 
+DNA1:471 
+DNA1:472 
+DNA1:473 
+DNA1:474 
+DNA1:475 
+DNA1:476 
+DNA1:477 
+DNA1:478 
+DNA1:479 
+DNA1:480 
+DNA1:481 
+DNA1:482 
+DNA1:483 
+DNA1:484 
+DNA1:485 
+DNA1:486 
+DNA1:487 
+DNA1:488 
+DNA1:489 
+DNA1:490 
+DNA1:491 
+DNA1:492 
+DNA1:493 
+DNA1:494 
+DNA1:495 
+DNA1:496 
+DNA1:497 
+DNA1:498 
+DNA1:499 
+DNA1:500 
+DNA1:501 
+DNA1:502 
+DNA1:503 
+DNA1:504 
+DNA1:505 
+DNA1:506 
+DNA1:507 
+DNA1:508 
+DNA1:509 
+DNA1:510 
+DNA1:511 
+DNA1:512 
+DNA1:513 
+DNA1:514 
+DNA1:515 
+DNA1:516 
+DNA1:517 
+DNA1:518 
+DNA1:519 
+DNA1:520 
+DNA1:521 
+DNA1:522 
+DNA1:523 
+DNA1:524 
+DNA1:525 
+DNA1:526 
+DNA1:527 
