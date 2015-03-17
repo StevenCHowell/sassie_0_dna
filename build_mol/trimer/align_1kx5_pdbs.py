@@ -179,9 +179,14 @@ def generate_psfgen_patches():
     import x_dna.build_mol.seg_pdb2psfgen as pdb2psfgen
     in_vars = inputs()
     
-    in_vars.pdb = 'c11_folded_tails.pdb'
-    in_vars.segnames = ['DNA1','DNA2']
+    in_vars.pdb = 'dna1.pdb'
+    in_vars.segnames = ['DNA1','dummy']
     pdb2psfgen.main(in_vars)
+
+    in_vars.pdb = 'dna2.pdb'
+    in_vars.segnames = ['DNA2','dummy']
+    pdb2psfgen.main(in_vars)
+
     
 def replace_N_atoms():
     '''
@@ -283,11 +288,11 @@ def replace_n1_n9(dna_mol, dna_out):
 if __name__ == "__main__":
     
     # align_1kx5()
-    # separate_1kx5()
+    separate_1kx5()
     # verify_dna_sequence()
     # replace_dna_sequence()
     # generate_psfgen_patches()
     # main()
-    replace_N_atoms()
+    # replace_N_atoms()
     
     print 'done'
