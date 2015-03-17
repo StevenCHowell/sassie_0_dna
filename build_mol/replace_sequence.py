@@ -27,14 +27,14 @@ import numpy as np
 # chain1.read_pdb(chain1_pdb)
 # sequenceFile = 'dimer/dimer_dna1_correct.seq'
 
-chain1_out = 'dimer/dna2_right_seq.pdb'
-chain1_pdb = 'dimer/dna2_wrong_seq.pdb'
+chain1_out = 'trimer/3x167_dna1.pdb'
+chain1_pdb = 'trimer/3x167_dna_bb_seg_DNA11.pdb' # 3x167_dna_bb.pdb'
 chain1 = sasmol.SasMol(0)
 chain1.read_pdb(chain1_pdb)
-sequenceFile = 'dimer/dimer_dna2_correct.seq'
+sequenceFile = 'trimer/trimer.seq'
 
-chain2_out = 'dimer/dummy_out.pdb'
-chain2_pdb = 'dimer/dummy.pdb'
+chain2_out = 'trimer/3x167_dna2.pdb'
+chain2_pdb = 'trimer/3x167_dna_bb_seg_DNA21.pdb'
 chain2 = sasmol.SasMol(0)
 chain2.read_pdb(chain2_pdb)
 
