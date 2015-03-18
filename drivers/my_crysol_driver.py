@@ -4,8 +4,13 @@ import sys
 import sassie.interface.input_filter as input_filter
 import sassie.calculate.gcrysol as gcrysol
 
+class inputs():
+    def __init__(self, parent = None):
+        pass
+    
 def parse():
     ''' Returns arguments in parser'''
+    import argparse
 
     parser = argparse.ArgumentParser(
         #prog='',
@@ -14,8 +19,8 @@ def parse():
         #epilog = 'no epilog found'
     )
     # standard input
-    parser.add_argument( "-r", "--runname", type=str, help = ("folder to store the minimization results"))
-    parser.add_argument( "-d", "--dcdfile", type=str, help = ("dcd/pdb file containing the structures for scattering calculation"))
+    parser.add_argument( "-r", "--runname", type=str, help = ("folder to store the results"))
+    parser.add_argument( "-d", "--dcdfile", type=str, help = ("dcd/pdb file containing the structure frames for scattering calculation"))
     parser.add_argument("-dp", "--dcdpath", type=str, default = 'minimization/', help =("path to the dcd/pdb file containing the structures for scattering calculation"))
     parser.add_argument( "-p", "--pdbfile", type=str, default = 'new_c11h5.pdb', help = ("pdb file containing the structure info (enables using dcd files)"))
     parser.add_argument("-pp", "--pdbpath", type=str, default = 'minimization/', help = ("path pdb file containing the structure info (enables using dcd files)"))
@@ -26,7 +31,7 @@ class Drv():
 
     module = 'crysol'
 
-    def run_me(self):
+    def run_me(self, inputs=None):
         import os
 
         #### BEGIN USER EDIT
@@ -62,17 +67,25 @@ class Drv():
         #### END USER EDIT
         #### END USER EDIT
         #### END USER EDIT
+        
+        try:
+            in_vars = inputs
+        except:
+            in_vars = parse()
 
-        ARGS = parse()
-        if ARGS.dcdfile != None and ARGS.pdbfile != None:
+        if in_vars.dcdfile != None and in_vars.pdbfile != None:
             print 'loading parameters from command line'
-            runname = ARGS.runname
-            dcdpath = ARGS.dcdpath
-            dcdfile = ARGS.dcdfile
-            pdbpath = ARGS.pdbpath
-            pdbfile = ARGS.pdbfile
+            runname   = in_vars.runname
+            dcdpath   = in_vars.dcdpath
+            dcdfile   = in_vars.dcdfile
+            pdbpath   = in_vars.pdbpath
+            pdbfile   = in_vars.pdbfile
+            maxh      = in_vars.maxh
+            fib       = in_vars.fib
+            maxs      = in_vars.maxs
+            numpoints = in_vars.numpoints
         else:
-            print 'using parameters from driver script'
+            print 'using default parameters from driver script'
 
         svariables={}
 
@@ -139,8 +152,6 @@ class Drv():
 
 
 if __name__=='__main__':
-    import argparse
-    ARGS = parse()
     o=Drv()
     o.run_me()
     # o.verify_me()
