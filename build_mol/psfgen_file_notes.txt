@@ -1,0 +1,34 @@
+#!/home/myPrograms/NAMD/psfgen
+
+#topology ~/toppar/top_all27_prot_na.inp
+#topology /home/myPrograms/NAMD/toppar/toph19.inp
+topology /home/myPrograms/NAMD/toppar/top_all36_na.rtf
+
+alias residue HIS HSE        ### this allows you to change all HIS to HSE (probably needed)
+#alias atom ILE CD1 CD        ### this allows you to change CD1 to CD in all ILE residues
+#alias atom SER HG HG1       ### this allows you to change HG to HG1 in all SER residues
+#alias atom CYS HG HG1      ### this allows you to change HG to HG1 in all CYS residues
+
+#s segment PROT {                ### the PROT statement can be any 3 or 4 letter code you want
+#s   first NTER                         ### use this if you want the first amino acid residue to be the N-terminus
+#s   pdb 1zbb_tetra_uncombined.pdb                        ###  this line tells psfgen where to find the protein sequence information
+#s   last CTER                           ### use this if you want the last amino acid residue to be the C-terminus
+#s }
+
+segment PROT {                ### the PROT statement can be any 3 or 4 letter code you want
+  pdb 1zbb_tetra_uncombined.pdb                        ###  this line tells psfgen where to find the protein sequence information
+}
+
+#patch DISU PROT:5 PROT:28    ### this creates a disufide bond between residues 5 & 28 in PROT
+
+coordpdb 1zbb_tetra_uncombined.pdb PROT    ### load the coordinates for the segment PROT
+
+#guesscoord        ### use this command to add hydrogen coordinates
+
+writepsf 1zbb_tetra_uncombined.pdb   ### this command saves the PSF file
+
+writepdb new_1zbb.pdb    ### this command saves a new PDB file (for example purposes)
+
+### end script ###
+
+
