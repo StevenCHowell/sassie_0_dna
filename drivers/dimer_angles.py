@@ -308,12 +308,12 @@ if __name__ == '__main__':
     else:
         logging.basicConfig()
 
-    dcd_file = 'dimer_example.dcd'
-    dcd_dir  = '/home/schowell/data/xfer/'
+    dcd_file = 'dimer_ta.dcd'
+    dcd_dir  = '/home/schowell/data/myData/sassieRuns/dimer/flex25/run2'
     dcd_path = op.join(dcd_dir, dcd_file)
 
     pdb_file = 'dimer_half_trun.pdb'
-    pdb_dir  = '/home/schowell/data/xfer/'
+    pdb_dir  = '/home/schowell/data/myData/sassieRuns/dimer/flex25'
     pdb_path = op.join(pdb_dir, pdb_file)
     
     x2_file = 'x2file.txt'
