@@ -1,0 +1,407 @@
+topology /home/myPrograms/sassie_bin/toppar/top_all27_prot_na.inp
+
+alias residue DG GUA
+alias residue DA ADE
+alias residue DT THY
+alias residue DC CYT
+
+alias atom THY O5* O5'
+alias atom THY C5* C5'
+alias atom ADE O5* O5'
+alias atom ADE C5* C5'
+alias atom GUA O5* O5'
+alias atom GUA C5* C5'
+alias atom CYT O5* O5'
+alias atom CYT C5* C5'
+
+alias residue HIS HSE
+alias atom ILE CD1 CD
+
+
+###################### H3 histones ######################
+
+segment 1H3 {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H3_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_E1.pdb 1H3
+
+segment 2H3 {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H3_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_A1.pdb 2H3
+
+patch DISU 1H3:110 2H3:110
+
+
+###################### H4 histones ######################
+
+segment 1H4 {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H4_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_B1.pdb 1H4
+
+segment 2H4 {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H4_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_F1.pdb 2H4
+
+
+###################### H2A histones ######################
+
+segment 1H2A {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H2A_1kx5_corrected.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_C1.pdb 1H2A
+
+segment 2H2A {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H2A_1kx5_corrected.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_G1.pdb 2H2A
+ 
+
+###################### H2B histones ######################
+
+segment 1H2B {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H2B_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_D1.pdb 1H2B
+
+segment 2H2B {  
+  first NTER
+  last CTER
+  pdb seq_pdb/H2B_1kx5.pdb
+}
+coordpdb 4mer_ncp1/1KX5_4mer_ncp1_ch_H1.pdb 2H2B
+ 
+
+###################### DNA ######################
+
+segment DNA2 {
+  first 5TER
+  pdb dna_pdb/w601dna2.pdb
+  last 3TER
+}
+coordpdb dna_pdb/w601dna2.pdb DNA2
+
+patch DEO2 dna2:193
+patch DEO1 dna2:194
+patch DEO2 dna2:195
+patch DEO2 dna2:196
+patch DEO2 dna2:197
+patch DEO2 dna2:198
+patch DEO1 dna2:199
+patch DEO2 dna2:200
+patch DEO1 dna2:201
+patch DEO2 dna2:202
+patch DEO1 dna2:203
+patch DEO2 dna2:204
+patch DEO1 dna2:205
+patch DEO2 dna2:206
+patch DEO1 dna2:207
+patch DEO1 dna2:208
+patch DEO1 dna2:209
+patch DEO2 dna2:210
+patch DEO2 dna2:211
+patch DEO1 dna2:212
+patch DEO2 dna2:213
+patch DEO1 dna2:214
+patch DEO2 dna2:215
+patch DEO1 dna2:216
+patch DEO2 dna2:217
+patch DEO1 dna2:218
+patch DEO1 dna2:219
+patch DEO1 dna2:220
+patch DEO2 dna2:221
+patch DEO2 dna2:222
+patch DEO2 dna2:223
+patch DEO2 dna2:224
+patch DEO2 dna2:225
+patch DEO1 dna2:226
+patch DEO1 dna2:227
+patch DEO2 dna2:228
+patch DEO2 dna2:229
+patch DEO2 dna2:230
+patch DEO2 dna2:231
+patch DEO2 dna2:232
+patch DEO2 dna2:233
+patch DEO1 dna2:234
+patch DEO2 dna2:235
+patch DEO2 dna2:236
+patch DEO1 dna2:237
+patch DEO1 dna2:238
+patch DEO1 dna2:239
+patch DEO1 dna2:240
+patch DEO1 dna2:241
+patch DEO1 dna2:242
+patch DEO1 dna2:243
+patch DEO2 dna2:244
+patch DEO2 dna2:245
+patch DEO1 dna2:246
+patch DEO2 dna2:247
+patch DEO2 dna2:248
+patch DEO1 dna2:249
+patch DEO1 dna2:250
+patch DEO2 dna2:251
+patch DEO2 dna2:252
+patch DEO2 dna2:253
+patch DEO2 dna2:254
+patch DEO1 dna2:255
+patch DEO2 dna2:256
+patch DEO1 dna2:257
+patch DEO2 dna2:258
+patch DEO2 dna2:259
+patch DEO2 dna2:260
+patch DEO2 dna2:261
+patch DEO2 dna2:262
+patch DEO2 dna2:263
+patch DEO1 dna2:264
+patch DEO2 dna2:265
+patch DEO2 dna2:266
+patch DEO1 dna2:267
+patch DEO2 dna2:268
+patch DEO1 dna2:269
+patch DEO2 dna2:270
+patch DEO1 dna2:271
+patch DEO2 dna2:272
+patch DEO1 dna2:273
+patch DEO2 dna2:274
+patch DEO1 dna2:275
+patch DEO2 dna2:276
+patch DEO1 dna2:277
+patch DEO2 dna2:278
+patch DEO1 dna2:279
+patch DEO1 dna2:280
+patch DEO1 dna2:281
+patch DEO2 dna2:282
+patch DEO2 dna2:283
+patch DEO2 dna2:284
+patch DEO1 dna2:285
+patch DEO2 dna2:286
+patch DEO2 dna2:287
+patch DEO1 dna2:288
+patch DEO2 dna2:289
+patch DEO1 dna2:290
+patch DEO1 dna2:291
+patch DEO2 dna2:292
+patch DEO2 dna2:293
+patch DEO2 dna2:294
+patch DEO2 dna2:295
+patch DEO1 dna2:296
+patch DEO1 dna2:297
+patch DEO2 dna2:298
+patch DEO1 dna2:299
+patch DEO1 dna2:300
+patch DEO1 dna2:301
+patch DEO2 dna2:302
+patch DEO1 dna2:303
+patch DEO2 dna2:304
+patch DEO2 dna2:305
+patch DEO1 dna2:306
+patch DEO1 dna2:307
+patch DEO2 dna2:308
+patch DEO2 dna2:309
+patch DEO1 dna2:310
+patch DEO1 dna2:311
+patch DEO2 dna2:312
+patch DEO2 dna2:313
+patch DEO2 dna2:314
+patch DEO1 dna2:315
+patch DEO2 dna2:316
+patch DEO2 dna2:317
+patch DEO1 dna2:318
+patch DEO1 dna2:319
+patch DEO1 dna2:320
+patch DEO1 dna2:321
+patch DEO2 dna2:322
+patch DEO2 dna2:323
+patch DEO1 dna2:324
+patch DEO2 dna2:325
+patch DEO1 dna2:326
+patch DEO1 dna2:327
+patch DEO2 dna2:328
+patch DEO2 dna2:329
+patch DEO2 dna2:330
+patch DEO2 dna2:331
+patch DEO1 dna2:332
+patch DEO1 dna2:333
+patch DEO1 dna2:334
+patch DEO1 dna2:335
+patch DEO1 dna2:336
+patch DEO1 dna2:337
+patch DEO2 dna2:338
+patch DEO2 dna2:339
+
+
+segment DNA1 {
+ first 5TER
+ pdb dna_pdb/w601dna1.pdb
+ last 3TER
+}
+coordpdb dna_pdb/w601dna1.pdb DNA1
+
+patch DEO1 dna1:15
+patch DEO1 dna1:16
+patch DEO2 dna1:17
+patch DEO2 dna1:18
+patch DEO2 dna1:19
+patch DEO2 dna1:20
+patch DEO2 dna1:21
+patch DEO2 dna1:22
+patch DEO1 dna1:23
+patch DEO1 dna1:24
+patch DEO1 dna1:25
+patch DEO1 dna1:26
+patch DEO2 dna1:27
+patch DEO2 dna1:28
+patch DEO1 dna1:29
+patch DEO2 dna1:30
+patch DEO1 dna1:31
+patch DEO1 dna1:32
+patch DEO2 dna1:33
+patch DEO2 dna1:34
+patch DEO2 dna1:35
+patch DEO2 dna1:36
+patch DEO1 dna1:37
+patch DEO1 dna1:38
+patch DEO2 dna1:39
+patch DEO1 dna1:40
+patch DEO1 dna1:41
+patch DEO1 dna1:42
+patch DEO2 dna1:43
+patch DEO2 dna1:44
+patch DEO1 dna1:45
+patch DEO1 dna1:46
+patch DEO2 dna1:47
+patch DEO2 dna1:48
+patch DEO1 dna1:49
+patch DEO1 dna1:50
+patch DEO2 dna1:51
+patch DEO1 dna1:52
+patch DEO2 dna1:53
+patch DEO2 dna1:54
+patch DEO2 dna1:55
+patch DEO1 dna1:56
+patch DEO2 dna1:57
+patch DEO2 dna1:58
+patch DEO1 dna1:59
+patch DEO1 dna1:60
+patch DEO1 dna1:61
+patch DEO1 dna1:62
+patch DEO2 dna1:63
+patch DEO2 dna1:64
+patch DEO1 dna1:65
+patch DEO2 dna1:66
+patch DEO1 dna1:67
+patch DEO1 dna1:68
+patch DEO2 dna1:69
+patch DEO1 dna1:70
+patch DEO1 dna1:71
+patch DEO1 dna1:72
+patch DEO2 dna1:73
+patch DEO2 dna1:74
+patch DEO2 dna1:75
+patch DEO1 dna1:76
+patch DEO2 dna1:77
+patch DEO1 dna1:78
+patch DEO2 dna1:79
+patch DEO1 dna1:80
+patch DEO2 dna1:81
+patch DEO1 dna1:82
+patch DEO2 dna1:83
+patch DEO1 dna1:84
+patch DEO2 dna1:85
+patch DEO1 dna1:86
+patch DEO2 dna1:87
+patch DEO1 dna1:88
+patch DEO1 dna1:89
+patch DEO2 dna1:90
+patch DEO1 dna1:91
+patch DEO1 dna1:92
+patch DEO1 dna1:93
+patch DEO1 dna1:94
+patch DEO1 dna1:95
+patch DEO1 dna1:96
+patch DEO2 dna1:97
+patch DEO1 dna1:98
+patch DEO2 dna1:99
+patch DEO1 dna1:100
+patch DEO1 dna1:101
+patch DEO1 dna1:102
+patch DEO1 dna1:103
+patch DEO2 dna1:104
+patch DEO2 dna1:105
+patch DEO1 dna1:106
+patch DEO1 dna1:107
+patch DEO2 dna1:108
+patch DEO1 dna1:109
+patch DEO1 dna1:110
+patch DEO2 dna1:111
+patch DEO2 dna1:112
+patch DEO2 dna1:113
+patch DEO2 dna1:114
+patch DEO2 dna1:115
+patch DEO2 dna1:116
+patch DEO2 dna1:117
+patch DEO1 dna1:118
+patch DEO1 dna1:119
+patch DEO2 dna1:120
+patch DEO1 dna1:121
+patch DEO1 dna1:122
+patch DEO1 dna1:123
+patch DEO1 dna1:124
+patch DEO1 dna1:125
+patch DEO1 dna1:126
+patch DEO2 dna1:127
+patch DEO2 dna1:128
+patch DEO1 dna1:129
+patch DEO1 dna1:130
+patch DEO1 dna1:131
+patch DEO1 dna1:132
+patch DEO1 dna1:133
+patch DEO2 dna1:134
+patch DEO2 dna1:135
+patch DEO2 dna1:136
+patch DEO1 dna1:137
+patch DEO2 dna1:138
+patch DEO1 dna1:139
+patch DEO2 dna1:140
+patch DEO1 dna1:141
+patch DEO2 dna1:142
+patch DEO1 dna1:143
+patch DEO1 dna1:144
+patch DEO2 dna1:145
+patch DEO2 dna1:146
+patch DEO2 dna1:147
+patch DEO1 dna1:148
+patch DEO2 dna1:149
+patch DEO1 dna1:150
+patch DEO2 dna1:151
+patch DEO1 dna1:152
+patch DEO2 dna1:153
+patch DEO1 dna1:154
+patch DEO2 dna1:155
+patch DEO1 dna1:156
+patch DEO1 dna1:157
+patch DEO1 dna1:158
+patch DEO1 dna1:159
+patch DEO2 dna1:160
+patch DEO1 dna1:161
+
+guesscoord
+
+writepsf psfgen_result/w601ncp.psf
+writepdb psfgen_result/w601ncp.pdb
