@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt    
 
 def xyplot(data, fmt='-', label=''):
     return plt.plot(data[:,0], data[:,1], fmt, label=label)
@@ -20,5 +20,49 @@ def prlabel():
     plt.xlabel(r'$R (\AA)$')
     plt.xlabel(r'$P(R)$')
 
+def symbol_order(i, l=False):
+    symbols = ['s', 'o', '^', 'd', 'v', '*', '<', 'p', 'h', 'x']
+    if l:
+        return symbols[i%len(symbols)] + l
+    else:
+        return symbols[i%len(symbols)]
 
+def color_order(i):
+    colors = [[   0,    0,    1],
+              [   0,  0.5,    0],
+              [   1,    0,    0],
+              [0.75,    0, 0.75],
+              [   0, 0.75, 0.75],
+              [0.75, 0.75,    0],
+              # [   0,    1,    0],
+              [0.25,    0, 0.25],
+              # [   1,    1,    0],
+              [   1,  0.5,    0]]
+    return colors[i%len(colors)]
+
+if __name__ == '__main__':
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt    
+
+    j = 11
+    x = np.array(range(j))
+    y = np.ones(j)
+    fig = plt.figure()
+    for i in x:
+        y[:] = i
+        s = symbol_order(i, '-')
+        plt.plot(x, y, s, mec=color_order(i), c=color_order(i), ms = 10,
+                 mfc='none', label=str(color_order(i)))
+        # plt.plot(x, y, s, ms = 10)
+        # plt.scatter(x, y, s, markeredgecolor=color_order(i), facecolors='none')
+    dy = 0.1
+    plt.ylim([-dy, x[-1]+dy])
+    leg = plt.legend(scatterpoints=1, numpoints=1)
+    plt.show()
+    name = 'python_symbol_color'
+    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
+    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     
+    print '\m/ >.< \m/'
