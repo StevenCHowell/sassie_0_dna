@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #
 # Author:  Steven C. Howell
-# Purpose:
-# Created: 
+# Purpose: Calculate the angles between the nucleosomes in a tetramer array
+# Created: 15 April 2015
 #
-# $Id: $
+# $Id$
 #
 #0000000011111111112222222222333333333344444444445555555555666666666677777777778
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -12,9 +12,9 @@
 # import ncp_angles as na
 import sassie.sasmol.sasmol as sasmol
 import numpy as np
-import sassie_1_na.util.geometry as geometry
-import sassie_1_na.util.basis_to_python as basis_to_python
-import pandas as pd
+import x_dna.util.geometry as geometry
+import x_dna.util.basis_to_python as basis_to_python
+# import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from numpy.core.umath_tests import inner1d
@@ -23,7 +23,7 @@ try:
 except:
     import pickle as pickle
     
-def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids):
+def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, array=None):
     pkl_file = pdb[:-3] + 'pkl'
     try:
         pkl_in = open(pkl_file, 'rb')
@@ -55,8 +55,10 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids):
         all_ncp_plot_vars  = [None] * n_ncps
         print 'creating masks from input variables'
 
-    array = sasmol.SasMol(0)
-    array.read_pdb(pdb)
+    # check if pdb is a filename or a sasmol object
+    if not array:
+        array = sasmol.SasMol(0)
+        array.read_pdb(pdb)
 
     # # re-orient the array
     # coor = array.coor()
@@ -113,6 +115,41 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids):
     pickle.dump(all_ncp_plot_vars, pkl_out, -1)
     pkl_out.close()
     return all_ncp_plot_vars, all_ncp_axes, all_ncp_origins
+
+def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
+    # get tetramer angles
+    all_ncp_axes = np.array(all_ncp_axes)
+    all_ncp_origins = np.array(all_ncp_origins)
+    
+    n_ncp = len(all_ncp_axes)
+    all_ncp1_axes = all_ncp_axes[:-1] # ncp 1-3
+    all_ncp2_axes = all_ncp_axes[ 1:] # ncp 2-4
+    all_ncp1_origins = all_ncp_origins[:-1] # ncp 1-3
+    all_ncp2_origins = all_ncp_origins[ 1:] # ncp 2-4
+
+    # bending
+    phi_r = np.arccos(inner1d(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]))
+    phi_switch = inner1d(np.cross(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]), all_ncp1_axes[:, 2, :]) < 0
+    phi_r[phi_switch] = 2 * np.pi - phi_r[phi_switch]
+    phi_d = phi_r * 180 / np.pi
+    
+    # twist (Victor's group from NIH uses rho, my psi/2)
+    psi_r = np.arccos(inner1d(all_ncp1_axes[:, 2, :], all_ncp2_axes[:, 2, :]))
+    psi_switch = inner1d(np.cross(all_ncp2_axes[:, 2, :], all_ncp1_axes[:, 2, :]), all_ncp1_axes[:, 0, :]) < 0
+    psi_r[psi_switch] = 2 * np.pi - psi_r[psi_switch]
+    psi_d = psi_r * 180 / np.pi
+    
+    # rise     
+    h = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
+    
+    plot_title = (r'$\phi$ (bend): (%0.1f, %0.1f, %0.1f); '
+                  r'$\psi$ (twist): (%0.1f, %0.1f, %0.1f); '
+                  r'h (rise): (%0.1f, %0.1f, %0.1f)'
+                  % (phi_d[0], phi_d[1], phi_d[2], 
+                     psi_d[0], psi_d[1], psi_d[2],
+                     h[0], h[1], h[2]))
+    
+    return phi_d, psi_d, h, plot_title
     
 def main():
     NotImplemented
@@ -167,43 +204,13 @@ if __name__ == '__main__':
         # plt.axis('equal')
         plt.legend(loc='upper left', numpoints=1, bbox_to_anchor=(1, 0.5))
         plt.show()
-        
-    all_ncp_axes = np.array(all_ncp_axes)
-    all_ncp_origins = np.array(all_ncp_origins)
-    
-    # get tetramer angles
-    n_ncp = len(ncp_dna_resids)
-    all_ncp1_axes = all_ncp_axes[:-1] # ncp 1-3
-    all_ncp2_axes = all_ncp_axes[ 1:] # ncp 2-4
-    all_ncp1_origins = all_ncp_origins[:-1] # ncp 1-3
-    all_ncp2_origins = all_ncp_origins[ 1:] # ncp 2-4
 
-    # bending
-    phi_r = np.arccos(inner1d(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]))
-    phi_switch = inner1d(np.cross(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]), all_ncp1_axes[:, 2, :]) < 0
-    phi_r[phi_switch] = 2 * np.pi - phi_r[phi_switch]
-    phi_d = phi_r * 180 / np.pi
-    
-    # twist (Victor's group from NIH uses rho, my psi/2)
-    psi_r = np.arccos(inner1d(all_ncp1_axes[:, 2, :], all_ncp2_axes[:, 2, :]))
-    psi_switch = inner1d(np.cross(all_ncp2_axes[:, 2, :], all_ncp1_axes[:, 2, :]), all_ncp1_axes[:, 0, :]) < 0
-    psi_r[psi_switch] = 2 * np.pi - psi_r[psi_switch]
-    psi_d = psi_r * 180 / np.pi
-    
-    # rise     
-    h = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
+    phi_d, psi_d, h, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
+    geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
     
     data = 'N4merH5TE_zeroCon.iq'
     # data = 'N4merH5TE_zeroCon.i0q'
     # data = 'N4merH5Mg1_zeroCon.iq'
     # data = 'N4merH5Mg1_zeroCon.i0q'
-
-    plot_title = (r'$\phi$ (bend): (%0.1f, %0.1f, %0.1f); '
-                  r'$\psi$ (twist): (%0.1f, %0.1f, %0.1f); '
-                  r'h (rise): (%0.1f, %0.1f, %0.1f)'
-                  % (phi_d[0], phi_d[1], phi_d[2], 
-                     psi_d[0], psi_d[1], psi_d[2],
-                     h[0], h[1], h[2]))
-    geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
     print '\m/ >.< \m/'    
     
