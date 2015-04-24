@@ -122,43 +122,102 @@ def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
     all_ncp_origins = np.array(all_ncp_origins)
     
     n_ncp = len(all_ncp_axes)
-    all_ncp1_axes = all_ncp_axes[:-1] # ncp 1-3
-    all_ncp2_axes = all_ncp_axes[ 1:] # ncp 2-4
-    all_ncp1_origins = all_ncp_origins[:-1] # ncp 1-3
-    all_ncp2_origins = all_ncp_origins[ 1:] # ncp 2-4
+    ncp1_axes = all_ncp_axes[:-1] # ncp 1-3
+    ncp2_axes = all_ncp_axes[ 1:] # ncp 2-4
+    ncp1_origins = all_ncp_origins[:-1] # ncp 1-3
+    ncp2_origins = all_ncp_origins[ 1:] # ncp 2-4
 
-    # bending
-    phi_r = np.arccos(inner1d(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]))
-    phi_switch = inner1d(np.cross(all_ncp1_axes[:, 0, :], all_ncp2_axes[:, 0, :]), all_ncp1_axes[:, 2, :]) < 0
-    phi_r[phi_switch] = 2 * np.pi - phi_r[phi_switch]
-    phi_d = phi_r * 180 / np.pi
+    #~~~ these angles and translations are different from Victor Zhurkin @ NIH ~~~#
+    # phi_x: angle that aligns Z_2 to the X_1-Z_1 plane
+    psi_x_rad = np.zeros(n_ncp-1)
+    Z_x1z1 = np.zeros((n_ncp-1, 3))
+    for i in xrange(n_ncp-1):
+        Z_x1 = ncp2_axes[i, 2, :].dot(ncp1_axes[i, 0, :]) * ncp1_axes[i, 0, :]
+        Z_z1 = ncp2_axes[i, 2, :].dot(ncp1_axes[i, 2, :]) * ncp1_axes[i, 2, :]
+        Z_x1z1[i] = Z_x1 + Z_z1
+        psi_x_rad[i] = np.arccos(ncp2_axes[i, 2, :].dot(Z_x1z1[i]))
+    # check if negative or positive angle
+    psi_switch = inner1d(np.cross(ncp2_axes[:, 2, :], Z_x1z1), ncp1_axes[:, 0, :]) < 0
+    psi_x_rad[psi_switch] = 2 * np.pi - psi_x_rad[psi_switch]
+    psi_x_deg = psi_x_rad * 180 / np.pi
     
-    # twist (Victor's group from NIH uses rho, my psi/2)
-    psi_r = np.arccos(inner1d(all_ncp1_axes[:, 2, :], all_ncp2_axes[:, 2, :]))
-    psi_switch = inner1d(np.cross(all_ncp2_axes[:, 2, :], all_ncp1_axes[:, 2, :]), all_ncp1_axes[:, 0, :]) < 0
-    psi_r[psi_switch] = 2 * np.pi - psi_r[psi_switch]
-    psi_d = psi_r * 180 / np.pi
+    tmp = np.zeros((n_ncp-1, 4, 3))
+    for i in xrange(n_ncp-1):
+        coor3 = np.zeros((4,3))
+        coor3[1:,:] = ncp2_axes[i]
+        coor3 += ncp2_origins[i]
+        tmp[i] = geometry.rotate_about_v(coor3, ncp1_axes[i, 0, :], psi_x_deg[i])
+        tmp[i] -= ncp2_origins[i]
+    rot_ncp2_axes = tmp[:, 1:,:]
+    #### THIS IS WRONG }:-| ### 
     
-    # rise     
-    h = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
+    # phi_y: angle that aligns Z_2 to the X_1-Z_1 plane
+    phi_x_rad = np.zeros(n_ncp)
+    Z_x1z1 = np.zeros((n_ncp, 3))
+    for i in xrange(n_ncp):
+        Z_x1 = ncp2_axes[i, 2, :].dot(ncp1_axes[i, 0, :]) * ncp1_axes[i, 0, :]
+        Z_z1 = ncp2_axes[i, 2, :].dot(ncp1_axes[i, 2, :]) * ncp1_axes[i, 2, :]
+        Z_x1z1[i] = Z_x1 + Z_z1
+        psi_x_rad[i] = np.arcos(ncp2_axes[i, 2, :].dot(Z_x1z1[i]))
+    # check if negative or positive angle
+    psi_switch = inner1d(np.cross(ncp2_axes[:, 2, :], Z_x1z1), ncp1_axes[:, 0, :]) < 0
+    psi_x_rad[psi_switch] = 2 * np.pi - psi_x_rad[psi_switch]
     
-    # radius
-    # solve this linear system: r1 * X_1 - r2 * X_2 + h * Z_1 = O_2 - O_1
-    a = np.array([all_ncp1_axes[:, 0, :], -all_ncp2_axes[:, 0, :], all_ncp1_axes[:, 2, :]])
-    b = np.array([all_ncp2_origins - all_ncp1_origins])
-    r1, r2, h = np.linalg.solve(a, b)
     
     
+    # psi_r = np.arccos(inner1d(all_ncp1_axes[:, 2, :], all_ncp2_axes[:, 2, :]))
+    # psi_switch = inner1d(np.cross(all_ncp2_axes[:, 2, :], all_ncp1_axes[:, 2, :]), all_ncp1_axes[:, 0, :]) < 0
+    # psi_r[psi_switch] = 2 * np.pi - psi_r[psi_switch]
+    # psi_d = psi_r * 180 / np.pi
+    
+    # R_align = geometry.rotate_v2_to_v1(all_ncp1_axes[:, 2, :], all_ncp2_axes[:, 2, :])
+    # # np.einsum('ijk,ik->ij', R_align, all_ncp2_axes[:, 2, :])
+    # # np.einsum('jk,lk->lj', R_align[0], all_ncp2_axes[0])
+    # rot_ncp2_axes = np.einsum('ijk,ilk->ilj', R_align, all_ncp2_axes)
+    
+    # # bending
+    # phi_r = np.arccos(inner1d(all_ncp1_axes[:, 0, :], rot_ncp2_axes[:, 0, :]))
+    # phi_switch = inner1d(np.cross(all_ncp1_axes[:, 0, :], rot_ncp2_axes[:, 0, :]), all_ncp1_axes[:, 2, :]) < 0
+    # phi_r[phi_switch] = 2 * np.pi - phi_r[phi_switch]
+    # phi_d = phi_r * 180 / np.pi
+    
+
+    # # rise (not effective without the radius values)
+    # h0 = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
+    
+    # radius and rise
+    # # solve this linear system: r1 * X_1 - r2 * X_2 + h * Z_1 = O_2 - O_1 (not effective)
+    # results = []
+    # for i in xrange(len(all_ncp1_origins)):
+        # a = np.array([all_ncp1_axes[i,0,:], -all_ncp2_axes[i,0,:], all_ncp1_axes[i,2,:]]).transpose()
+        # b = all_ncp2_origins[i] - all_ncp1_origins[i]
+        # results.append(np.linalg.solve(a, b))
+    # [r1, r2, h] = np.array(results).transpose()
+    
+    # solve this linear system: r1 * X_1 - r2 * X_2 + h * Z_1 = O_2 - O_1 (not effective)
+    results = []
+    for i in xrange(len(ncp1_origins)):
+        a = np.array([ncp1_axes[i,0,:], ncp1_axes[i,1,:], ncp1_axes[i,2,:]]).transpose()
+        b = ncp2_origins[i] - ncp1_origins[i]
+        results.append(np.linalg.solve(a, b))
+    [x, y, z] = np.array(results).transpose()
+    
+    
+    for i in xrange(3):
+        p1 = ncp1_origins[i] + x[i] * ncp1_axes[i, 0, :] + y[i] * ncp1_axes[i, 1, :] + z[i] * ncp1_axes[i, 2, :]
+        p2 = ncp2_origins[i]
+        assert np.allclose(p1, p2), 'WARNING: problem with results'
+
     plot_title = (r'$\phi$ (bend): (%0.1f, %0.1f, %0.1f); '
                   r'$\psi$ (twist): (%0.1f, %0.1f, %0.1f); '
                   r'h (rise): (%0.1f, %0.1f, %0.1f); '
-                  r'r (radius): (%0.1f, %0.1f, %0.1f)'
+                  r'x1, y2: ((%0.1f,%0.1f) (%0.1f,%0.1f) (%0.1f,%0.1f))'
                   % (phi_d[0], phi_d[1], phi_d[2], 
                      psi_d[0], psi_d[1], psi_d[2],
-                     h[0], h[1], h[2],
-                     r[0], r[1], r[2]) ) 
+                     z[0], z[1], z[2],
+                     x[0], y[0], x[1], y[1], x[2], y[2]) ) 
     
-    return phi_d, psi_d, h, plot_title
+    return phi_d, psi_d, x, y, z, plot_title
     
 def main():
     NotImplemented
@@ -190,7 +249,8 @@ if __name__ == '__main__':
         pkl_in.close()
     except:
         all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids)
-    geometry.show_ncps(all_ncp_plot_vars)
+
+    # geometry.show_ncps(all_ncp_plot_vars)
     
     if False:
         fig = plt.figure()
@@ -214,20 +274,47 @@ if __name__ == '__main__':
         plt.legend(loc='upper left', numpoints=1, bbox_to_anchor=(1, 0.5))
         plt.show()
 
-    phi_d, psi_d, h, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
+    phi_d, psi_d, x, y, z, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
 
-    axes_name = pdb[:-4] + '_n1_axes.txt'
-    np.savetxt(axes_name, all_ncp_axes[0], fmt='%1.6e')
+    n1_axes_name = pdb[:-4] + '_n1_axes.txt'
+    np.savetxt(n1_axes_name, all_ncp_axes[0], fmt='%1.6e')
     
-    axes_name = pdb[:-4] + '_n2_axes.txt'
-    np.savetxt(axes_name, all_ncp_axes[1], fmt='%1.6e')    
+    n2_axes_name = pdb[:-4] + '_n2_axes.txt'
+    np.savetxt(n2_axes_name, all_ncp_axes[1], fmt='%1.6e')    
+
+    n3_axes_name = pdb[:-4] + '_n3_axes.txt'
+    np.savetxt(n3_axes_name, all_ncp_axes[1], fmt='%1.6e')    
+
+    n4_axes_name = pdb[:-4] + '_n4_axes.txt'
+    np.savetxt(n4_axes_name, all_ncp_axes[1], fmt='%1.6e')    
     
     origins_name = pdb[:-4] + '_orig.txt'
     np.savetxt(origins_name, all_ncp_origins, fmt='%1.6e')
     
-    h_name = pdb[:-4] + '_h.txt'
-    np.savetxt(h_name, h, fmt='%1.6e')
+    x_name = pdb[:-4] + '_x.txt'
+    np.savetxt(x_name, x, fmt='%1.6e')
+
+    y_name = pdb[:-4] + '_y.txt'
+    np.savetxt(y_name, y, fmt='%1.6e')
+    
+    z_name = pdb[:-4] + '_z.txt'
+    np.savetxt(z_name, z, fmt='%1.6e')
+    
+    # r1_name = pdb[:-4] + '_r1.txt'
+    # np.savetxt(r1_name, r1, fmt='%1.6e')
+
+    # r2_name = pdb[:-4] + '_r2.txt'
+    # np.savetxt(r2_name, r2, fmt='%1.6e')
+    
+    # h_name = pdb[:-4] + '_h.txt'
+    # np.savetxt(h_name, h, fmt='%1.6e')
+
+    psi_name = pdb[:-4] + '_psi.txt'
+    np.savetxt(psi_name, psi_d, fmt='%1.6e')
+
+    phi_name = pdb[:-4] + '_phi.txt'
+    np.savetxt(phi_name, phi_d, fmt='%1.6e')
     
     data = 'N4merH5TE_zeroCon.iq'
     # data = 'N4merH5TE_zeroCon.i0q'
