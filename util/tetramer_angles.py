@@ -142,12 +142,20 @@ def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
     # rise     
     h = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
     
+    # radius
+    # all_ncp2_origins -  = all_ncp1_origins + r * all_ncp1_axes[:, 0, :]
+    rhs = all_ncp2_origins - h * all_ncp1_axes[:, 2, :] - all_ncp1_origins
+    lhs = all_ncp1_axes[:, 0, :] - all_ncp2_axes[:, 0, :]
+    r = [50]*3
+    
     plot_title = (r'$\phi$ (bend): (%0.1f, %0.1f, %0.1f); '
                   r'$\psi$ (twist): (%0.1f, %0.1f, %0.1f); '
-                  r'h (rise): (%0.1f, %0.1f, %0.1f)'
+                  r'h (rise): (%0.1f, %0.1f, %0.1f); '
+                  r'r (radius): (%0.1f, %0.1f, %0.1f)'
                   % (phi_d[0], phi_d[1], phi_d[2], 
                      psi_d[0], psi_d[1], psi_d[2],
-                     h[0], h[1], h[2]))
+                     h[0], h[1], h[2],
+                     r[0], r[1], r[2]) ) 
     
     return phi_d, psi_d, h, plot_title
     
@@ -207,6 +215,18 @@ if __name__ == '__main__':
 
     phi_d, psi_d, h, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
+
+    axes_name = pdb[:-4] + '_n1_axes.txt'
+    np.savetxt(axes_name, all_ncp_axes[0], fmt='%1.6e')
+    
+    axes_name = pdb[:-4] + '_n2_axes.txt'
+    np.savetxt(axes_name, all_ncp_axes[1], fmt='%1.6e')    
+    
+    origins_name = pdb[:-4] + '_orig.txt'
+    np.savetxt(origins_name, all_ncp_origins, fmt='%1.6e')
+    
+    h_name = pdb[:-4] + '_h.txt'
+    np.savetxt(h_name, h, fmt='%1.6e')
     
     data = 'N4merH5TE_zeroCon.iq'
     # data = 'N4merH5TE_zeroCon.i0q'

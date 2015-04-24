@@ -323,22 +323,22 @@ def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids,
             ncp_origins.append(ncp1_origin)
             ncp_axes.append(ncp1_axes)
         else:
-            ncp1_origin = ncp_origins[i+1]
-            ncp1_axes = ncp_axes[i+1]
+            ncp1_origin = ncp_origins[i]
+            ncp1_axes = ncp_axes[i]
         
         # copy NCP1 to NCP2
         ncp2 = sasmol.SasMol(0)
-        ncp_list[i+1].append(ncp2)
+        ncp_list.append(ncp2)
         error = ncp1.copy_molecule_using_mask(ncp2, copy_mask, 0)
         coor = ncp2.coor()[0]
         axes_coor = ncp1_axes + ncp1_origin
-        all_coor = np.concatenate((coor, ncp1_origin.reshape(1,3), axes_coor))
+        all_coor = np.concatenate((ncp1_origin.reshape(1,3), axes_coor, coor))
         
         # rotate NCP2 about Z_1 == Z_2 by an angle phi
-        phi_d[i]
+        all_coor = geometry.rotate_about_v(all_coor, ncp1_axes[2], phi_d[i])
         
         # rotate NCP2 about X_2 by an angle psi
-        psi_d[i]
+        all_coor = geometry.rotate_about_v(all_coor, all_coor[1], psi_d[i])
         
         # translate NCP2 a distance h along Z_1
         all_coor += h[i] * ncp1_axes[2]
@@ -347,12 +347,14 @@ def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids,
         all_coor += r[i] * ncp1_axes[0]
         
         # translate NCP2 a distance r along -X_2
-        all_coor -= r[i] * (all_coor[-3] - all_coor[-4])
+        all_coor -= r[i] * (all_coor[1] - all_coor[0])
 
-        ncp_origins.append(all_coor[-4])
-        ncp_axes.append(all_coor[-3:] - all_coor[-4])
-        ncp2.setCoor(np.array([all_coor[:-4]]))
-        ncp_list.append(ncp2)
+        ncp_origins.append(all_coor[0])
+        ncp_axes.append(all_coor[1:4] - all_coor[0])
+        ncp2.setCoor(np.array([all_coor[4:]]))
+
+    array = combine_sasmols(ncp_list)
+    
     return array
     
 if __name__ == '__main__':
@@ -361,7 +363,7 @@ if __name__ == '__main__':
     phi_d = [168.7, 194.0, 168.4]
     psi_d = [86.3, 86.6, 86.2]
     h = [17.9, -7.9, -19.5]
-    r = [50, 50, 50]
+    r = [70] * 3
 
     bps = np.array([np.linspace(0, 167, 168), np.linspace(168, 1, 168)]).T
     ncp_dna_resids = bps[[14, 154]]
@@ -369,4 +371,5 @@ if __name__ == '__main__':
     dna_segnames = ['I', 'J']
     array = construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, 
                                 ncp_dna_resids, dyad_resids)
+    array.write_pdb('manual_gH5x4.pdb', 0, 'w')
     

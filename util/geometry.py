@@ -28,6 +28,184 @@ class struct():
     def __init__(self):
         pass
 
+
+def get_move_to_origin_matrix(coor4):
+    '''
+    construct the 4x4 matrix to move Nx4 coordinate array to the origin
+    '''
+    
+    translation_matrix = np.eye(4)
+    reverse_translation_matrix = np.copy(translation_matrix)
+
+    try:
+        translation_matrix[3, 0:3] = -coor4[0, 0:3]
+        reverse_translation_matrix[3, 0:3] = coor4[0, 0:3]
+    except:
+        print 'no coordinates to translate:\n', coor4
+
+    return translation_matrix, reverse_translation_matrix
+
+def align_v_to_z(v):
+    '''
+    align the axis connecting the first 2 coordinates of a 1x4 array of
+    coodinate vectors to the z-axis
+    '''
+    align = np.eye(4, dtype=np.float)
+    v1 = np.array([0,0,1])
+    v2 = v
+    align[:3,:3] = rotate_v2_to_v1(v1, v2).transpose()
+
+    return align
+
+def rotate_about_v(coor3, v, theta):
+    '''
+    this function is designed to generate a modified version of the input
+    coordinates (coor3)
+    1) translate all coordinates so the first one is at the origin 
+       (rotation origin should be first coordinate)
+    2) orient the rotation vector, v, along the z-axis
+    3) performs rotations using the angle theta
+    4) reverse the orientation of v to the z-axis
+    5) reverse transaltion of all coordinates so the first is where it started
+    '''
+    n_atoms = coor3.shape[0]
+
+    # populate the arrays with the input values
+    # changing coordinate array from 3 to 4 component vectors 
+    # to incorporate transaltions into the matrix math
+    coor4 = np.ones((n_atoms, 4), np.float)
+    coor4[:, 0:3] = coor3     
+  
+    # create the translation-rotation matrix
+    # This is intended to be multiplied from the right (unlike standard matrix
+    # multiplication) so as not to require transposing the coordinate vectors.
+    theta_xyz_rad = np.array([0, 0, theta]) * np.pi / 180.0 # radians
+
+    [cx, cy, cz] = np.cos(theta_xyz_rad)
+    [sx, sy, sz] = np.sin(theta_xyz_rad)
+
+    # initialize the rotation
+    # consolidated method of defining the rotation matrices
+    rotate = np.eye(4, dtype=np.float)
+    rotate[0][0:3] = [ cy*cz,          cy*sz,          -sy   ]
+    rotate[1][0:3] = [ sx*sy*cz-cx*sz, sx*sy*sz+cx*cz, sx*cy ]
+    rotate[2][0:3] = [ sx*sz+cx*sy*cz, cx*sy*sz-sx*cz, cx*cy ]
+
+    # move coordinates to rotation origin
+    move_to_origin, return_from_origin = get_move_to_origin_matrix(coor4)  
+    # note: Ti0 != T0, negative off diag elements
+    coor4 = np.dot(coor4, move_to_origin) 
+
+    # align coordinates to the rotation vector then rotate
+    z_align_matrix = align_v_to_z(v)
+    align_and_rotate = np.dot(z_align_matrix, rotate)
+    coor4 = np.dot(coor4, align_and_rotate)          
+    
+    # reverse alignment
+    coor4 = np.dot(coor4, z_align_matrix.transpose()) 
+    
+    # return rotation origin to the original position
+    coor4 = np.dot(coor4, return_from_origin)        
+
+    # return the modified positions
+    return coor4[:, 0:3]
+
+
+def rotate_v2_to_v1(v1, v2):
+    '''
+    get the rotation matrix that rotate from v2 to v1 along the vector 
+    orthongal to both
+
+    Parameters
+    ----------
+    v1 : Nx3 np.array
+        The vector/s to rotate to
+    v2 : Nx3 np.array
+        The vector/s to rotate from
+        
+
+    Returns
+    -------
+    R : Nx3x3 np.array
+        The rotation matrices that rotate from v2 to v1
+
+
+    Notes
+    -----
+    Followed the description on http://math.stackexchange.com/questions/180418/
+
+    See Also
+    --------
+    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4 
+                 array of coordinate vectors to be on the z-axis
+    
+    Examples
+    --------
+    >>> v1 = np.array([0,0,1])
+    >>> v2 = np.array([1,0,0])
+    >>> R = rotate_v2_to_v1(v1, v2)
+    >>> print R
+    [[ 0.  0. -1.]
+     [ 0.  1.  0.]
+     [ 1.  0.  0.]]
+    >>> np.dot(R, v2) - v1
+    array([ 0.,  0.,  0.])
+
+    Graphical illustration:
+
+    >>> NotImplemented
+    NotImplemented
+    '''
+    if len(v2.shape) != len(v1.shape):
+        if len(v2.shape) > len(v1.shape):
+            new_v1 = np.zeros(v2.shape)
+            new_v1[:] = v1
+            v1 = new_v1
+        else:
+            pass # THIS WILL BREAK
+    
+    if len(v2.shape) == 1:
+        # make sure v1 and v2 are unit vectors:
+        v1 = v1/np.sqrt(v1.dot(v1))
+        v2 = v2/np.sqrt(v2.dot(v2))
+        
+        v = np.cross(v2, v1) # hinge axis
+        c = np.dot(v2, v1)
+        s = np.sqrt(np.dot(v, v))
+        V = np.array([[    0, -v[2],  v[1]], 
+                         [ v[2],     0, -v[0]], 
+                         [-v[1],  v[0],    0]])
+    
+        R = np.eye(3) + V + np.dot(V, V) * (1 - c) / s**2
+    else:
+        # make sure v1 and v2 are unit vectors:
+        v1 = np.einsum('ij,i->ij', v1, 1/np.sqrt(np.einsum('ij,ij->i', v1, v1)))
+        v2 = np.einsum('ij,i->ij', v2, 1/np.sqrt(np.einsum('ij,ij->i', v2, v2)))
+
+        v = np.cross(v2, v1)
+        c = np.einsum('ij,ij->i', v2, v1)
+        s = np.sqrt(np.einsum('ij,ij->i', v, v))
+        
+        n_v = len(v)
+        
+        # V = np.array([[    0, -v[2],  v[1]], 
+                      # [ v[2],     0, -v[0]], 
+                      # [-v[1],  v[0],    0]])
+        V = np.zeros((n_v, 3, 3))
+        V[:,0,1:]  = v[:,2:0:-1]
+        V[:,1,::2] = v[:,::-2]
+        V[:,2,:2]  = v[:,1::-1]
+        V[:,0,1] = -V[:,0,1]
+        V[:,1,2] = -V[:,1,2]
+        V[:,2,0] = -V[:,2,0]
+        
+        I = np.zeros((n_v, 3, 3))
+        I[:] = np.eye(3)
+    
+        R = I + V + np.einsum('ijk,i->ijk', np.einsum('hij,hjk->hik', V, V), (1 - c) / s**2)
+
+    return R
+
 def cylinder_distances_from_R(coor, R, X0, Y0, Vx, Vy):
     origin = np.array([X0, Y0, 0]) # Z0 = 0
 
