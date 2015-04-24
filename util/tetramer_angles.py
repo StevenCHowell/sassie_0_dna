@@ -143,10 +143,11 @@ def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
     h = inner1d(all_ncp1_axes[:, 2, :], all_ncp2_origins - all_ncp1_origins)
     
     # radius
-    # all_ncp2_origins -  = all_ncp1_origins + r * all_ncp1_axes[:, 0, :]
-    rhs = all_ncp2_origins - h * all_ncp1_axes[:, 2, :] - all_ncp1_origins
-    lhs = all_ncp1_axes[:, 0, :] - all_ncp2_axes[:, 0, :]
-    r = [50]*3
+    # solve this linear system: r1 * X_1 - r2 * X_2 + h * Z_1 = O_2 - O_1
+    a = np.array([all_ncp1_axes[:, 0, :], -all_ncp2_axes[:, 0, :], all_ncp1_axes[:, 2, :]])
+    b = np.array([all_ncp2_origins - all_ncp1_origins])
+    r1, r2, h = np.linalg.solve(a, b)
+    
     
     plot_title = (r'$\phi$ (bend): (%0.1f, %0.1f, %0.1f); '
                   r'$\psi$ (twist): (%0.1f, %0.1f, %0.1f); '
