@@ -57,6 +57,89 @@ def align_v_to_z(v):
 
     return align
 
+def get_alignment_angles(axes1, axes2):
+    '''
+    determine the angles to align axes2 to axes1
+    
+    Parameters
+    ----------
+    axes1 : 3x3 np.array
+        The axes to rotate to
+    axes2 : 3x3 np.array
+        The axes to rotate from
+        
+
+    Returns
+    -------
+    phi : 1x3 np.array
+        phi_x, phi_y, and phi_z angles to rotate axes2 about
+    Notes
+    -----
+    rotation order should be: 
+        phi_x about axes1[0]
+        phi_y about axes1[1]
+        phi_z about axes1[2]
+
+    procedure:
+        1) reorient axes1 and axes2 so axes1 is along the cardinal directions
+        2) determine phi_x
+        3) determine phi_y
+        4) determine phi_z
+
+    See Also
+    --------
+    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4 
+                 array of coordinate vectors to be on the z-axis
+    rotate_about_v : rotate coordinates about an arbitrary vector
+    
+    Examples
+    --------
+    >>> axes1 = np.eye(3)
+    >>> sqrt2 = np.sqrt(2)
+    >>> axes2 = np.array([[0, 0, 1],[1/sqrt2, 1/sqrt2, 0],[-1/sqrt2, 1/sqrt2, 0]])
+    >>> phi = get_alignment_angles(axes1, axes2)
+    >>> print phi
+    [ 90.  45.  90.]
+    '''
+
+    # 0) make sure input axes are orthonomal 
+    assert np.allclose(np.eye(3), axes1.dot(axes1.transpose())), 'ERROR: axes1 is not orthonormal'
+    assert np.allclose(np.eye(3), axes2.dot(axes2.transpose())), 'ERROR: axes2 is not orthonormal'
+
+    # 1) reorient axes1 and axes2 so axes1 is along the cardinal directions
+    if np.allclose(axes1, np.eye(3)):
+        axes1xyz = axes1
+        axes2xyz = axes2
+    else:
+        alignX = rotate_v2_to_v1(np.array([1, 0, 0]), axes1[0]).transpose()
+        axes1x = axes1.dot(alignX)
+        alignY = rotate_v2_to_v1(np.array([0, 1, 0]), axes1x[1]).transpose()
+        axes1xy = axes1x.dot(alignY)
+        alignZ = rotate_v2_to_v1(np.array([0, 0, 1]), axes1xy[2]).transpose()
+        axes1xyz = axes1xy.dot(alignZ)
+        axes2xyz = axes2.dot(alignX).dot(alignY).dot(alignZ)
+        assert np.allclose(np.eye(3), axes1xyz), 'ERROR: failed to align axes1 to the cardinal axes'
+
+    # 2) determine phi_x
+    phi_x_r = np.arctan2(axes2xyz[2, 1], axes2xyz[2, 2]) # angle to make z[1] = 0
+    phi_x = phi_x_r * 180/np.pi
+    axes2xyz = rotate_about_v(np.concatenate(([[0, 0, 0]], axes2xyz)), axes1xyz[0], phi_x)[1:]
+
+    # 3) determine phi_y
+    phi_y_r = np.arctan2(-axes2xyz[2, 0], axes2xyz[2, 2]) # angle to make z[0] = 0
+    phi_y = phi_y_r * 180/np.pi
+    axes2xyz = rotate_about_v(np.concatenate(([[0, 0, 0]], axes2xyz)), axes1xyz[1], phi_y)[1:]
+
+    # 4) determine phi_z
+    phi_z_r = np.arctan2(-axes2xyz[0, 1], axes2xyz[0, 0]) # angle to make x[1] = 0 (y[0] = 0 also)
+    phi_z = phi_z_r * 180/np.pi    
+    axes2xyz = rotate_about_v(np.concatenate(([[0, 0, 0]], axes2xyz)), axes1xyz[2], phi_z)[1:]
+
+    # 5) verify the result actually rotated axes2 to axes1
+    assert np.allclose(np.eye(3), axes2xyz), 'ERROR: failed to align axes2 to axes1 (invalid angles)'
+    
+    return np.array([phi_x, phi_y, phi_z])
+
 def rotate_about_v(coor3, v, theta):
     '''
     this function is designed to generate a modified version of the input
@@ -91,20 +174,20 @@ def rotate_about_v(coor3, v, theta):
     rotate[1][0:3] = [ sx*sy*cz-cx*sz, sx*sy*sz+cx*cz, sx*cy ]
     rotate[2][0:3] = [ sx*sz+cx*sy*cz, cx*sy*sz-sx*cz, cx*cy ]
 
-    # move coordinates to rotation origin
+    # 1) move coordinates to rotation origin
     move_to_origin, return_from_origin = get_move_to_origin_matrix(coor4)  
     # note: Ti0 != T0, negative off diag elements
     coor4 = np.dot(coor4, move_to_origin) 
 
-    # align coordinates to the rotation vector then rotate
+    # 2-3) align coordinates to the rotation vector then rotate
     z_align_matrix = align_v_to_z(v)
     align_and_rotate = np.dot(z_align_matrix, rotate)
     coor4 = np.dot(coor4, align_and_rotate)          
     
-    # reverse alignment
+    # 4) reverse alignment
     coor4 = np.dot(coor4, z_align_matrix.transpose()) 
     
-    # return rotation origin to the original position
+    # 5) return rotation origin to the original position
     coor4 = np.dot(coor4, return_from_origin)        
 
     # return the modified positions
@@ -168,20 +251,24 @@ def rotate_v2_to_v1(v1, v2):
         # make sure v1 and v2 are unit vectors:
         v1 = v1/np.sqrt(v1.dot(v1))
         v2 = v2/np.sqrt(v2.dot(v2))
+
+        if np.allclose(v1, v2):
+            R = np.eye(3)
+        else:
+            v = np.cross(v2, v1) # hinge axis
+            c = np.dot(v2, v1)
+            s = np.sqrt(np.dot(v, v))
+            V = np.array([[    0, -v[2],  v[1]], 
+                          [ v[2],     0, -v[0]], 
+                          [-v[1],  v[0],    0]])
         
-        v = np.cross(v2, v1) # hinge axis
-        c = np.dot(v2, v1)
-        s = np.sqrt(np.dot(v, v))
-        V = np.array([[    0, -v[2],  v[1]], 
-                      [ v[2],     0, -v[0]], 
-                      [-v[1],  v[0],    0]])
-    
-        R = np.eye(3) + V + np.dot(V, V) * (1 - c) / s**2
+            R = np.eye(3) + V + np.dot(V, V) * (1 - c) / s**2
     else:
         # make sure v1 and v2 are unit vectors:
         v1 = np.einsum('ij,i->ij', v1, 1/np.sqrt(np.einsum('ij,ij->i', v1, v1)))
         v2 = np.einsum('ij,i->ij', v2, 1/np.sqrt(np.einsum('ij,ij->i', v2, v2)))
 
+        # this could fail if a v1, v2 pair are nearly equal -> s~=0
         v = np.cross(v2, v1)
         c = np.einsum('ij,ij->i', v2, v1)
         s = np.sqrt(np.einsum('ij,ij->i', v, v))
@@ -667,6 +754,13 @@ def get_ncp_origin_and_axes(ncp_c1p_mask, dyad_mask, dyad_dna_id, ncp, prev_opt_
     return ncp_origin, ncp_axes, opt_params, dyad_mol, ncp_plot_vars
 
 if __name__ == '__main__':
+    
+    axes1 = np.eye(3)
+    sqrt2 = np.sqrt(2)
+    axes2 = np.array([[0, 0, 1],[1/sqrt2, 1/sqrt2, 0],[-1/sqrt2, 1/sqrt2, 0]])
+    phi = get_alignment_angles(axes1, axes2)
+    print phi
+    
     import time
     pdb_file = '1KX5tailfold_167bp.pdb'
     ncp = sasmol.SasMol(0)
