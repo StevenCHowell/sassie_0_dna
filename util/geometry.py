@@ -75,10 +75,16 @@ def get_alignment_angles(axes1, axes2):
         phi_x, phi_y, and phi_z angles to rotate axes2 about
     Notes
     -----
-    rotation order should be: 
+    to align axes, rotation order should be: 
         phi_x about axes1[0]
         phi_y about axes1[1]
         phi_z about axes1[2]
+
+    the reverse alignment should be
+        -phi_z about axes1[2]
+        -phi_y about axes1[1]
+        -phi_x about axes1[0]
+
 
     procedure:
         1) reorient axes1 and axes2 so axes1 is along the cardinal directions

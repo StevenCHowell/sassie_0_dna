@@ -265,7 +265,7 @@ def align_gH5_to_c11():
     # print 'max(test):', max(test)
     '''
 
-def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids, 
+def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
                         dyad_resids, save_name=None):
     '''
     given a list of sasmol objects, this will combine them into one 
@@ -284,9 +284,8 @@ def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids,
     see also:
         align_gH5_to_c11
     '''
-    n_ncp = (len(phi_d), len(psi_d), len(h), len(r))
-    assert min(n_ncp) == max(n_ncp), 'ERROR: inconsistent inputs, unclear definition parameters'
-    n_ncp = n_ncp[0]
+    assert len(phi) == len(dxyz), 'ERROR: inconsistent inputs, unclear definition parameters'
+    n_ncp = len(phi)
     
     # load in NCP1 if it is not already a sasmol object
     if isinstance(ncp, basestring):
@@ -334,20 +333,23 @@ def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids,
         axes_coor = ncp1_axes + ncp1_origin
         all_coor = np.concatenate((ncp1_origin.reshape(1,3), axes_coor, coor))
         
-        # rotate NCP2 about Z_1 == Z_2 by an angle phi
-        all_coor = geometry.rotate_about_v(all_coor, ncp1_axes[2], phi_d[i])
+        # rotate NCP2 about Z_1 by -phi_z
+        all_coor = geometry.rotate_about_v(all_coor, ncp1_axes[2], -phi[i, 2])
         
-        # rotate NCP2 about X_2 by an angle psi
-        all_coor = geometry.rotate_about_v(all_coor, all_coor[1], psi_d[i])
+        # rotate NCP2 about Y_1 by -phi_y
+        all_coor = geometry.rotate_about_v(all_coor, ncp1_axes[1], -phi[i, 1])
+
+        # rotate NCP2 about X_1 by -phi_x
+        all_coor = geometry.rotate_about_v(all_coor, ncp1_axes[0], -phi[i, 0])
         
-        # translate NCP2 a distance h along Z_1
-        all_coor += h[i] * ncp1_axes[2]
+        # translate NCP2 a distance dx along X_1
+        all_coor += dxyz[i, 0] * ncp1_axes[0]
         
-        # translate NCP2 a distance r along X_1
-        all_coor += r[i] * ncp1_axes[0]
-        
-        # translate NCP2 a distance r along -X_2
-        all_coor -= r[i] * (all_coor[1] - all_coor[0])
+        # translate NCP2 a distance dy along Y_1
+        all_coor += dxyz[i, 1] * ncp1_axes[1]
+    
+        # translate NCP2 a distance dz along Z_1
+        all_coor += dxyz[i, 2] * ncp1_axes[2]
 
         ncp_origins.append(all_coor[0])
         ncp_axes.append(all_coor[1:4] - all_coor[0])
@@ -360,16 +362,15 @@ def construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, ncp_dna_resids,
 if __name__ == '__main__':
     # align_gH5_to_c11()
     ncp = 'NCP1.pdb'
-    phi_d = [168.7, 194.0, 168.4]
-    psi_d = [86.3, 86.6, 86.2]
-    h = [17.9, -7.9, -19.5]
-    r = [70] * 3
-
+    phi_file = 'gH5c11_r_phi.txt'
+    dxyz_file = 'gH5c11_r_dxyz.txt'
+    phi = np.loadtxt(phi_file)
+    dxyz = np.loadtxt(dxyz_file)
     bps = np.array([np.linspace(0, 167, 168), np.linspace(168, 1, 168)]).T
     ncp_dna_resids = bps[[14, 154]]
     dyad_resids = bps[84]
     dna_segnames = ['I', 'J']
-    array = construct_ncp_array(ncp, phi_d, psi_d, h, r, dna_segnames, 
+    array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
                                 ncp_dna_resids, dyad_resids)
     array.write_pdb('manual_gH5x4.pdb', 0, 'w')
-    
+    print '\m/ >.< \m/'
