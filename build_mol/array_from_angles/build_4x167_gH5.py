@@ -316,9 +316,10 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         # get the axes and origin for NCP1
         ncp1 = ncp_list[i]
         if i == 0:
+            debug=False
             (ncp1_origin, ncp1_axes, ncp_opt_params, ncp_dyad_mol, 
              ncp_plot_vars) = geometry.get_ncp_origin_and_axes(
-                 ncp_mask, dyad_mask, dna_segnames, ncp1, debug=True)
+                 ncp_mask, dyad_mask, dna_segnames, ncp1, debug=debug)
             ncp_origins.append(ncp1_origin)
             ncp_axes.append(ncp1_axes)
         else:
@@ -350,6 +351,19 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     
         # translate NCP2 a distance dz along Z_1
         all_coor += dxyz[i, 2] * ncp1_axes[2]
+
+        # translate NCP2 a distance z along Z_1
+        all_coor += z[i] * ncp1_axes[2]
+
+        # # THIS DID NOT WORK WELL # # 
+        # # translate NCP2 a distance h along Z_1
+        # all_coor += h[i] * ncp1_axes[2]
+    
+        # # translate NCP2 a distance r1 along X_1
+        # all_coor += r1[i] * ncp1_axes[0]
+    
+        # # translate NCP2 a distance r2 along -X_2
+        # all_coor -= r2[i] * (all_coor[1] - all_coor[0])
 
         ncp_origins.append(all_coor[0])
         ncp_axes.append(all_coor[1:4] - all_coor[0])
