@@ -1,6 +1,6 @@
 '''
 This file is meant to serve as a record of the generation of the dimer.pdb file
-rather than a python library to be improted.  It also serves as an example of 
+rather than a python library to be imported.  It also serves as an example of 
 how to use several of the libraries called within.
 '''
 import sassie.sasmol.sasmol as sasmol

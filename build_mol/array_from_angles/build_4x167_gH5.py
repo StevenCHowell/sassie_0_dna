@@ -375,7 +375,8 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     
 if __name__ == '__main__':
     # align_gH5_to_c11()
-    ncp = 'NCP1.pdb'
+    # ncp = 'NCP1.pdb'
+    ncp = 'gH5_1x164.pdb'
     phi_file = 'gH5c11_r_phi.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
@@ -386,5 +387,5 @@ if __name__ == '__main__':
     dna_segnames = ['I', 'J']
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
                                 ncp_dna_resids, dyad_resids)
-    array.write_pdb('manual_gH5x4.pdb', 0, 'w')
+    array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'
