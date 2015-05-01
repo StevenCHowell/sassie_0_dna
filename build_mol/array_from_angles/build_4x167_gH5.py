@@ -352,9 +352,6 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         # translate NCP2 a distance dz along Z_1
         all_coor += dxyz[i, 2] * ncp1_axes[2]
 
-        # translate NCP2 a distance z along Z_1
-        all_coor += z[i] * ncp1_axes[2]
-
         # # THIS DID NOT WORK WELL # # 
         # # translate NCP2 a distance h along Z_1
         # all_coor += h[i] * ncp1_axes[2]
@@ -376,15 +373,21 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
 if __name__ == '__main__':
     # align_gH5_to_c11()
     # ncp = 'NCP1.pdb'
+    # dna_segnames = ['I', 'J']
+    # w601 = [14, 154]
+    # bps = np.array([np.linspace(0, 167, 168), np.linspace(168, 1, 168)]).T
     ncp = 'gH5_1x164.pdb'
+    dna_segnames = ['DNA1', 'DNA2']
+    w601 = [12, 152]
+    bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
+    
     phi_file = 'gH5c11_r_phi.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
     dxyz = np.loadtxt(dxyz_file)
-    bps = np.array([np.linspace(0, 167, 168), np.linspace(168, 1, 168)]).T
-    ncp_dna_resids = bps[[14, 154]]
-    dyad_resids = bps[84]
-    dna_segnames = ['I', 'J']
+
+    ncp_dna_resids = bps[[w601[0], w601[1]]]
+    dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
                                 ncp_dna_resids, dyad_resids)
     array.write_pdb('complete_gH5x4.pdb', 0, 'w')
