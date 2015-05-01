@@ -23,7 +23,8 @@ try:
 except:
     import pickle as pickle
     
-def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, array=None):
+def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, 
+                      ncp_ref_atom_basis, array=None):
     pkl_file = pdb[:-3] + 'pkl'
     try:
         pkl_in = open(pkl_file, 'rb')
@@ -62,7 +63,8 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, array=None)
 
     # # re-orient the array
     # coor = array.coor()
-    # coor[0] = geometry.transform_coor(coor[0], np.array([1, 0, 0]), np.array([0, 0, 0]))
+    # coor[0] = geometry.transform_coor(coor[0], np.array([1, 0, 0]), 
+                                      # np.array([0, 0, 0]))
     # array.setCoor(coor)
     # array.write_pdb('gH5c11_r.pdb', 0, 'w')
 
@@ -75,25 +77,36 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, array=None)
             ncp_opt_params = all_ncp_opt_params[i]
         else:
             ncp_basis_vmd = ("((segname %s and resid >= %d and resid <=  %d) or"
-                             " (segname %s and resid <= %d and resid >= %d) ) and name C1' " 
-                             % (dna_ids[i][0], resids[0,0], resids[1,0], dna_ids[i][1], resids[0,1], resids[1,1]))
+                             " (segname %s and resid <= %d and resid >= %d) ) "
+                             "and name C1' " 
+                             % (dna_ids[i][0], resids[0,0], resids[1,0], 
+                                dna_ids[i][1], resids[0,1], resids[1,1]))
             ncp_basis = basis_to_python.parse_basis(ncp_basis_vmd)
             error, ncp_mask = array.get_subset_mask(ncp_basis)
             errors.append(errors)
             
             dyad_basis = ('( segname[i] == "%s" and resid[i] == %d ) or'
                           '( segname[i] == "%s" and resid[i] == %d )'
-                          % (dna_ids[i][0], ncp_dyad_resids[i][0], dna_ids[i][1], ncp_dyad_resids[i][1]) )
+                          % (dna_ids[i][0], ncp_dyad_resids[i][0], 
+                             dna_ids[i][1], ncp_dyad_resids[i][1]) )
             error, dyad_mask = array.get_subset_mask(dyad_basis)
             errors.append(errors)
+
+            ref_atom_basis_vmd = ("(segname %s and resid %d and name C1\')" %
+                                  (dna_ids[i][0], ncp_ref_atom_basis[i]))
+            ref_atom_basis = basis_to_python.parse_basis(ref_atom_basis_vmd)
+            error, ref_atom_mask = array.get_subset_mask(ref_atom_basis)
+            
             ncp_opt_params = None
             all_ncp_bases[i]      = ncp_basis
             all_ncp_masks[i]      = ncp_mask
             all_dyad_bases[i]     = dyad_basis
             all_dyad_masks[i]     = dyad_mask
 
-        ncp_origin, ncp_axes, ncp_opt_params, ncp_dyad_mol, ncp_plot_vars = geometry.get_ncp_origin_and_axes(
-            ncp_mask, dyad_mask, dna_ids[i], array, prev_opt_params=ncp_opt_params, debug=True)
+        (ncp_origin, ncp_axes, ncp_opt_params, ncp_dyad_mol, ncp_plot_vars
+         ) = geometry.get_ncp_origin_and_axes(ncp_mask, dyad_mask, dna_ids[i], 
+                                              array, ref_atom_mask, debug=True,
+                                              prev_opt_params=ncp_opt_params)
         
         # store all the variables for debug purposes
         all_ncp_origins[i]    = ncp_origin
@@ -127,7 +140,7 @@ def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
     ncp1_origins = all_ncp_origins[:-1] # ncp 1-3
     ncp2_origins = all_ncp_origins[ 1:] # ncp 2-4
 
-    #~~~ these angles and translations are different from Victor Zhurkin @ NIH ~~~#
+    #~ these angles and translations are different from Victor Zhurkin @ NIH ~#
     # phi_x: angle that aligns Z_2 to the X_1-Z_1 plane
     phi = np.zeros((n_ncp-1, 3))
     for i in xrange(n_ncp-1):
@@ -196,7 +209,8 @@ if __name__ == '__main__':
     dna_ids = [['DNA1', 'DNA2']]*4
     ncp_dna_resids = [bps[[26, 166]], bps[[193, 333]], bps[[360, 500]], bps[[527, 667]]]
     ncp_dyad_resids = [bps[96], bps[263], bps[430], bps[597]]
-
+    ncp_ref_atom_basis = [37, 204, 371, 538]
+    
     # get tetramer axes
     pkl_file = pdb[:-3] + 'pkl'
     try:
@@ -213,7 +227,8 @@ if __name__ == '__main__':
         all_ncp_plot_vars  = pickle.load(pkl_in)
         pkl_in.close()
     except:
-        all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids)
+        all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = get_tetramer_axes(
+            pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_ref_atom_basis)
 
     # geometry.show_ncps(all_ncp_plot_vars)
     

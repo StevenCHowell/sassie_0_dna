@@ -681,7 +681,8 @@ def get_axes_from_points(origin, p1, p2):
     accordingly (p1, p2) should be (pX, pY), (pY, pZ), or (pZ, pX)
 
     example:
-    >>> get_axes_from_points(np.array([0,0,0]), np.array([2,0,0]), np.array([0,3,0]))
+    >>> get_axes_from_points(np.array([0,0,0]), np.array([2,0,0]), 
+                             np.array([0,3,0])) 
     (array([ 1.,  0.,  0.]), array([ 0.,  1.,  0.]), array([ 0.,  0.,  1.]))
     '''
     ax1 = p1 - origin
@@ -693,9 +694,11 @@ def get_axes_from_points(origin, p1, p2):
     return ax1_hat, ax2_hat, ax3_hat
 
 
-def get_ncp_origin_and_axes(ncp_c1p_mask, dyad_mask, dyad_dna_id, ncp, prev_opt_params=None, 
+def get_ncp_origin_and_axes(ncp_c1p_mask, dyad_mask, dyad_dna_id, ncp, 
+                            ref_atom_mask, prev_opt_params=None, 
                             dna_id_type='segname', dyad_mol=None, debug=False):
-    dyad_origin, dyad_axes, dyad_mol = get_dna_bp_and_axes(dyad_mask, dyad_dna_id, ncp, dyad_mol, dna_id_type)
+    dyad_origin, dyad_axes, dyad_mol = get_dna_bp_and_axes(dyad_mask, 
+                                        dyad_dna_id, ncp, dyad_mol, dna_id_type)
 
     error, coor = ncp.get_coor_using_mask(0, ncp_c1p_mask)
     coor = coor[0]
@@ -743,11 +746,19 @@ def get_ncp_origin_and_axes(ncp_c1p_mask, dyad_mask, dyad_dna_id, ncp, prev_opt_
     # x = xp1 - np.dot(xp1, z_hat)*z_hat #subtract from x the projection along z_hat        
     
     y_hat = np.cross(z_hat,x_hat)
+    error, ref_coor = ncp.get_coor_using_mask(0, ref_atom_mask)
+    ref_vec = (ref_coor - ncp_origin).reshape(y_hat.shape)
+    ref_vec /= np.sqrt(ref_vec.dot(ref_vec))
+    if y_hat.dot(ref_vec) < 0:
+        y_hat *= -1
+        z_hat *= -1
     ncp_axes = np.array([x_hat, y_hat, z_hat])
+
 
     if debug:
         ## display the fit results
-        show_cylinder(coor, opt_params, ncp_origin, ncp_axes, dyad_origin, dyad_axes)
+        show_cylinder(coor, opt_params, ncp_origin, ncp_axes, dyad_origin, 
+                      dyad_axes)
     
     ncp_plot_vars = struct()
     ncp_plot_vars.coor        = coor
@@ -771,16 +782,23 @@ if __name__ == '__main__':
     pdb_file = '1KX5tailfold_167bp.pdb'
     ncp = sasmol.SasMol(0)
     ncp.read_pdb(pdb_file)
-    basis_filter = ' ( chain[i] ==  "I"  or chain[i] ==  "J"  ) and name[i] ==  "C1\'" '
+    basis_filter = '( chain[i] ==  "I"  or chain[i] ==  "J"  ) and name[i] ==  "C1\'" '
     error, c1p_mask = ncp.get_subset_mask(basis_filter)
     dyad_dna_resids = [0, 0]
     dyad_dna_id = ['I', 'J']
-    tic = time.time()
-    bp_filter = '( chain[i] == "%s" and resid[i] == %d ) or ( chain[i] == "%s" and resid[i] == %d )' % (
-        dyad_dna_id[0], dyad_dna_resids[0], dyad_dna_id[1], dyad_dna_resids[1])
+
+    bp_filter = ('( chain[i] == "%s" and resid[i] == %d ) or ( chain[i] == "%s" '
+                 'and resid[i] == %d )' % (dyad_dna_id[0], dyad_dna_resids[0], 
+                                           dyad_dna_id[1], dyad_dna_resids[1]))
     error, dyad_mask = ncp.get_subset_mask(bp_filter)
+
+    ref_atom_basis = 'segname[i] == "I" and resid[i] == 18 and name[i] == "C1\'"'
+    error, ref_atom_mask = ncp.get_subset_mask(ref_atom_basis)
+
+    tic = time.time()
     ncp_origin, ncp_axes, opt_params, dyad_mol, plot_vars = get_ncp_origin_and_axes(
-        c1p_mask, dyad_mask, dyad_dna_id, ncp, None, 'chain', None, False) 
+        c1p_mask, dyad_mask, dyad_dna_id, ncp, ref_atom_mask, 
+        prev_opt_params=None, dna_id_type='chain', dyad_mol=None, debug=False) 
     toc = time.time() - tic
     print 'determining the NCP origin and axes took %0.3f s' %toc
     print 'ncp_origin =', ncp_origin
