@@ -16,6 +16,7 @@ import numpy as np
 import x_dna.util.tetramer_angles as ta
 import x_dna.util.geometry as geometry
 import x_dna.drivers.myAlign as align
+import x_dna.util.basis_to_python as b2p
 
 class inputs():
     def __init__(self, parent = None):
@@ -65,15 +66,16 @@ def combine_pdbs(all_pdbs, out_pdb=None):
     if out_pdb: combined_mol.write_pdb(out_pdb, 0, 'w')
     return combined_mol
 
-def replace_prime(names):
-    last_name = ''
-    for (j, name) in enumerate(names):
-        if name == last_name: 
-            pass
-        else:
-            last_name = name
-            new_name = name.replace("*","'")
-        segnames[j] = new_name
+# m.setName([name.replace("*","'") for name in m.name()])
+# def replace_prime(names):
+    # last_name = ''
+    # for (j, name) in enumerate(names):
+        # if name == last_name: 
+            # pass
+        # else:
+            # last_name = name
+            # new_name = name.replace("*","'")
+        # segnames[j] = new_name
         
 def increment_ncp_segnames(segnames, i):
     last_name = ''
@@ -121,6 +123,7 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setSegname(mol.segname())
             combined_mol.setElement(mol.element())
             combined_mol.setCharge(mol.charge())
+            combined_mol.setMoltype([moltype.replace('rna','dna') for moltype in mol.moltype()])
         else:
             index = np.concatenate((combined_mol.index(), combined_mol.index()[-1] + mol.index()))
             combined_mol.setIndex(index)
@@ -140,6 +143,8 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setSegname(combined_mol.segname() + mol.segname())
             combined_mol.setElement(combined_mol.element() + mol.element())
             combined_mol.setCharge(combined_mol.charge() + mol.charge())
+            combined_mol.setMoltype(combined_mol.moltype() + 
+                                    [moltype.replace('rna','dna') for moltype in mol.moltype()])
 
     if combine_segnames:
         for segname in combine_segnames:
@@ -176,10 +181,15 @@ def align_gH5_to_c11():
         
         # create the filter to select the C11 DNA to align to
         c11_filter = []
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 166) and (resid[i] >=  26))")  # NCP-1
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 333) and (resid[i] >= 193))")  # NCP-2
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 499) and (resid[i] >= 359))")  # NCP-3
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 667) and (resid[i] >= 527))")  # NCP-4
+        # the symmetry resulted in rotated result -> wrong DNA sequence
+        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 166) and (resid[i] >=  26))")  # NCP-1
+        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 333) and (resid[i] >= 193))")  # NCP-2
+        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 499) and (resid[i] >= 359))")  # NCP-3
+        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 667) and (resid[i] >= 527))")  # NCP-4        
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 76) and (resid[i] >=  26))")  # NCP-1
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 243) and (resid[i] >= 193))")  # NCP-2
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 409) and (resid[i] >= 359))")  # NCP-3
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 577) and (resid[i] >= 527))")  # NCP-4
     
         all_ncps = []
     
@@ -198,7 +208,8 @@ def align_gH5_to_c11():
         
             linker.center(0)
             # create the filter to select the coordinates for aligning
-            linker_filter = "((moltype[i] == 'dna' or moltype[i] == 'rna') and name[i] == 'P' and chain[i] == 'I' and resid[i] >= 14 and resid[i] <= 154)"
+            # linker_filter = "((moltype[i] == 'dna' or moltype[i] == 'rna') and name[i] == 'P' and chain[i] == 'I' and resid[i] >= 14 and resid[i] <= 154)"
+            linker_filter = "((moltype[i] == 'dna' or moltype[i] == 'rna') and name[i] == 'P' and chain[i] == 'I' and resid[i] >= 14 and resid[i] <= 64)"
             error, linker_mask = linker.get_subset_mask(linker_filter)
             s_link = sum(linker_mask)
             print 'sum(linker_mask) =', s_link 
@@ -255,7 +266,7 @@ def align_gH5_to_c11():
 
     all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = ta.get_tetramer_axes(
         pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_array)
-    phi_d, psi_d, h, plot_title = ta.get_tetramer_angles(all_ncp_axes, all_ncp_origins)
+    phi, dxyz, plot_title = ta.get_tetramer_angles(all_ncp_axes, all_ncp_origins)
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
 
     print '\m/ >.< \m/'
@@ -297,8 +308,7 @@ def align_gH5_to_c11():
     '''
 
 def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
-                        dyad_resids, ref_linker, link_segnames, link_align_ids,
-                        save_name=None):
+                        dyad_resids, link_vars, save_name=None):
     '''
     given a list of sasmol objects, this will combine them into one 
     sasmol object
@@ -390,10 +400,18 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         ncp2.setCoor(np.array([all_coor[4:]]))
 
     array = combine_sasmols(ncp_list)
+
+    if not save_name:
+        save_name = 'tmp.pdb'
+    array.write_pdb(save_name, 0, 'w')
+    array.read_pdb(save_name)
     
     # align the linker dna
     ref_linker = sasmol.SasMol(0)
-    ref_linker.read_pdb(link)
+    ref_linker.read_pdb(link_vars.pdb)
+    link_segnames = link_vars.segnames
+    link_resids = link_vars.resids
+    ncp_resids = link_vars.ncp_resids
     linker_list = []
     in_vars = inputs()
     in_vars.aa_goal = array
@@ -401,25 +419,40 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         linker = sasmol.SasMol(0)
         error, mask = ref_linker.get_subset_mask('all')
         error = ref_linker.copy_molecule_using_mask(linker, mask, 0)
-        
-        in_vars.goal_basis = ('( (segname[i] =="%s" and resid[i] >= %d and resid[i] <= %d ) or'
-                              '  (segname[i] =="%s" and resid[i] <= %d and resid[i] >= %d ) or'
-                              '  (segname[i] =="%s" and resid[i] >= %d and resid[i] <= %d ) or'
-                              '  (segname[i] =="%s" and resid[i] <= %d and resid[i] >= %d ) ) and'
-                              '  (name[i] == "C1\'")'
-                              %  (link_segnames[0], link_align_ids[0,0], link_align_ids[0,1],
-                                  link_segnames[1], link_align_ids[1,1], link_align_ids[1,1],
-                                  link_segnames[2], link_align_ids[0,2], link_align_ids[0,2],
-                                  link_segnames[3], link_align_ids[1,3], link_align_ids[1,3]) )
         in_vars.aa_move = linker
-        in_vars.move_basis = 
-        # align.align_mol(inputs)
-        # linker_list.append(in_vars.aa_move)
+        in_vars.move_basis = b2p.parse_basis('(segname %s and (resid %d or resid %d or resid %d) and name C1\')' %
+                                             (link_segnames[0], link_resids[0,0], link_resids[1,0], link_resids[2,0]) )
+    
+        ncp_segnames = [[dna_segnames[0].replace('1', str(2*i+1)), 
+                        dna_segnames[0].replace('1', str(2*i+2))],
+                        [dna_segnames[0].replace('1', str(2*(i+1)+1)), 
+                         dna_segnames[0].replace('1', str(2*(i+1)+2))]]                        
+        in_vars.goal_basis = b2p.parse_basis('( ( (segname %s and (resid == %d or resid == %d) ) or '
+                                             '(segname %s and resid == %d) ) and name == C1\')'
+                                             %  (ncp_segnames[0][0], ncp_resids[0,0], ncp_resids[1,0], 
+                                                 ncp_segnames[1][0], ncp_resids[2,0]) )
+        
+        # in_vars.move_basis = ('( (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) or'
+                              # '  (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) ) and'                              
+                              # '  (name[i] == "C1\'")'
+                              # %  (link_segnames[0], link_resids[0,0], link_resids[1,0], link_resids[2,0],
+                                  # link_segnames[1], link_resids[0,1], link_resids[1,1], link_resids[2,1]) )
+        
+        # ncp_segnames = [dna_segnames[0].replace('1', str(2*i+1)), 
+                        # dna_segnames[0].replace('1', str(2*i+2))]
+        # in_vars.goal_basis = ('( (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) or'
+                              # '  (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) ) and'                              
+                              # '  (name[i] == "C1\'")'
+                              # %  (ncp_segnames[0], ncp_resids[0,0], ncp_resids[1,0], ncp_resids[2,0],
+                                  # ncp_segnames[1], ncp_resids[0,1], ncp_resids[1,1], ncp_resids[2,1]) )
+        align.align_mol(in_vars)
+        linker_list.append(in_vars.aa_move)
     
     return array
     
 if __name__ == '__main__':
-    # align_gH5_to_c11()
+    align_gH5_to_c11()
+    
     # ncp = 'NCP1.pdb'
     # dna_segnames = ['I', 'J']
     # w601 = [14, 154]
@@ -427,13 +460,17 @@ if __name__ == '__main__':
     ncp = 'gH5_1x164.pdb'
     dna_segnames = ['DNA1', 'DNA2']
     w601 = [12, 152]
+    ncp_link_match = [163, 164, 2]
     bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
     
-    link = 'linker.pdb'
-    link_segnames = ['A', 'B']
-    link_align_resids = np.array([[1, 7], [2, 6], [6, 2], [7, 1]])
+    link_vars = inputs()
+    link_vars.pdb = 'linker.pdb'
+    link_vars.segnames = ['DNA1', 'DNA2']
+    link_vars.resids = np.array([[1, 7], [2, 6], [7, 1]])
+    link_vars.keep = [3,5]
+    link_vars.ncp_resids = bps[ncp_link_match]
     
-    phi_file = 'gH5c11_r_phi.txt'
+    phi_file = 'gH5c11_r_phi_mod.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
     dxyz = np.loadtxt(dxyz_file)
@@ -442,6 +479,6 @@ if __name__ == '__main__':
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
                                 ncp_dna_resids, dyad_resids,
-                                link, link_segnames, link_align_resids)
-    array.write_pdb('complete_gH5x4.pdb', 0, 'w')
+                                link_vars, save_name = 'complete_gH5x4.pdb')
+    # array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'
