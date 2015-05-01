@@ -15,6 +15,11 @@ import numpy as np
 # import string, os, locale, sys, random
 import x_dna.util.tetramer_angles as ta
 import x_dna.util.geometry as geometry
+import x_dna.drivers.myAlign as align
+
+class inputs():
+    def __init__(self, parent = None):
+        pass
 
 def renumber_index_resid(index, resid):
     '''
@@ -59,6 +64,31 @@ def combine_pdbs(all_pdbs, out_pdb=None):
     combined_mol = combine_sasmols(all_mols)
     if out_pdb: combined_mol.write_pdb(out_pdb, 0, 'w')
     return combined_mol
+
+def replace_prime(names):
+    last_name = ''
+    for (j, name) in enumerate(names):
+        if name == last_name: 
+            pass
+        else:
+            last_name = name
+            new_name = name.replace("*","'")
+        segnames[j] = new_name
+        
+def increment_ncp_segnames(segnames, i):
+    last_name = ''
+    for (j, name) in enumerate(segnames):
+        if name == last_name: 
+            pass
+        else:
+            last_name = name
+            try: 
+                n = int(name[0])
+                new_name = str(n + 2*i) + name[1:]
+            except:
+                n = int(name[-1])
+                new_name = name[:-1] + str(n + 2*i)
+        segnames[j] = new_name
     
 def combine_sasmols(all_mols, combine_segnames=None):
     '''
@@ -88,7 +118,7 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setCoor(mol.coor())
             combined_mol.setOccupancy(mol.occupancy())
             combined_mol.setBeta(mol.beta())
-            combined_mol.setSegname([i_str + name for name in mol.segname()])
+            combined_mol.setSegname(mol.segname())
             combined_mol.setElement(mol.element())
             combined_mol.setCharge(mol.charge())
         else:
@@ -106,7 +136,8 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setCoor(coor)
             combined_mol.setOccupancy(combined_mol.occupancy() + mol.occupancy())
             combined_mol.setBeta(combined_mol.beta() + mol.beta())
-            combined_mol.setSegname(combined_mol.segname() + [i_str + name for name in mol.segname()])
+            increment_ncp_segnames(mol.segname(), i)
+            combined_mol.setSegname(combined_mol.segname() + mol.segname())
             combined_mol.setElement(combined_mol.element() + mol.element())
             combined_mol.setCharge(combined_mol.charge() + mol.charge())
 
@@ -266,16 +297,18 @@ def align_gH5_to_c11():
     '''
 
 def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
-                        dyad_resids, save_name=None):
+                        dyad_resids, ref_linker, link_segnames, link_align_ids,
+                        save_name=None):
     '''
     given a list of sasmol objects, this will combine them into one 
     sasmol object
     
     inputs:
-        ncp       : template ncp, either a sasmol object or filename for a pdb 
-        phi_d     : bend angle
-        psi_d     : twist angle
-        h         : rise
+        ncp          : template ncp, either a sasmol object or filename for a pdb 
+        phi          : orientation angle
+        dxyz         : translation distances
+        dna_segnames : ...
+        
         save_name : optional input for what to save the result as 
         
     outputs:
@@ -352,21 +385,36 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         # translate NCP2 a distance dz along Z_1
         all_coor += dxyz[i, 2] * ncp1_axes[2]
 
-        # # THIS DID NOT WORK WELL # # 
-        # # translate NCP2 a distance h along Z_1
-        # all_coor += h[i] * ncp1_axes[2]
-    
-        # # translate NCP2 a distance r1 along X_1
-        # all_coor += r1[i] * ncp1_axes[0]
-    
-        # # translate NCP2 a distance r2 along -X_2
-        # all_coor -= r2[i] * (all_coor[1] - all_coor[0])
-
         ncp_origins.append(all_coor[0])
         ncp_axes.append(all_coor[1:4] - all_coor[0])
         ncp2.setCoor(np.array([all_coor[4:]]))
 
     array = combine_sasmols(ncp_list)
+    
+    # align the linker dna
+    ref_linker = sasmol.SasMol(0)
+    ref_linker.read_pdb(link)
+    linker_list = []
+    in_vars = inputs()
+    in_vars.aa_goal = array
+    for i in xrange(n_ncp):
+        linker = sasmol.SasMol(0)
+        error, mask = ref_linker.get_subset_mask('all')
+        error = ref_linker.copy_molecule_using_mask(linker, mask, 0)
+        
+        in_vars.goal_basis = ('( (segname[i] =="%s" and resid[i] >= %d and resid[i] <= %d ) or'
+                              '  (segname[i] =="%s" and resid[i] <= %d and resid[i] >= %d ) or'
+                              '  (segname[i] =="%s" and resid[i] >= %d and resid[i] <= %d ) or'
+                              '  (segname[i] =="%s" and resid[i] <= %d and resid[i] >= %d ) ) and'
+                              '  (name[i] == "C1\'")'
+                              %  (link_segnames[0], link_align_ids[0,0], link_align_ids[0,1],
+                                  link_segnames[1], link_align_ids[1,1], link_align_ids[1,1],
+                                  link_segnames[2], link_align_ids[0,2], link_align_ids[0,2],
+                                  link_segnames[3], link_align_ids[1,3], link_align_ids[1,3]) )
+        in_vars.aa_move = linker
+        in_vars.move_basis = 
+        # align.align_mol(inputs)
+        # linker_list.append(in_vars.aa_move)
     
     return array
     
@@ -381,6 +429,10 @@ if __name__ == '__main__':
     w601 = [12, 152]
     bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
     
+    link = 'linker.pdb'
+    link_segnames = ['A', 'B']
+    link_align_resids = np.array([[1, 7], [2, 6], [6, 2], [7, 1]])
+    
     phi_file = 'gH5c11_r_phi.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
@@ -389,6 +441,7 @@ if __name__ == '__main__':
     ncp_dna_resids = bps[[w601[0], w601[1]]]
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
-                                ncp_dna_resids, dyad_resids)
+                                ncp_dna_resids, dyad_resids,
+                                link, link_segnames, link_align_resids)
     array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'
