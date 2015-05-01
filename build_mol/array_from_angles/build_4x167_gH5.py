@@ -181,15 +181,14 @@ def align_gH5_to_c11():
         
         # create the filter to select the C11 DNA to align to
         c11_filter = []
-        # the symmetry resulted in rotated result -> wrong DNA sequence
-        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 166) and (resid[i] >=  26))")  # NCP-1
-        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 333) and (resid[i] >= 193))")  # NCP-2
-        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 499) and (resid[i] >= 359))")  # NCP-3
-        # c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 667) and (resid[i] >= 527))")  # NCP-4        
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 76) and (resid[i] >=  26))")  # NCP-1
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 243) and (resid[i] >= 193))")  # NCP-2
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 409) and (resid[i] >= 359))")  # NCP-3
-        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and (resid[i] <= 577) and (resid[i] >= 527))")  # NCP-4
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and "
+                          "(resid[i] <= 166) and (resid[i] >=  26))")  # NCP-1
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and "
+                          "(resid[i] <= 333) and (resid[i] >= 193))")  # NCP-2
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and "
+                          "(resid[i] <= 499) and (resid[i] >= 359))")  # NCP-3
+        c11_filter.append("((name[i] == 'P') and (segname[i] == 'DNA1') and "
+                          "(resid[i] <= 667) and (resid[i] >= 527))")  # NCP-4        
     
         all_ncps = []
     
@@ -200,7 +199,8 @@ def align_gH5_to_c11():
             # names = ['NCP1.pdb', 'NCP2.pdb', 'NCP3.pdb', 'NCP4.pdb']
             # for i in xrange(len(names)):
                 # linker.read_pdb(names[i])
-                # linker.setResname([name.replace('DA', 'ADE').replace('DC', 'CYT').replace('DG', 'GUA').replace('DT', 'THY')
+                # linker.setResname([name.replace('DA', 'ADE').replace(
+                #'DC', 'CYT').replace('DG', 'GUA').replace('DT', 'THY')
                                    # for name in linker.resname()])
                 # linker.write_pdb(names[i], 0, 'w')
                 # print 'renamed resnames in %s' %names[i]
@@ -263,9 +263,11 @@ def align_gH5_to_c11():
     ncp_dna_resids = [bps[[14, 154]]]*4
     dna_ids = [['1I', '1J'], ['2I', '2J'], ['3I', '3J'], ['4I', '4J']]
     ncp_dyad_resids = [bps[84], bps[84], bps[84], bps[84]]
-
+    ncp_ref_atom_resids = [25, 25, 25, 25]    
+    
     all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = ta.get_tetramer_axes(
-        pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_array)
+        pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_ref_atom_resids,
+        array=ncp_array)
     phi, dxyz, plot_title = ta.get_tetramer_angles(all_ncp_axes, all_ncp_origins)
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
 
@@ -308,7 +310,7 @@ def align_gH5_to_c11():
     '''
 
 def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
-                        dyad_resids, link_vars, save_name=None):
+                        dyad_resids, ref_atom_resid, link_vars, save_name=None):
     '''
     given a list of sasmol objects, this will combine them into one 
     sasmol object
@@ -352,6 +354,10 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
                      dna_segnames[1], dyad_resids[1]) )
     error, dyad_mask = ncp.get_subset_mask(dyad_basis)
     
+    ref_atom_basis = b2p.parse_basis("segname %s and resid %d and name C1\'"
+                                     % (dna_segnames[0], ref_atom_resid))
+    error, ref_atom_mask = ncp.get_subset_mask(ref_atom_basis)
+    
     copy_mask = np.ones(ncp_mask.shape)
     ncp_origins = []
     ncp_axes = []
@@ -362,7 +368,8 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
             debug=False
             (ncp1_origin, ncp1_axes, ncp_opt_params, ncp_dyad_mol, 
              ncp_plot_vars) = geometry.get_ncp_origin_and_axes(
-                 ncp_mask, dyad_mask, dna_segnames, ncp1, debug=debug)
+                 ncp_mask, dyad_mask, dna_segnames, ncp1, ref_atom_mask,
+                 debug=debug)
             ncp_origins.append(ncp1_origin)
             ncp_axes.append(ncp1_axes)
         else:
@@ -451,7 +458,7 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     return array
     
 if __name__ == '__main__':
-    align_gH5_to_c11()
+    # align_gH5_to_c11()
     
     # ncp = 'NCP1.pdb'
     # dna_segnames = ['I', 'J']
@@ -462,6 +469,7 @@ if __name__ == '__main__':
     w601 = [12, 152]
     ncp_link_match = [163, 164, 2]
     bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
+    ref_atom_resid = 23
     
     link_vars = inputs()
     link_vars.pdb = 'linker.pdb'
@@ -470,15 +478,15 @@ if __name__ == '__main__':
     link_vars.keep = [3,5]
     link_vars.ncp_resids = bps[ncp_link_match]
     
-    phi_file = 'gH5c11_r_phi_mod.txt'
+    phi_file = 'gH5c11_r_phi.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
     dxyz = np.loadtxt(dxyz_file)
 
     ncp_dna_resids = bps[[w601[0], w601[1]]]
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
-    array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
-                                ncp_dna_resids, dyad_resids,
-                                link_vars, save_name = 'complete_gH5x4.pdb')
+    array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
+                                dyad_resids, ref_atom_resid, link_vars, 
+                                save_name = 'complete_gH5x4.pdb')
     # array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'

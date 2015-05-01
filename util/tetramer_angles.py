@@ -24,7 +24,7 @@ except:
     import pickle as pickle
     
 def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, 
-                      ncp_ref_atom_basis, array=None):
+                      ncp_ref_atom_resids, array=None):
     pkl_file = pdb[:-3] + 'pkl'
     try:
         pkl_in = open(pkl_file, 'rb')
@@ -33,6 +33,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
         all_ncp_masks      = pickle.load(pkl_in)
         all_dyad_bases     = pickle.load(pkl_in)
         all_dyad_masks     = pickle.load(pkl_in)
+        all_ref_masks      = pickle.load(pkl_in)
         all_ncp_origins    = pickle.load(pkl_in)
         all_ncp_axes       = pickle.load(pkl_in)
         all_ncp_opt_params = pickle.load(pkl_in)
@@ -49,6 +50,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
         all_ncp_masks      = [None] * n_ncps
         all_dyad_bases     = [None] * n_ncps
         all_dyad_masks     = [None] * n_ncps
+        all_ref_atom_masks = [None] * n_ncps
         all_ncp_origins    = [None] * n_ncps
         all_ncp_axes       = [None] * n_ncps
         all_ncp_opt_params = [None] * n_ncps
@@ -75,6 +77,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
             ncp_mask       = all_ncp_masks[i]
             dyad_mask      = all_dyad_masks[i]
             ncp_opt_params = all_ncp_opt_params[i]
+            ref_atom_mask  = all_ref_atom_masks[i]
         else:
             ncp_basis_vmd = ("((segname %s and resid >= %d and resid <=  %d) or"
                              " (segname %s and resid <= %d and resid >= %d) ) "
@@ -93,7 +96,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
             errors.append(errors)
 
             ref_atom_basis_vmd = ("(segname %s and resid %d and name C1\')" %
-                                  (dna_ids[i][0], ncp_ref_atom_basis[i]))
+                                  (dna_ids[i][0], ncp_ref_atom_resids[i]))
             ref_atom_basis = basis_to_python.parse_basis(ref_atom_basis_vmd)
             error, ref_atom_mask = array.get_subset_mask(ref_atom_basis)
             
@@ -102,7 +105,8 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
             all_ncp_masks[i]      = ncp_mask
             all_dyad_bases[i]     = dyad_basis
             all_dyad_masks[i]     = dyad_mask
-
+            all_ref_atom_masks[i] = ref_atom_mask
+            
         (ncp_origin, ncp_axes, ncp_opt_params, ncp_dyad_mol, ncp_plot_vars
          ) = geometry.get_ncp_origin_and_axes(ncp_mask, dyad_mask, dna_ids[i], 
                                               array, ref_atom_mask, debug=True,
@@ -121,6 +125,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
     pickle.dump(all_ncp_masks, pkl_out, -1)
     pickle.dump(all_dyad_bases, pkl_out, -1)
     pickle.dump(all_dyad_masks, pkl_out, -1)
+    pickle.dump(all_ref_atom_masks, pkl_out, -1)
     pickle.dump(all_ncp_origins, pkl_out, -1)
     pickle.dump(all_ncp_axes, pkl_out, -1)
     pickle.dump(all_ncp_opt_params, pkl_out, -1)
@@ -209,7 +214,7 @@ if __name__ == '__main__':
     dna_ids = [['DNA1', 'DNA2']]*4
     ncp_dna_resids = [bps[[26, 166]], bps[[193, 333]], bps[[360, 500]], bps[[527, 667]]]
     ncp_dyad_resids = [bps[96], bps[263], bps[430], bps[597]]
-    ncp_ref_atom_basis = [37, 204, 371, 538]
+    ncp_ref_atom_resids = [37, 204, 371, 538]
     
     # get tetramer axes
     pkl_file = pdb[:-3] + 'pkl'
@@ -228,7 +233,7 @@ if __name__ == '__main__':
         pkl_in.close()
     except:
         all_ncp_plot_vars, all_ncp_axes, all_ncp_origins = get_tetramer_axes(
-            pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_ref_atom_basis)
+            pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids, ncp_ref_atom_resids)
 
     # geometry.show_ncps(all_ncp_plot_vars)
     
@@ -285,7 +290,7 @@ if __name__ == '__main__':
     # np.savetxt(h_name, h, fmt='%1.6e')
 
     phi_name = pdb[:-4] + '_phi.txt'
-    np.savetxt(phi_name, phi, fmt='%1.6e')
+    np.savetxt(phi_name, phi, fmt='%0.3f')
     
     # data = 'N4merH5TE_zeroCon.iq'
     # data = 'N4merH5TE_zeroCon.i0q'

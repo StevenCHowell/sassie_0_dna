@@ -55,6 +55,8 @@ def align(inputs):
     path:    output path
     max:     minimun residue to match 
     min:     minimun residue to match
+    
+    note: inputs.ref and inputs.move are typically the same pdb/dcd
     '''
     aa_goal_pdb    = inputs.goal
     aa_move_pdb    = inputs.ref
@@ -83,7 +85,6 @@ def align(inputs):
         move_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (move_seg_or_ch, move_segname, basis_atoms, move_res_min, move_res_max)
         
     # create the SasMol objects
-    aa_move  = sasmol.SasMol(0)
     sub_goal = sasmol.SasMol(0)
     sub_move = sasmol.SasMol(0)
     aa_goal  = sasmol.SasMol(0)
@@ -148,6 +149,66 @@ def align(inputs):
         aa_move.close_dcd_write(dcd_out_file)
 
     print 'COMPLETE \m/ >.< \m/'
+
+if __name__ == "__main__":
+
+    import argparse
+    if '-v' in sys.argv:
+        logging.basicConfig(filename='_log-%s' %__name__, level=logging.DEBUG)
+        sys.argv.pop(sys.argv.index('-v'))
+    else:
+        logging.basicConfig()
+
+    # make ARGS global
+    ARGS = parse()
+    
+    align(ARGS)
+
+def align_mol(inputs):
+    '''
+    input:
+    ------
+        intputs: object that should contain the following attributes
+            aa_goal:    goal sasmol object
+            aa_move:    sasmol object to align
+            goal_basis: goal basis for alignment
+            move_basis: move basis for alignment
+            
+    returns:
+    --------
+        out: aligned sasmol object
+
+    note: inputs.ref and inputs.move are typically the same pdb/dcd
+    '''
+    aa_goal = inputs.aa_goal
+    aa_move = inputs.aa_move
+    goal_basis = inputs.goal_basis
+    move_basis = inputs.move_basis
+        
+    # create the SasMol objects
+    sub_goal = sasmol.SasMol(0)
+    sub_move = sasmol.SasMol(0)
+
+    error, goal_seg_mask = aa_goal.get_subset_mask(goal_basis)
+    error, move_seg_mask = aa_move.get_subset_mask(move_basis)
+
+    error = aa_goal.copy_molecule_using_mask(sub_goal, goal_seg_mask, 0)
+    error = aa_move.copy_molecule_using_mask(sub_move, move_seg_mask, 0)
+
+    com_sub_goal = sub_goal.calccom(0)         # calculate the center of mass of the subset of m1
+    sub_goal.center(0)                         # center the m1 coordinates
+    coor_sub_goal = sub_goal.coor()[0]         # get the m1 centered coordinates
+
+    aa_move.center(0)                  # move m2 to be centered at the origin 
+    error, sub_move.coor = aa_move.get_coor_using_mask(0, move_seg_mask)
+    sub_move.setCoor(sub_move.coor)
+    com_sub_move = sub_move.calccom(0) # calculate the center of mass of the subset of m2
+    sub_move.center(0)                 # move the subset of m2 to be centered at the origin
+    coor_sub_move = sub_move.coor[0]   # get the new coordinates of the subset of m2
+    aa_move.align(0,coor_sub_move,com_sub_move,coor_sub_goal,com_sub_goal) # align m2 using the transformation from sub_m2 to sub_m1
+
+    # the return statement may not be necessary
+    # return aa_move
 
 if __name__ == "__main__":
 
