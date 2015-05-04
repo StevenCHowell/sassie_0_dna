@@ -77,20 +77,22 @@ def combine_pdbs(all_pdbs, out_pdb=None):
             # new_name = name.replace("*","'")
         # segnames[j] = new_name
         
-def increment_ncp_segnames(segnames, i):
-    last_name = ''
-    for (j, name) in enumerate(segnames):
-        if name == last_name: 
-            pass
-        else:
-            last_name = name
-            try: 
-                n = int(name[0])
-                new_name = str(n + 2*i) + name[1:]
-            except:
-                n = int(name[-1])
-                new_name = name[:-1] + str(n + 2*i)
-        segnames[j] = new_name
+def increment_ncp_segnames(segnames, duplicate_segnames, i):
+    if len(duplicate_segnames):
+        last_name = ''
+        for (j, name) in enumerate(segnames):
+            if name in duplicate_segnames:
+                if name == last_name: 
+                    pass
+                else:
+                    last_name = name
+                    try: 
+                        n = int(name[0])
+                        new_name = str(n + 2*i) + name[1:]
+                    except:
+                        n = int(name[-1])
+                        new_name = name[:-1] + str(n + 2*i)
+                segnames[j] = new_name
     
 def combine_sasmols(all_mols, combine_segnames=None):
     '''
@@ -124,6 +126,7 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setElement(mol.element())
             combined_mol.setCharge(mol.charge())
             combined_mol.setMoltype([moltype.replace('rna','dna') for moltype in mol.moltype()])
+            combined_mol.setSegnames(list(set(combined_mol.segname())))
         else:
             index = np.concatenate((combined_mol.index(), combined_mol.index()[-1] + mol.index()))
             combined_mol.setIndex(index)
@@ -139,13 +142,18 @@ def combine_sasmols(all_mols, combine_segnames=None):
             combined_mol.setCoor(coor)
             combined_mol.setOccupancy(combined_mol.occupancy() + mol.occupancy())
             combined_mol.setBeta(combined_mol.beta() + mol.beta())
-            increment_ncp_segnames(mol.segname(), i)
+            duplicate_segnames = []
+            for segname in mol.segnames():
+                if segname in combined_mol.segnames():
+                    duplicate_segnames.append(segname)
+            increment_ncp_segnames(mol.segname(), duplicate_segnames, i)
             combined_mol.setSegname(combined_mol.segname() + mol.segname())
             combined_mol.setElement(combined_mol.element() + mol.element())
             combined_mol.setCharge(combined_mol.charge() + mol.charge())
             combined_mol.setMoltype(combined_mol.moltype() + 
                                     [moltype.replace('rna','dna') for moltype in mol.moltype()])
-
+            combined_mol.setSegnames(list(set(combined_mol.segname())))
+    
     if combine_segnames:
         for segname in combine_segnames:
             tmp_segname = combined_mol.segname()
@@ -310,7 +318,8 @@ def align_gH5_to_c11():
     '''
 
 def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
-                        dyad_resids, ref_atom_resid, link_vars, save_name=None):
+                        dyad_resids, ref_atom_resid, link_vars, pre_suf_vars,
+                        save_name=None):
     '''
     given a list of sasmol objects, this will combine them into one 
     sasmol object
@@ -419,43 +428,125 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     link_segnames = link_vars.segnames
     link_resids = link_vars.resids
     ncp_resids = link_vars.ncp_resids
-    linker_list = []
+    all_mols = [array]
     in_vars = inputs()
     in_vars.aa_goal = array
+    linker_keep_basis = b2p.parse_basis('(segname DNA1 or segname DNA2) and '
+                                        'resid >= %d and resid <= %d ' %
+                                        (link_vars.keep[0], link_vars.keep[1]))
+    error, keep_linker_mask = ref_linker.get_subset_mask(linker_keep_basis)
     for i in xrange(n_ncp):
         linker = sasmol.SasMol(0)
         error, mask = ref_linker.get_subset_mask('all')
         error = ref_linker.copy_molecule_using_mask(linker, mask, 0)
         in_vars.aa_move = linker
-        in_vars.move_basis = b2p.parse_basis('(segname %s and (resid %d or resid %d or resid %d) and name C1\')' %
-                                             (link_segnames[0], link_resids[0,0], link_resids[1,0], link_resids[2,0]) )
+        move_vmd_basis = ('( segname %s and ( ( name C1\' and (resid %d or '
+                          ' resid %d) ) or ( (name C2\' or name C1\') and '
+                          'resid %d) ) )' % (link_segnames[0], link_resids[0,0],
+                          link_resids[1,0], link_resids[2,0]) )
+        in_vars.move_basis = b2p.parse_basis(move_vmd_basis)
     
         ncp_segnames = [[dna_segnames[0].replace('1', str(2*i+1)), 
                         dna_segnames[0].replace('1', str(2*i+2))],
                         [dna_segnames[0].replace('1', str(2*(i+1)+1)), 
-                         dna_segnames[0].replace('1', str(2*(i+1)+2))]]                        
-        in_vars.goal_basis = b2p.parse_basis('( ( (segname %s and (resid == %d or resid == %d) ) or '
-                                             '(segname %s and resid == %d) ) and name == C1\')'
-                                             %  (ncp_segnames[0][0], ncp_resids[0,0], ncp_resids[1,0], 
-                                                 ncp_segnames[1][0], ncp_resids[2,0]) )
-        
-        # in_vars.move_basis = ('( (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) or'
-                              # '  (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) ) and'                              
-                              # '  (name[i] == "C1\'")'
-                              # %  (link_segnames[0], link_resids[0,0], link_resids[1,0], link_resids[2,0],
-                                  # link_segnames[1], link_resids[0,1], link_resids[1,1], link_resids[2,1]) )
-        
-        # ncp_segnames = [dna_segnames[0].replace('1', str(2*i+1)), 
-                        # dna_segnames[0].replace('1', str(2*i+2))]
-        # in_vars.goal_basis = ('( (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) or'
-                              # '  (segname[i] =="%s" and (resid[i] == %d or resid[i] == %d or resid[i] == %d) ) ) and'                              
-                              # '  (name[i] == "C1\'")'
-                              # %  (ncp_segnames[0], ncp_resids[0,0], ncp_resids[1,0], ncp_resids[2,0],
-                                  # ncp_segnames[1], ncp_resids[0,1], ncp_resids[1,1], ncp_resids[2,1]) )
+                         dna_segnames[0].replace('1', str(2*(i+1)+2))]]  
+        goal_vmd_basis = ('(segname %s and name C1\' and (resid %d or resid %d)'
+                          ') or (segname %s and resid %d and (name C1\' or name'
+                          ' C2\') )') % (ncp_segnames[0][0], ncp_resids[0,0], 
+                          ncp_resids[1,0], ncp_segnames[1][0], ncp_resids[2,0])
+        in_vars.goal_basis = b2p.parse_basis(goal_vmd_basis)
+
         align.align_mol(in_vars)
-        linker_list.append(in_vars.aa_move)
+        keep_linker = sasmol.SasMol(0)
+        error = in_vars.aa_move.copy_molecule_using_mask(
+            keep_linker, keep_linker_mask, 0)
+        new_segnames = [name.replace(link_segnames[0],'DNA0').replace(
+            link_segnames[1],'DNA9') for name in keep_linker.segname()]
+        keep_linker.setSegname(new_segnames)  
+        all_mols.append(keep_linker)
+
+    # align the prefix and suffix DNA
+    segnames = pre_suf_vars.segnames
+
+    # prefix #
+    prefix = sasmol.SasMol(0)
+    prefix.read_pdb(pre_suf_vars.pre_pdb)
+    in_vars.aa_move = prefix
+    pre_align_id = pre_suf_vars.pre_align_id
+    move_vmd_basis = ('(segname %s and (name C1\' or name C2\') and '
+                      '(resid %d or resid %d or resid %d) ) or '
+                      '(segname %s and name C1\' and '
+                      '(resid %d or resid %d or resid %d) )' % (
+                      segnames[0], pre_align_id[0,0], 
+                      pre_align_id[1,0], pre_align_id[2,0],
+                      segnames[1], pre_align_id[0,1], 
+                      pre_align_id[1,1], pre_align_id[2,1]))
+    in_vars.move_basis = b2p.parse_basis(move_vmd_basis)
     
-    return array
+    pre_ref_id = pre_suf_vars.pre_ref_id
+    goal_vmd_basis = ('(segname %s and (name C1\' or name C2\') and '
+                      '(resid %d or resid %d or resid %d) ) or '
+                      '(segname %s and name C1\' and '
+                      '(resid %d or resid %d or resid %d) )' %
+                      (dna_segnames[0], pre_ref_id[0,0], 
+                      pre_ref_id[1,0], pre_ref_id[2,0],
+                      dna_segnames[1], pre_ref_id[0,1], 
+                      pre_ref_id[1,1], pre_ref_id[2,1]))
+    in_vars.goal_basis = b2p.parse_basis(goal_vmd_basis)
+    align.align_mol(in_vars)
+    
+    keep_pre = sasmol.SasMol(0)
+    keep_pre_basis = ('resid <= %d or resid >= %d' % (pre_suf_vars.pre_keep[0],
+                                                      pre_suf_vars.pre_keep[1]))
+    error, keep_pre_mask = prefix.get_subset_mask(b2p.parse_basis(
+        keep_pre_basis))
+    error = in_vars.aa_move.copy_molecule_using_mask(keep_pre, keep_pre_mask, 0)
+    new_segnames = [name.replace(segnames[0],'DNA0').replace(segnames[1],'DNA9') 
+                    for name in keep_pre.segname()]
+    keep_pre.setSegname(new_segnames)
+    all_mols.append(keep_pre)
+    
+    # suffix #
+    suffix = sasmol.SasMol(0)
+    suffix.read_pdb(pre_suf_vars.suf_pdb)
+    in_vars.aa_move = suffix
+    suf_align_id = pre_suf_vars.suf_align_id
+    move_vmd_basis = ('(segname %s and (name C1\' or name C2\') and '
+                      '(resid %d or resid %d or resid %d) ) or '
+                      '(segname %s and name C1\' and '
+                      '(resid %d or resid %d or resid %d) )' % (
+                      segnames[0], suf_align_id[0,0], 
+                      suf_align_id[1,0], suf_align_id[2,0],
+                      segnames[1], suf_align_id[0,1], 
+                      suf_align_id[1,1], suf_align_id[2,1]))
+    in_vars.move_basis = b2p.parse_basis(move_vmd_basis)
+    
+    suf_ref_id = pre_suf_vars.suf_ref_id
+    goal_vmd_basis = ('(segname %s and (name C1\' or name C2\') and '
+                      '(resid %d or resid %d or resid %d) ) or '
+                      '(segname %s and name C1\' and '
+                      '(resid %d or resid %d or resid %d) )' %
+                      (ncp_segnames[1][0], suf_ref_id[0,0], 
+                      suf_ref_id[1,0], suf_ref_id[2,0],
+                      ncp_segnames[1][1], suf_ref_id[0,1], 
+                      suf_ref_id[1,1], suf_ref_id[2,1]))
+    in_vars.goal_basis = b2p.parse_basis(goal_vmd_basis)
+    align.align_mol(in_vars)
+    
+    keep_suf = sasmol.SasMol(0)
+    keep_suf_basis = ('resid >= %d or resid <= %d' % (pre_suf_vars.suf_keep[0],
+                                                      pre_suf_vars.suf_keep[1]))
+    error, keep_suf_mask = suffix.get_subset_mask(b2p.parse_basis(
+        keep_suf_basis))
+    error = in_vars.aa_move.copy_molecule_using_mask(keep_suf, keep_suf_mask, 0)
+    new_segnames = [name.replace(segnames[0],'DNA0').replace(segnames[1],'DNA9') 
+                    for name in keep_suf.segname()]
+    keep_suf.setSegname(new_segnames)    
+    all_mols.append(keep_suf)
+    
+    complete = combine_sasmols(all_mols)
+    complete.write_pdb(save_name, 0, 'w')
+    return complete
     
 if __name__ == '__main__':
     # align_gH5_to_c11()
@@ -478,6 +569,27 @@ if __name__ == '__main__':
     link_vars.keep = [3,5]
     link_vars.ncp_resids = bps[ncp_link_match]
     
+    pre_suf_vars = inputs()
+    pre_suf_vars.segnames = ['DNA1', 'DNA2']
+
+    # pre_suf_vars.pre_pdb = 'dna_prefix190.pdb'
+    # save_name = 'complete_gH5x4_190.pdb'
+    # pre_suf_vars.pre_pdb = 'dna_prefix191.pdb'
+    # save_name = 'complete_gH5x4_191.pdb'
+    pre_suf_vars.pre_pdb = 'dna_prefix218.pdb'
+    save_name = 'complete_gH5x4_218.pdb'
+    pre_bps = np.array([np.linspace(0, 17, 18), np.linspace(694, 677, 18)]).T
+    pre_suf_vars.pre_keep = pre_bps[14]
+    pre_suf_vars.pre_align_id = pre_bps[-3:]
+    pre_suf_vars.pre_ref_id = bps[1:4]
+
+
+    pre_suf_vars.suf_pdb = 'dna_suffix.pdb'
+    suf_bps = np.array([np.linspace(694, 677, 18), np.linspace(0, 17, 18)]).T
+    pre_suf_vars.suf_keep = suf_bps[14]
+    pre_suf_vars.suf_align_id = suf_bps[-3:]
+    pre_suf_vars.suf_ref_id = bps[-3:]
+    
     phi_file = 'gH5c11_r_phi.txt'
     dxyz_file = 'gH5c11_r_dxyz.txt'
     phi = np.loadtxt(phi_file)
@@ -487,6 +599,6 @@ if __name__ == '__main__':
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
                                 dyad_resids, ref_atom_resid, link_vars, 
-                                save_name = 'complete_gH5x4.pdb')
+                                pre_suf_vars, save_name = save_name)
     # array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'
