@@ -319,7 +319,7 @@ def align_gH5_to_c11():
 
 def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
                         dyad_resids, ref_atom_resid, link_vars, pre_suf_vars,
-                        save_name=None):
+                        save_name=None, adjust_ncp=None):
     '''
     given a list of sasmol objects, this will combine them into one 
     sasmol object
@@ -414,6 +414,9 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
         ncp_origins.append(all_coor[0])
         ncp_axes.append(all_coor[1:4] - all_coor[0])
         ncp2.setCoor(np.array([all_coor[4:]]))
+
+    if adjust_ncp:
+        reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp)
 
     array = combine_sasmols(ncp_list)
 
@@ -547,7 +550,34 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     complete = combine_sasmols(all_mols)
     complete.write_pdb(save_name, 0, 'w')
     return complete
+
+def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
+    move_ncp = adjust_ncp.move_ncp
+    i_axes = adjust_ncp.i_axes # [which ncp, which axis]
+    angles = adjust_ncp.angles
+    assert len(i_axes) == len(angles) == len(move_ncp), (
+        'ERROR: mismatch in input')
     
+    for (i, i_ncp) in enumerate(move_ncp):
+        
+        # setup the rotation
+        ncp = ncp_list[i_ncp]
+        axis = ncp_axes[i_axes[i][0]][i_axes[i][1]]
+        
+        axes_coor = ncp_axes[i_ncp] + ncp_origins[i_ncp]
+        coor = ncp.coor()[0]
+        all_coor = np.concatenate((ncp_origins[i_ncp].reshape(1,3), axes_coor, 
+                                   coor))
+
+        # perform the rotation
+        all_coor = geometry.rotate_about_v(all_coor, axis, angles[i])
+        
+        # store the output
+        assert all(np.isclose(ncp_origins[i_ncp], all_coor[0])), (
+            'ERROR: origin shifted')
+        ncp_axes[i_ncp] = all_coor[1:4] - all_coor[0]
+        ncp.setCoor(np.array([all_coor[4:]]))
+
 if __name__ == '__main__':
     # align_gH5_to_c11()
     
@@ -595,10 +625,18 @@ if __name__ == '__main__':
     phi = np.loadtxt(phi_file)
     dxyz = np.loadtxt(dxyz_file)
 
+    adjust_ncp = inputs()
+    adjust_ncp.move_ncp = [1,3]
+    adjust_ncp.i_axes = [[1,0],[3,0]]
+    # adjust_ncp.i_axes = [[1,0],[1,0]]
+    adjust_ncp.angles = [20, 20]
+    save_name = 'gH5x4_20n1n3_a.pdb'
+
     ncp_dna_resids = bps[[w601[0], w601[1]]]
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
     array = construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids, 
                                 dyad_resids, ref_atom_resid, link_vars, 
-                                pre_suf_vars, save_name = save_name)
+                                pre_suf_vars, save_name = save_name, 
+                                adjust_ncp = adjust_ncp)
     # array.write_pdb('complete_gH5x4.pdb', 0, 'w')
     print '\m/ >.< \m/'
