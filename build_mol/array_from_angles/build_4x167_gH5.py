@@ -558,7 +558,7 @@ if __name__ == '__main__':
     ncp = 'gH5_1x164.pdb'
     dna_segnames = ['DNA1', 'DNA2']
     w601 = [12, 152]
-    ncp_link_match = [163, 164, 2]
+    ncp_link_match = [163, 164, 1, 2]
     bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
     ref_atom_resid = 23
     
