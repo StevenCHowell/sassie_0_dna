@@ -190,9 +190,9 @@ def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
         p2 = ncp2_origins[i]
         assert np.allclose(p1, p2), 'WARNING: problem with results'
 
-    plot_title = (r'$\phi_x$, $\phi_y$ $\phi_z$: (%0.1f, %0.1f, %0.1f) (%0.1f, %0.1f, %0.1f) (%0.1f, %0.1f, %0.1f)'
+    plot_title = (r'($\phi_x$, $\phi_y$ $\phi_z)$: (%0.1f, %0.1f, %0.1f), (%0.1f, %0.1f, %0.1f), (%0.1f, %0.1f, %0.1f)'
                   '\n'
-                  r'$d_x$, $d_y$, $d_z$: (%0.1f, %0.1f, %0.1f) (%0.1f, %0.1f, %0.1f) (%0.1f, %0.1f, %0.1f)'
+                  r'($d_x$, $d_y$, $d_z$): (%0.1f, %0.1f, %0.1f), (%0.1f, %0.1f, %0.1f), (%0.1f, %0.1f, %0.1f)'
                   % (phi[0,0],  phi[0,1],  phi[0,2], 
                      phi[1,0],  phi[1,1],  phi[1,2], 
                      phi[2,0],  phi[2,1],  phi[2,2], 
@@ -225,6 +225,7 @@ if __name__ == '__main__':
         all_ncp_masks      = pickle.load(pkl_in)
         all_dyad_bases     = pickle.load(pkl_in)
         all_dyad_masks     = pickle.load(pkl_in)
+        all_ref_masks      = pickle.load(pkl_in)
         all_ncp_origins    = pickle.load(pkl_in)
         all_ncp_axes       = pickle.load(pkl_in)
         all_ncp_opt_params = pickle.load(pkl_in)
@@ -260,7 +261,14 @@ if __name__ == '__main__':
         plt.show()
 
     phi, dxyz, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
+    # plot all NCPs:
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
+
+    # plot NCP1-NCP2:
+    geometry.show_ncps(all_ncp_plot_vars[:2], title=plot_title)
+
+    # plot NCP1-NCP3:
+    geometry.show_ncps(all_ncp_plot_vars[:3], title=plot_title)
 
     n1_axes_name = pdb[:-4] + '_n1_axes.txt'
     np.savetxt(n1_axes_name, all_ncp_axes[0], fmt='%1.6e')

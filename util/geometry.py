@@ -510,21 +510,21 @@ def show_ncps(all_ncp_plot_vars, title='NCP array'):
         coor_label = "NCP-%d C1' atoms" % i_ncp
         ax.plot(coor[:,0], coor[:,1], coor[:,2], 'o', label=coor_label)
         
-        # plot the cylinder fit of the coordinates
-        vector = np.array([Vx, Vy, Vz])
-        X_raw, Y_raw, Z_raw = cylinder(np.ones((2,1))*R, 20)
-        h = 40
-        Z_raw = (Z_raw-0.5) * h
-        X, Y, Z = transform_surf(X_raw, Y_raw, Z_raw, vector, ncp_origin)
-        ax.plot_wireframe(X,Y,Z, color='orange', lw='2')
+        # # plot the cylinder fit of the coordinates
+        # vector = np.array([Vx, Vy, Vz])
+        # X_raw, Y_raw, Z_raw = cylinder(np.ones((2,1))*R, 20)
+        # h = 40
+        # Z_raw = (Z_raw-0.5) * h
+        # X, Y, Z = transform_surf(X_raw, Y_raw, Z_raw, vector, ncp_origin)
+        # ax.plot_wireframe(X,Y,Z, color='orange', lw='2')
 
         # plot NCP origin and axes
         # origin_label = "NCP-%d origin" % n_ncp
-        ax.plot([ncp_origin[0]], [ncp_origin[1]], [ncp_origin[2]], 'gs')
+        ax.plot([ncp_origin[0]], [ncp_origin[1]], [ncp_origin[2]], 'ms')
         styles = ['r-','g-','b-']
         labels = ['X-axis', 'Y-axis', 'Z-axis']
         for (j, axis) in enumerate(ncp_axes):
-            axes_vec = np.vstack((ncp_origin, axis*15 + ncp_origin))
+            axes_vec = np.vstack((ncp_origin, axis*80 + ncp_origin))
             if i_ncp == n_ncps:
                 ax.plot(axes_vec[:,0], axes_vec[:,1], axes_vec[:,2], styles[j], label=labels[j])
             else:
@@ -533,9 +533,9 @@ def show_ncps(all_ncp_plot_vars, title='NCP array'):
         # plot the NCP dyad origin
         dyad_origin = dyad_origin.reshape(1,3)
         if i_ncp == n_ncps:
-            ax.plot(dyad_origin[:,0], dyad_origin[:,1], dyad_origin[:,2], 'rs', label='dyad origin')
+            ax.plot(dyad_origin[:,0], dyad_origin[:,1], dyad_origin[:,2], 'ms', label='dyad origin')
         else:
-            ax.plot(dyad_origin[:,0], dyad_origin[:,1], dyad_origin[:,2], 'rs')
+            ax.plot(dyad_origin[:,0], dyad_origin[:,1], dyad_origin[:,2], 'ms')
     
     # Shrink current axis by 20%
     box = ax.get_position()
@@ -556,7 +556,7 @@ def get_dna_bp_reference_frame(dna_ids, bp_mol, dna_id_type='segname'):
     The x-axis points in the direction of the major groove along what would 
     be the pseudo-dyad axis of an ideal Watson-Crick base-pair, i.e. the 
     perpendicular bisector of the C1'...C1' vector spanning the base-pair. 
-    The y-axis runs along the long axis of the idealizosed base-pair in the
+    The y-axis runs along the long axis of the idealized base-pair in the
     direction of the sequence strand, parallel with the C1'...C1' vector, 
     and displaced so as to pass through the intersection on the 
     (pseudo-dyad) x-axis of the vector connecting the pyrimidine Y(C6) and 

@@ -1,0 +1,1326 @@
+#!/usr/bin/env python
+#
+# Author:  Steven C. Howell
+# Purpose: Compare experimental data to the sassie structures
+# Created: 20 March 2015
+#
+# $Id: $
+#
+#0000000011111111112222222222333333333344444444445555555555666666666677777777778
+#2345678901234567890123456789012345678901234567890123456789012345678901234567890
+                                                                                 
+                                                                                
+import logging
+LOGGER = logging.getLogger(__name__) #add module name manually
+
+import sys, os, glob, locale, errno, pickle, re
+import os.path as op
+import numpy as np
+import pandas as pd
+from pandas import Series, DataFrame
+from scipy import interpolate
+import matplotlib.pyplot as plt
+import x_dna.util.gw_plot as gp
+import matplotlib.gridspec as gridspec
+import sassie.sasmol.sasmol as sasmol
+debug = True
+
+# import sassie.sasmol.sasmol as sasmol
+# import sassie_1_na.util.geometry as geometry
+# import sassie_1_na.util.basis_to_python as basis_to_python
+# from numpy.core.umath_tests import inner1d
+
+# from mpl_toolkits.mplot3d import Axes3D
+
+class MainError(Exception):
+    pass
+
+def pr():
+    NotImplemented
+
+def load_crysol(saspath, i0):
+    '''
+    load in the crysol output (Rg and I(Q))
+    taken from "sassie/analyze/best.py"
+    '''	
+
+    sasfilestring=saspath.split('/')[-2] + '_'
+
+    nfilestring='find '+saspath+' -name "*.log" | grep -c log'
+    nfout=os.popen(nfilestring,'r').readlines()
+    nf=locale.atoi(nfout[0])
+    print "\n# READING Rg VALUES FROM LOG FILES"	
+    log=[] 
+
+    for i in xrange(nf):
+
+        mst = str(i+1).zfill(5)  #99999 maximum number of frames   
+        log.append(saspath+'/'+sasfilestring+mst)
+
+    Rg = crysol_rg(nf, log)
+    iq_data = load_crysol_iq(nf, log, i0)
+
+    return Rg, iq_data
+
+def load_foxs(saspath, i0=None):
+    '''
+    load in the FoXS output (Rg and I(Q))
+    '''	
+
+    sasfilestring=saspath.split('/')[-2] + '_'
+
+    syn_files = glob.glob(os.path.join(saspath, '*.dat'))
+
+    data = []
+    rg = []
+    for syn_file in syn_files:
+        tmp_data = np.loadtxt(syn_file)
+        if i0:
+            tmp_data[:,1:] /= tmp_data[0,1] * i0
+        data.append(tmp_data)
+        pdb_file = syn_file.replace('foxs', 'pdb').replace('.dat','')
+        rg.append(pdb_rg(pdb_file))
+
+    iq_data = (nf, log, i0)
+
+    return Rg, iq_data
+
+def pdb_rg(pdb_file):
+    '''
+    given a pdb filename, this will return the radius of gyration
+    '''
+    mol = sasmol.SasMol(0)
+    mol.read_pdb(pdb_file)
+    return mol.calcrg(0)
+
+def load_crysol_iq(ns, log, i0=None):
+    '''
+    read in the I(q) from the crysol output
+    taken from "sassie/analyze/best.py"
+    '''	
+    norm=1.0
+    for i in xrange(ns):
+        sinf=open(log[i]+'.int','r').readlines()
+        nh=1
+        sln=len(sinf)
+        jj=0 
+        if 0 == i:
+            # on the first iteration, setup the output array
+            allspec=np.zeros((ns,(sln-nh)),np.float)
+            qvar=np.zeros((sln-nh),np.float)
+            print '# READING '+str(ns)+' SAS INT FILES'
+        for j in xrange(sln):
+            if i0:
+                slin=sinf[j].split()
+                if(j>=nh):
+                    qval=locale.atof(slin[0])
+                    qvar[jj]=qval
+                    val1=locale.atof(slin[1])
+                    if(jj==0):
+                        norm=val1
+                    nval1=i0*val1/norm
+                    allspec[i][jj]=nval1  
+                    jj=jj+1
+            else:
+                slin=sinf[j].split()
+                if(j>=nh):
+                    qvar[jj]=locale.atof(slin[0])
+                    allspec[i][jj] = locale.atof(slin[1])
+                    jj += 1
+    # not sure pandas is the way to go
+    # iq_data = DataFrame(allspec, columns=qvar, index=range(1,ns+1)).T
+    # iq_data.columns.name = 'id' ; iq_data.index.name = 'Q'
+
+    # numpy seem to be the best option the I(Q) data
+    iq_data = np.zeros(((sln-nh),ns+1))
+    iq_data[:,0] = qvar
+    iq_data[:,1:] = allspec.T
+
+    return iq_data
+
+def gnom_rg(gnom_files):
+    '''
+    read the Rg in from the crysol output
+    taken from "sassie/analyze/best.py"
+    '''	
+    prefix = []
+    rg_reci=[] ; rg_real=[] ; rger_real=[]
+    i0_reci=[] ; i0_real=[] ; i0er_real=[]
+    for gnom_out in gnom_files:
+        inf=open(gnom_out, 'r').readlines()
+        ln=len(inf)
+        for k in xrange(ln):
+            lin=inf[k].split()
+            # print lin
+            if(len(lin)>0):
+                if(lin[0] == 'Reciprocal'):
+                    rg_reci.append(locale.atof(lin[4], func=float))
+                    i0_reci.append(locale.atof(lin[8], func=float))
+                elif(lin[0] =='Real' and lin[1] == 'space:'):
+                    rg_real.append(locale.atof(lin[4], func=float))
+                    i0_real.append(locale.atof(lin[6], func=float))
+                    rger_real.append(locale.atof(lin[9], func=float))
+                    i0er_real.append(locale.atof(lin[11], func=float))
+                    prefix.append(os.path.split(
+                        os.path.splitext(gnom_out)[0])[-1])
+
+
+    gnom_dict = {'Rg grp':rg_reci, 'Rg grl':rg_real, 'RgEr grl':rger_real, 
+                 'I0 grp':i0_reci, 'I0 grl':i0_real, 'I0Er grl':i0er_real}
+    return DataFrame(gnom_dict, index=prefix)
+
+def crysol_rg(ns, log):
+    '''
+    read the Rg in from the crysol output
+    taken from "sassie/analyze/best.py"
+    '''	
+    rgarray=[] ; keep=[] ; rgcl=[] ; rgch=[]
+    for i in xrange(ns):
+        inf=open(log[i]+'.log','r').readlines()
+        ln=len(inf)
+        for k in xrange(ln):
+            lin=inf[k].split()
+            if(len(lin)>0):
+                if(lin[0]=='Electron'):
+                    trg=lin[3]
+                    ftrg=locale.atof(trg)
+                    keep.append(i) 
+                    rgarray.append(ftrg)
+
+    # rg_series = Series(data=rgarray, index=range(1,ns+1))
+    # return rg_series
+    return np.array(rgarray)
+
+# def load_iq(saspath, ns):
+    # '''
+    # read in the crysol I(Q) output
+    # taken from "sassie/analyze/best.py"
+    # '''
+
+
+def mkdir_p(path):
+    '''
+    make directory recursively
+    adapted from http://stackoverflow.com/questions/600268/
+    '''
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+
+def compare_run_to_iq(run_dir, goal, ns, filter_dir):
+    
+    assert os.path.exists(run_dir), 'No such run directory: %s' % run_dir
+    if os.path.exists(os.path.join(run_dir,'crysol')):
+        syn_data_dir = os.path.join(run_dir,'crysol')
+        ext = '/*.int'
+    elif os.path.exists(os.path.join(run_dir,'foxs')):
+        syn_data_dir = os.path.join(run_dir,'foxs')
+        ext = '/*.dat'
+    else:
+        assert False, 'failed to find the calculated scattering data'
+    syn_files = glob.glob(syn_data_dir + ext)
+    assert len(syn_files) > 0, 'no crysol output in %s' % syn_data_dir
+    syn_files.sort()
+
+    # get the Rg and I(Q) for each structure from the crysol output
+    if ext[-3:] == 'int':
+        Rg, data_iq = load_crysol(syn_data_dir, goal[0,1])
+    elif ext[-3:] == 'dat':
+        Rg, data_iq = load_foxs(syn_data_dir, goal[0,1])
+    
+    new_q = np.linspace(0,0.2,ns)
+    # interpolate crysol data to be on the intended grid
+    if len(data_iq) != len(new_q) or not np.allclose(data_iq[-1,0], 0.2):
+        interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0, 
+                                             kind='cubic')
+        data_int = np.zeros((len(new_q), len(data_iq[0,:])))
+        data_int[:,0] = new_q
+        data_int[:,1:] = interp_c(new_q)
+        data_iq = data_int
+    else:
+        new_q = data_iq[:,0]
+
+    # interpolate reference data to be on the same grid as the crysol I(Q)
+    interp_iq = interpolate.interp1d(goal[:,0], goal[:,1:], kind='cubic', 
+                                     axis=0)
+    goal_iq = np.zeros((len(new_q), 3))
+    goal_iq[:,0] = new_q
+    goal_iq[:,1:] = interp_iq(new_q)
+
+    # # get the Kratky from the I(Q)
+    # data_kratky = kratky(data_iq)
+    # goal_kratky = kratky(goal_iq)
+    # print data_kratky
+
+    # create the data frame
+
+    # compare I(Q) and/or Kratky of the experimental vs synthetic structures
+    nf = data_iq.shape[1]
+    matc_iq = np.zeros(data_iq.shape)
+    s = np.zeros(nf-1)
+    o = np.zeros(nf-1)
+    X2 = np.zeros(nf-1)
+    
+    for i in xrange(1, nf):
+        j = i-1
+        # compare_match(goal_iq, data_iq[:,[0,i]], log=True)
+        # X2 = (diff2 / sigma2).sum() # non-reduced chi-square distribution
+        # X2 = (diff2 / goal).sum() # Pearson's X2 test-statistic (crazy units)
+        matc_iq[:,[0,i]], s[j], o[j], X2[j] = scale_offset(data_iq[:,[0,i]], 
+                                                           goal_iq)
+    
+    res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o}
+    result_df = DataFrame(res_dict, index=range(1,nf))
+    result_df.index.name = 'id'
+    
+    # save output to filter directory
+    mkdir_p(filter_dir)
+    out_file = os.path.join(filter_dir, 'rg_x2.out')
+    result_df.to_csv(out_file, float_format='%5.10f', sep='\t')
+    np.savetxt(os.path.join(filter_dir, 'goal.iq'), goal_iq) # small file
+    np.save(os.path.join(filter_dir, 'data_iq.npy'), matc_iq)
+    # np.savetxt('data.iq', data_iq) # too big to be useful as text file
+    
+    return result_df, matc_iq, goal_iq
+
+def match_poly(in_data, rf_data):
+    """
+    determine the scale and offset to match the input data to the reference 
+    data using a polynomial fit
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx3 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    offset:  offset applied to the input data
+   
+    Notes
+    --------
+    has the option to use error bars to weight the matching
+    
+    See also
+    --------
+    match_lstsq, scale, scale_offset
+
+    """
+    assert (in_data[:,0]-rf_data[:,0]).sum() == 0, ('mismatch between input and'
+                                                    ' reference x-grid')
+    try:
+        weights = 1/rf_data[:,2]
+    except:
+        weights = None
+    offset, scale = np.polynomial.polynomial.polyfit(
+        in_data[:,1], rf_data[:,1], 1, w=weights)
+    mt_data = np.vstack([in_data[:,0], scale * in_data[:,1] + offset]).T
+    
+    X2 = get_X2(rf_data, mt_data)
+    
+    return mt_data, scale, offset, X2
+
+def scale(in_data, rf_data):
+    """
+    determine the scale and offset to match the input data to the reference 
+    data by minimizing the X2 calculation
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx3 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    X2:      X^2 comparison between the reference data and matched input data
+    
+    See also
+    --------
+    match_poly, match_lstsq, scale_offset
+
+    """
+    assert (in_data[:,0]-rf_data[:,0]).sum() == 0, ('mismatch between input and'
+                                                    ' reference x-grid')
+
+    sigma2 = rf_data[:,2] * rf_data[:,2]
+    scale = ( (rf_data[:,1] * in_data[:,1] / rf_data[:,2]).sum() /
+              (in_data[:,1] * in_data[:,1] / rf_data[:,2]).sum() )
+    
+    mt_data = np.vstack([in_data[:,0], scale * in_data[:,1]]).T
+
+    X2 = get_X2(rf_data, mt_data)
+    
+    return mt_data, scale, X2
+
+def get_X2(rf_data, mt_data):
+    diff = mt_data[:,1] - rf_data[:,1]
+    diff2 = diff * diff
+    er2 = rf_data[:,2] * rf_data[:,2]
+    X2 = (diff2 / er2).sum()/(len(rf_data)-1)
+    return X2
+
+def scale_offset(in_data, rf_data):
+    """
+    determine the scale and offset to match the input data to the reference 
+    data by minimizing the X2 calculation
+    \chi^2 = \frac{1}{N_q-1}\sum_{i=1}^{N_q} \frac{\left[cI_{s_i}(Q) + I_c - I_{e_i}(Q)\right]^2}{\sigma_i^2(Q)}
+    
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx3 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    offset:  offset applied to the input data
+    X2:      X^2 comparison between the reference data and matched input data
+    
+    See also
+    --------
+    match_poly, match_lstsq, scale
+
+    """
+    e = 1E-4 # small parameter
+    assert np.allclose((in_data[:,0]-rf_data[:,0]).sum(), 0, atol=e), (
+        'mismatch between input and reference x-grid')
+
+    sigma2 = rf_data[:,2] * rf_data[:,2]
+    a = ( rf_data[:,1] / sigma2 ).sum()
+    b = ( in_data[:,1] / sigma2 ).sum()
+    c = ( 1 / sigma2 ).sum()
+    d = ( rf_data[:,1] * in_data[:,1] / sigma2 ).sum()
+    e = ( in_data[:,1] * in_data[:,1] / sigma2 ).sum()
+    
+    offset = (a*e - b*d)/(c*e - b*b)
+    scale = (c*d - b*a)/(c*e - b*b)
+    
+    mt_data = np.vstack([in_data[:,0], scale * in_data[:,1] + offset]).T
+
+    X2 = get_X2(rf_data, mt_data)
+    
+    return mt_data, scale, offset, X2
+
+def match_lstsq(in_data, rf_data):
+    """
+    determine the scale and offset to match the input data to the reference 
+    data using a lstsq fit
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx2 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    offset:  offset applied to the input data
+
+    Notes
+    --------
+    does not use error bars to weight the data
+    
+    See also
+    --------
+    match_poly, scale_offset, scale
+    
+    """
+    assert (in_data[:,0]-rf_data[:,0]).sum() == 0, ('mismatch between input and'
+                                                    ' reference x-grid')
+    
+    A = np.vstack([in_data[:,1], np.ones(len(in_data))]).T
+    scale, offset = np.linalg.lstsq(A, rf_data[:,1])[0]
+    mt_data = np.vstack([in_data[:,0], scale * in_data[:,1] + offset]).T
+    
+    X2 = get_X2(rf_data, mt_data)
+    
+    return mt_data, scale, offset, X2
+
+def kratky(iq_data):
+    '''
+    iq_data should be a multi-column 2-D numpy array
+    first column: Q
+    returns a numpy array the same size where columns >= 2 are muliplied by q^2
+    '''
+    q = np.diag(iq_data[:,0])
+    q2 = q.dot(q)
+    kratky_data = np.zeros(iq_data.shape)
+    kratky_data[:,0] = iq_data[:,0]
+    kratky_data[:,1:] = q2.dot(iq_data[:,1:])
+
+    return kratky_data
+
+def compare_match(rf_data, in_data, dummy_scale=None, dummy_offset=None, 
+                  log=False):
+    s = np.zeros(4)
+    o = np.zeros(4)
+    X2 = np.zeros(4)
+    mt_data_polyf, s[0], o[0], X2[0] = match_poly(in_data, rf_data)
+    mt_data_lstsq, s[1], o[1], X2[1] = match_lstsq(in_data, rf_data)
+    mt_data_scale, s[2], X2[2]       = scale(in_data, rf_data)
+    mt_data_sclof, s[3], o[3], X2[3] = scale_offset(in_data, rf_data)
+    info = []
+    for i in xrange(4):
+        info.append('s=%0.1f, o=%0.3f, X2=%0.1f' % (s[i], o[i], X2[i]))
+    if dummy_scale and dummy_offset:
+        ref_str = ', s=%0.1f, o=%0.1f' % (dummy_scale, dummy_offset)
+    else:
+        ref_str = ''
+    
+    fig = plt.figure()
+    plt.subplot(2,1,1)
+    plt.errorbar(rf_data[:,0], rf_data[:,1], yerr=rf_data[:,2], fmt='o', 
+                 label='reference' + ref_str)
+    plt.plot(mt_data_polyf[:,0], mt_data_polyf[:,1], 's', 
+             label='poly, %s' %info[0])
+    plt.plot(mt_data_sclof[:,0], mt_data_sclof[:,1], '^', 
+             label='sc-of, %s' %info[3]) 
+    plt.plot(mt_data_lstsq[:,0], mt_data_lstsq[:,1], '<', 
+             label='lstsq, %s' %info[1]) 
+    plt.plot(mt_data_scale[:,0], mt_data_scale[:,1], '>', 
+             label='scale, %s' %info[2]) 
+    plt.plot(in_data[:,0], in_data[:,1], 'o', label='input')
+    if log:
+        plt.yscale('log')
+        plt.xscale('log')
+        plt.axis('tight')
+        plt.legend(loc=3)
+    else:
+        plt.legend(loc=1)
+    
+    tl1 = plt.title("Comparison of different match methods")
+
+    plt.subplot(2,1,2)
+    ref = rf_data[:,1]
+    plt.errorbar(rf_data[:,0], rf_data[:,1]-ref, yerr=rf_data[:,2], fmt='o', 
+                 label='reference')
+    plt.plot(mt_data_polyf[:,0], mt_data_polyf[:,1]-ref, 's', label='poly')
+    plt.plot(mt_data_sclof[:,0], mt_data_sclof[:,1]-ref, '^', label='sc-of')
+    plt.plot(mt_data_lstsq[:,0], mt_data_lstsq[:,1]-ref, '<', label='lstsq')
+    plt.plot(mt_data_scale[:,0], mt_data_scale[:,1]-ref, '>', label='scale')
+    tl2 = plt.title('residuals')
+    if log:
+        plt.xscale('log')
+        plt.axis('tight')
+    plt.show()
+    
+    # i_sim = data_iq[1:,1]   
+    # i_exp = goal_iq[1:,1]
+    # sigma = goal_iq[1:,2]
+    # cs = np.linspace(0,20,201)
+    # X2 = np.zeros(cs.shape)
+    # dX2 = np.zeros(cs.shape)
+    # for i, c in enumerate(cs):
+        # X2[i] = ((c*i_sim-i_exp)**2/sigma**2).sum()/i_sim.shape[0]
+        # dX2[i] = (2*I_sim*(c*i_sim-i_exp)/sigma**2).sum()/i_sim.shape[0]        
+        
+    # import matplotlib.pyplot as plt
+    # plt.figure()
+    # plt.hold()
+    # plt.plot(cs, X2, label='X2')
+    # plt.plot(cs, dX2, label='dX2/dc')
+    # label_str = 'c=%0.3f' % c0
+    # plt.axvline(x=c0, color='r', label=label_str)
+    # plt.plot(cs,np.zeros(cs.shape),'k')
+    # lg = plt.legend()
+    # lg.draw_frame(False)
+    # plt.title('best scale factor')
+    # plt.show()    
+
+def examine_rg_i0(do_plot=False):
+    df = load_rg_csv()
+
+    di = ['diAtek010c050']
+    tri = ['triEtek010c050', 'triEtek050c050', 
+           'triEtek100c050', 'triEtek010Mg1c050']
+    tet = ['tetraAtek010c050', 'tetraAtek050c050', 
+           'tetraAtek100c050', 'tetraAtek010Mg1c050']
+    data_files = {'di': di, 'tri': tri, 'tet': tet}
+    
+    if do_plot:
+        plt.figure()
+        x_range = [0, 120]
+        #### Rg Subplots ####
+        plt.subplot(3,2,1)
+        plt.plot(df['KCl'].loc[di], df['Rg grp'].loc[di], 'o', label='GNOM rp',
+                 markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[di], df['Rg grl'].loc[di], 
+                     df['RgEr grl'].loc[di], fmt='s', label='GNOM rl', 
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[di], df['Rg'].loc[di], 
+                     df['RgEr'].loc[di], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        lg = plt.legend()
+        plt.ylabel('Rg')
+        plt.title('Dimer Rg comparison')
+        plt.xlim(x_range)
+    
+        plt.subplot(3,2,3)
+        plt.plot(df['KCl'].loc[tri], df['Rg grp'].loc[tri], 
+                 'o', label='GNOM rc', markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tri], df['Rg grl'].loc[tri], 
+                     df['RgEr grl'].loc[tri], fmt='s', label='GNOM rl',
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tri], df['Rg'].loc[tri], 
+                     df['RgEr'].loc[tri], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        # lg = plt.legend()
+        plt.title('Trimer Rg comparison')
+        plt.ylabel('Rg')
+        plt.xlim(x_range)
+    
+        plt.subplot(3,2,5)
+        plt.plot(df['KCl'].loc[tet], df['Rg grp'].loc[tet], 
+                 'o', label='GNOM rc', markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tet], df['Rg grl'].loc[tet], 
+                     df['RgEr grl'].loc[tet], fmt='s', label='GNOM rl', 
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tet], df['Rg'].loc[tet], 
+                     df['RgEr'].loc[tet], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        # lg = plt.legend()
+        plt.title('Tetramer Rg comparison')
+        plt.ylabel('Rg')
+        plt.xlabel(r'[KCl]')
+        plt.xlim(x_range)
+    
+        #### I(0) Subplots ####
+        plt.subplot(3,2,2)
+        plt.plot(df['KCl'].loc[di], df['I0 grp'].loc[di], 
+                 'o', label='GNOM rc', markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[di], df['I0 grl'].loc[di], 
+                     df['I0Er grl'].loc[di], fmt='s', label='GNOM rl',
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[di], df['I0'].loc[di], 
+                     df['I0Er'].loc[di], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        plt.title('Dimer I(0) comparison')
+        plt.ylabel('I(0)')
+        plt.xlim(x_range)   
+    
+        plt.subplot(3,2,4)
+        plt.plot(df['KCl'].loc[tri], df['I0 grp'].loc[tri], 
+                 'o', label='GNOM rc', markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tri], df['I0 grl'].loc[tri], 
+                     df['I0Er grl'].loc[tri], fmt='s', label='GNOM rl',
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tri], df['I0'].loc[tri], 
+                     df['I0Er'].loc[tri], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        plt.title('Dimer I(0) comparison')
+        plt.ylabel(r'I(0)')
+        plt.xlim(x_range)   
+    
+        plt.subplot(3,2,6)
+        plt.plot(df['KCl'].loc[tet], df['I0 grp'].loc[tet], 
+                 'o', label='GNOM rc', markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tet], df['I0 grl'].loc[tet], 
+                     df['I0Er grl'].loc[tet], fmt='s', label='GNOM rl', 
+                     markeredgecolor='none')
+        plt.errorbar(df['KCl'].loc[tet], df['I0'].loc[tet], 
+                     df['I0Er'].loc[tet], fmt='>', label='MATLAB',
+                     markeredgecolor='none')
+        plt.title('Dimer I(0) comparison')
+        plt.ylabel(r'I(0)')
+        plt.xlabel(r'[KCl]')
+        plt.xlim(x_range)   
+    
+        plt.show()
+    
+    return df, data_files
+
+def fig_rg_v_conc():
+    df = load_rg_csv()
+    series = []
+    labels = []
+    
+    series.append(['N12merH5Mg1b_zeroCon', 'N12merH5Mg1bx4', 'N12merH5Mg1bx2', 
+                   'N12merH5Mg1bx1'])
+    labels.append(r'12x167 H5 1mM $Mg^{2+}$')
+
+    series.append(['N12merH5TE_zeroCon', 'N12merH5TEx4', 'N12merH5TEx2', 
+                   'N12merH5TEx1'])
+    labels.append(r'12x167 H5 10mM $K^+$')
+
+    series.append(['N12merH5Mg1a_zeroCon', 'N12merH5Mg1ax4', 'N12merH5Mg1ax2', 'N12merH5Mg1ax1'])
+    labels.append(r'12x167 H5 1mM $Mg^{2+}$')
+
+    series.append(['N12merTE_zeroCon', 'N12merTEx4', 'N12merTEx2', 'N12merTEx1'])
+    labels.append(r'12x167 10mM $K^{+}$')
+
+    series.append(['N12merMg1_zeroCon', 'N12merMg1x4', 'N12merMg1x2', 
+                   'N12merMg1x1'])
+    labels.append(r'12x167 1mM $Mg^{2+}$')
+
+    series.append(['N4merH5TE_zeroCon', 'N4merH5TEx4', 'N4merH5TEx2', 
+                   'N4merH5TEx1'])
+    labels.append(r'4x167 H5 10mM $K^{+}$')
+
+    series.append(['N4merH5Mg1_zeroCon', 'N4merH5Mg1x4', 'N4merH5Mg1x2', 
+                   'N4merH5Mg1x1'])
+    labels.append(r'4x167 H5 1mM $Mg^{2+}$')
+
+    series.append(['N4merTE_zeroCon', 'N4merTEx4', 'N4merTEx2', 'N4merTEx1'])
+    labels.append(r'4x167 10mM $K^{+}$ c')
+
+    series.append(['N4merMg1_zeroCon', 'N4merMg1x4', 'N4merMg1x2', 'N4merMg1x1'])
+    labels.append(r'4x167 1mM $Mg^{2+}$ c')
+
+    series.append(['GW3merTek010_zeroCon', 'GW3merAtek010x8', 'GW3merAtek010x4', 
+                   'GW3merAtek010x2', 'GW3merAtek010x1'])
+    labels.append(r'3x167 10mM $K^+$ c')
+
+    series.append(['GW3merTek050_zeroCon', 'GW3merAtek050x4', 'GW3merAtek050x2', 
+                   'GW3merAtek050x1'])
+    labels.append(r'3x167 50mM $K^+$ c')
+
+    series.append(['GW3merTek100_zeroCon', 'GW3merAtek100x4', 'GW3merAtek100x2', 
+                   'GW3merAtek100x1'])
+    labels.append(r'3x167 100mM $K^+$ c')
+
+    series.append(['GW3merTek200_zeroCon', 'GW3merAtek200x4', 'GW3merAtek200x2', 
+                   'GW3merAtek200x1'])
+    labels.append(r'3x167 200mM $K^+$ c')
+
+    series.append(['diAtek010_zeroCon', 'diAtek010c012', 'diAtek010c025', 
+                   'diAtek010c050'])
+    labels.append(r'2x167 10mM $K^+$ na')
+
+    series.append(['diBtek010_zeroCon', 'diBtek010c012', 'diBtek010c025', 
+                   'diBtek010c050'])
+    labels.append(r'2x167 10mM $K^+$ nb')
+
+    series.append(['triDtek010_zeroCon', 'triDtek010c012', 'triDtek010c025', 
+                   'triDtek010c050'])
+    labels.append(r'3x167 10mM $K^+$ nd')
+
+    series.append(['triEtek010_zeroCon', 'triEtek010c012', 'triEtek010c025', 
+                   'triEtek010c050'])
+    labels.append(r'3x167 10mM $K^+$ ne')
+
+    series.append(['triEtek050_zeroCon', 'triEtek050c012', 'triEtek050c025', 
+                   'triEtek050c050'])
+    labels.append(r'3x167 50mM $K^+$ ne')
+
+    series.append(['triEtek100_zeroCon', 'triEtek100c012', 'triEtek100c025', 
+                   'triEtek100c050'])
+    labels.append(r'3x167 100mM $K^+$ ne')
+
+    series.append(['triEMg1_zeroCon', 'triEtek010Mg1c012', 'triEtek010Mg1c025', 
+                   'triEtek010Mg1c050'])
+    labels.append(r'3x167 1mM $Mg^{2+}$ ne')
+
+    series.append(['triFtek010_zeroCon', 'triFtek010c012', 'triFtek010c025', 
+                   'triFtek010c050'])
+    labels.append(r'3x167 10mM $K^+$ nf')
+
+    series.append(['triFtek050_zeroCon', 'triFtek050c012', 'triFtek050c025', 
+                   'triFtek050c050'])
+    labels.append(r'3x167 50mM $K^+$ nf')
+
+    series.append(['tetraAtek010_zeroCon', 'tetraAtek010c012a', 'tetraAtek010c025', 
+                   'tetraAtek010c050'])
+    labels.append(r'4x167 10mM $K^+$ na')
+
+    series.append(['tetraAtek050_zeroCon', 'tetraAtek050c012', 'tetraAtek050c025', 
+                   'tetraAtek050c050'])
+    labels.append(r'4x167 50mM $K^+$ na')
+
+    series.append(['tetraAtek100_zeroCon', 'tetraAtek100c012', 'tetraAtek100c025', 
+                   'tetraAtek100c050'])
+    labels.append(r'4x167 100mM $K^+$ na')
+
+    series.append(['tetraAMg1_zeroCon', 'tetraAtek010Mg1c025', 
+                   'tetraAtek010Mg1c050', 'tetraAtek010Mg1c012'])
+    labels.append(r'4x167 1mM $Mg^{2+}$ na')
+
+    series.append(['tetraCtek010_zeroCon', 'tetraCtek010c012', 'tetraCtek010c050'])
+    labels.append(r'4x167 10mM $K^+$ nc')
+
+    series.append(['tetraCtek050_zeroCon', 'tetraCtek050c012', 'tetraCtek050c025', 
+                   'tetraCtek050c050'])
+    labels.append(r'4x167 50mM $K^+$ nc')
+
+    plt.figure()
+    x_range = [-1, 1]
+
+    for i in xrange(len(series)):
+        plt.errorbar(df['conc'].loc[series[i]], df['Rg'].loc[series[i]], 
+                     df['RgEr'].loc[series[i]], label=labels[i],  
+                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.color_order(i), mfc='none', ms=15)
+    
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    plt.xlabel(r'mg/mL')
+    plt.title(r'$R_g$ vs mg/mL comparison')
+    plt.xlim(x_range)
+    plt.show()
+    
+    return
+
+def fig_sub_rg_v_conc(show=False):
+    df = load_rg_csv()
+    dod = []
+    tet = []
+    tri = []
+    di = []
+    dod_labels = []
+    tet_labels = []
+    tri_labels = []
+    di_labels = []
+    
+    dod.append(['N12merH5Mg1b_zeroCon', 'N12merH5Mg1bx4', 'N12merH5Mg1bx2', 
+                'N12merH5Mg1bx1'])
+    dod_labels.append(r'H5 1mM $Mg^{2+}$ B')
+
+    dod.append(['N12merH5Mg1a_zeroCon', 'N12merH5Mg1ax4', 'N12merH5Mg1ax2', 
+                'N12merH5Mg1ax1'])
+    dod_labels.append(r'H5 1mM $Mg^{2+}$ A')
+
+    dod.append(['N12merH5TE_zeroCon', 'N12merH5TEx4', 'N12merH5TEx2', 
+                'N12merH5TEx1'])
+    dod_labels.append(r'H5 10mM $K^+$')
+
+    dod.append(['N12merTE_zeroCon', 'N12merTEx4', 'N12merTEx2', 'N12merTEx1'])
+    dod_labels.append(r'10mM $K^{+}$')
+
+    dod.append(['N12merMg1_zeroCon', 'N12merMg1x4', 'N12merMg1x2', 
+                'N12merMg1x1'])
+    dod_labels.append(r'1mM $Mg^{2+}$')
+
+    tet.append(['N4merH5TE_zeroCon', 'N4merH5TEx4', 'N4merH5TEx2', 
+                'N4merH5TEx1'])
+    tet_labels.append(r'H5 10mM $K^{+}$')
+
+    tet.append(['N4merH5Mg1_zeroCon', 'N4merH5Mg1x4', 'N4merH5Mg1x2', 
+                'N4merH5Mg1x1'])
+    tet_labels.append(r'H5 1mM $Mg^{2+}$')
+
+    # tet.append(['N4merTE_zeroCon', 'N4merTEx4', 'N4merTEx2', 'N4merTEx1'])
+    # tet_labels.append(r'10mM $K^{+}$')
+
+    # These are definitely aggregated
+    # tet.append(['N4merMg1_zeroCon', 'N4merMg1x4', 'N4merMg1x2', 'N4merMg1x1'])
+    # tet_labels.append(r'1mM $Mg^{2+}$ C')
+
+    # tri.append(['GW3merTek010_zeroCon', 'GW3merAtek010x8', 'GW3merAtek010x4', 
+                # 'GW3merAtek010x2', 'GW3merAtek010x1'])
+    tri.append(['c000_3x167_k010', 
+                'c068_3x167_k010', 
+                'c125_3x167_k010', 
+                'c250_3x167_k010', 
+                'c500_3x167_k010'])
+    tri_labels.append(r'10mM $K^+$ C')
+
+    # tri.append(['GW3merTek050_zeroCon', 'GW3merAtek050x4', 'GW3merAtek050x2', 
+    # 'GW3merAtek050x1'])
+    tri.append(['c000_3x167_k050',
+                'c125_3x167_k050',
+                'c250_3x167_k050',
+                'c500_3x167_k050'])
+    tri_labels.append(r'50mM $K^+$ C')
+
+    # tri.append(['GW3merTek100_zeroCon', 'GW3merAtek100x4', 'GW3merAtek100x2', 
+                # 'GW3merAtek100x1'])
+    tri.append(['c000_3x167_k100',
+                'c125_3x167_k100',
+                'c250_3x167_k100',
+                'c500_3x167_k100'])
+    tri_labels.append(r'100mM $K^+$ C')
+
+    # tri.append(['GW3merTek200_zeroCon', 'GW3merAtek200x4', 'GW3merAtek200x2', 
+                # 'GW3merAtek200x1'])
+    tri.append(['c000_3x167_k200',
+                'c125_3x167_k200',
+                'c250_3x167_k200',
+                'c500_3x167_k200'])
+    tri_labels.append(r'200mM $K^+$ C')
+
+    # di.append(['diAtek010_zeroCon', 'diAtek010c012', 'diAtek010c025', 
+               # 'diAtek010c050'])
+    di.append(['c000_2x167_k010',
+               'c125_2x167_k010',
+               'c250_2x167_k010',
+               'c500_2x167_k010'])
+    di_labels.append(r'10mM $K^+$ A')
+
+    tet.append(['c000_4x167_k010',
+                'c125_4x167_k010',
+                'c250_4x167_k010',
+                'c500_4x167_k010'])
+    tet_labels.append(r'10mM $K^+$ A')
+
+    tet.append(['c000_4x167_k050',
+                'c125_4x167_k050',
+                'c250_4x167_k050',
+                'c500_4x167_k050'])
+    tet_labels.append(r'50mM $K^+$ A')
+
+    tet.append(['c000_4x167_k100',
+                'c125_4x167_k100',
+                'c250_4x167_k100',
+                'c500_4x167_k100'])
+    tet_labels.append(r'100mM $K^+$ A')
+
+    tet.append(['c000_4x167_mg1',
+                'c125_4x167_mg1',
+                'c250_4x167_mg1',
+                'c500_4x167_mg1'])
+    tet_labels.append(r'1mM $Mg^{2+}$ A')
+
+    # tet.append(['tetraCtek010_zeroCon', 'tetraCtek010c012', 'tetraCtek010c050'])
+    # tet_labels.append(r'10mM $K^+$ C')
+
+    # tet.append(['tetraCtek050_zeroCon', 'tetraCtek050c012', 'tetraCtek050c025', 
+                # 'tetraCtek050c050'])
+    # tet_labels.append(r'50mM $K^+$ C')
+
+    fig = plt.figure(figsize = (14, 14))
+    gs1 = gridspec.GridSpec(2, 2)
+    gs1.update(hspace=0)
+    x_range = [-0.1, 1.22]
+
+    ax = plt.subplot(gs1[0])
+    for i in xrange(len(tri)):
+        plt.errorbar(df['conc'].loc[tri[i]], df['Rg'].loc[tri[i]], 
+                     df['RgEr'].loc[tri[i]], label=tri_labels[i],  
+                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.color_order(i), mfc='none', ms=15)
+    
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    plt.xlabel(r'mg/mL')
+    plt.title(r'3x167', x=0.3, y=0.92)
+    ylim = np.array(plt.ylim())
+    ylim[1] *= 1.03 
+    plt.ylim(ylim)
+    plt.xlim(x_range)
+    ax.get_xaxis().set_ticks([])
+    ax.text(0.03, 0.03, 'a)', verticalalignment='bottom', fontweight='bold', 
+        horizontalalignment='left', transform=ax.transAxes)
+    
+    ax = plt.subplot(gs1[2])
+    for i in xrange(len(tet)):
+        plt.errorbar(df['conc'].loc[tet[i]], df['Rg'].loc[tet[i]], 
+                     df['RgEr'].loc[tet[i]], label=tet_labels[i],  
+                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.color_order(i), mfc='none', ms=15)
+    
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    plt.xlabel(r'mg/mL')
+    plt.title(r'4x167', x=0.3, y=0.92)
+    ylim = np.array(plt.ylim())
+    ylim[1] *= 1.1
+    plt.ylim(ylim)
+    plt.xlim(x_range)
+    ax.text(0.03, 0.03, 'b)', verticalalignment='bottom', fontweight='bold', 
+        horizontalalignment='left', transform=ax.transAxes)
+
+
+    x_range = [-0.1, 0.9]
+
+    ax = plt.subplot(gs1[1])
+    # plt.figure()
+    for i in xrange(len(di)):
+        plt.errorbar(df['conc'].loc[di[i]], df['Rg'].loc[di[i]], 
+                     df['RgEr'].loc[di[i]], label=di_labels[i],  
+                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.color_order(i), mfc='none', ms=15)
+    
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    # plt.xlabel(r'mg/mL')
+    plt.title('2x167', x=0.3, y=0.92)
+    # plt.text(.2, .9, r'2x167: $R_g$ vs mg/mL comparison',
+             # horizontalalignment='center',
+             # transform=plt.transAxes)
+    plt.xlim(x_range)
+    ax.get_xaxis().set_ticks([])
+    ax.text(0.03, 0.03, 'c)', verticalalignment='bottom', fontweight='bold', 
+        horizontalalignment='left', transform=ax.transAxes)
+        
+    ax = plt.subplot(gs1[3])
+    for i in xrange(len(dod)):
+        plt.errorbar(df['conc'].loc[dod[i]], df['Rg'].loc[dod[i]], 
+                     df['RgEr'].loc[dod[i]], label=dod_labels[i],  
+                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.color_order(i), mfc='none', ms=15)
+        
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    plt.xlabel(r'mg/mL')
+    plt.title(r'12x167', x=0.3, y=0.92)
+    ylim = np.array(plt.ylim())
+    ylim[1] *= 1.03
+    plt.ylim(ylim)
+    plt.xlim(x_range)
+    ax.text(.03, .03, 'd)', verticalalignment='bottom', fontweight='bold', 
+            horizontalalignment='left', transform=ax.transAxes) 
+    
+    if show: plt.show()
+    fig.tight_layout()
+    fig.savefig('Rg_v_mgmL.png')
+    fig.savefig('Rg_v_mgmL.eps')
+    
+    return
+
+def fig_rg_v_salt(show=False):
+    df = load_rg_csv()
+    tetA = ['tetraAtek010_zeroCon', 'tetraAtek050_zeroCon', 
+            'tetraAtek100_zeroCon']
+    # tetA = ['tetraAtek010_zeroCon', 'tetraAtek050_zeroCon', 
+            # 'tetraAtek100_zeroCon']
+    # tetC = ['tetraCtek010_zeroCon', 'tetraCtek050_zeroCon']
+    # triC = ['GW3merTek010_zeroCon', 'GW3merTek050_zeroCon', 
+            # 'GW3merTek100_zeroCon', 'GW3merTek200_zeroCon']
+    tri0 = ['c000_3x167_k010',
+            'c000_3x167_k050',
+            'c000_3x167_k100',
+            'c000_3x167_k200']
+    tri5 = ['c500_3x167_k010',
+            'c500_3x167_k050',
+            'c500_3x167_k100',
+            'c500_3x167_k200']
+    # triE = ['triEtek010_zeroCon', 'triEtek050_zeroCon',
+            # 'triEtek100_zeroCon']
+    di0 = ['c000_2x167_k010']
+    di5 = ['c050_2x167_k010']
+    series = [di0, di5, tri0, tri5, tetA]
+    labels = ['2x167 (0.0 mg/mL)', 
+              '2x167 (0.5 mg/mL)', 
+              '3x167 (0.0 mg/mL)',               
+              '3x167 (0.5 mg/mL)',               
+              '4x167 (0.0 mg/mL)']
+    fig = plt.figure()
+    x_range = [-10, 220]
+    for i in xrange(len(series)):
+        plt.errorbar(df['KCl'].loc[series[i]], df['Rg'].loc[series[i]], 
+                     df['RgEr'].loc[series[i]], label=labels[i], 
+                     c = gp.color_order(i), fmt=gp.symbol_order(i, '--'),
+                     mec=gp.color_order(i), mfc='none', ms=15)
+    
+    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'$R_g$')
+    plt.xlabel(r'[$K^+$]')
+    plt.title(r'$R_g$ vs [$K^+$] comparison')
+    plt.xlim(x_range)
+    if show: plt.show()
+    fig.tight_layout()
+    fig.savefig('Rg_v_salt.png')
+    fig.savefig('Rg_v_salt.eps')
+    return
+
+def load_rg_csv():
+    output_csv = 'rg_i0.csv'
+    if os.path.exists(output_csv) and not debug:
+        print '# READING Rg AND I(0) FROM CSV FILE'
+        df = pd.read_csv(output_csv, sep='\t')
+        # df = pd.read_csv(output_csv, sep=',')
+        df.index = df['prefix']
+    else:
+        print '# READING Rg AND I(0) FROM MATLAB AND GNOM OUTPUT'
+        df = combine_rg_i0()
+        df.to_csv('rg_i0.csv', sep='\t')
+    return df
+
+def combine_rg_i0():
+    data_dir = 'iqdata'
+
+    # chess_dir = '/home/schowell/Dropbox/gw_phd/experiments/1406CHESS/'
+    chess_dir = '/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/chess/'
+    chess_matlab_file = 'rg_i0_chess_nor.csv'
+    chess_matlab_df = pd.read_csv(os.path.join(chess_dir, chess_matlab_file))
+    chess_matlab_df = chess_matlab_df.set_index(chess_matlab_df['prefix']).drop('prefix',1)
+
+    chess_gnom_files = glob.glob(os.path.join(chess_dir, data_dir,'*.out'))    
+    chess_gnom_df = gnom_rg(chess_gnom_files)
+
+    # nsls_dir = '/home/schowell/Dropbox/gw_phd/experiments/1406NSLS/'
+    nsls_dir = '/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/nsls/'
+    nsls_matlab_file = 'rg_i0_nsls_nor.csv'
+    nsls_matlab_df = pd.read_csv(os.path.join(nsls_dir, nsls_matlab_file))
+    nsls_matlab_df = nsls_matlab_df.set_index(nsls_matlab_df['prefix']).drop('prefix',1)
+
+    nsls_gnom_files = glob.glob(os.path.join(nsls_dir, data_dir,'*.out'))    
+    nsls_gnom_df = gnom_rg(nsls_gnom_files)
+
+    chess_df = pd.concat([chess_gnom_df, chess_matlab_df])
+    nsls_df =  pd.concat([nsls_gnom_df, nsls_matlab_df])
+    df = pd.concat([chess_df, nsls_df])
+    df.index.name = 'prefix'
+        
+    KCl = []
+    for prefix in df.index:
+        if 'mg1' in prefix.lower():
+            salt = 211
+        elif 'k010' in prefix.lower() or 'TE' in prefix:
+            salt = 10
+        elif 'k100' in prefix.lower():
+            salt = 100
+        elif 'k200' in prefix.lower():
+            salt = 200
+        elif 'k050' in prefix.lower():
+            salt = 50
+        else:
+            salt = np.nan
+        if False:
+            print '%s: ' % prefix, salt
+        KCl.append(salt)
+    df['KCl'] = KCl
+
+    return df
+
+def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
+    
+    for array_type in array_types:
+        for data_file in data_files[array_type]:
+            full_file = os.path.join(data_dir, data_file + data_ext)
+            assert os.path.exists(full_file), (
+                    "No such file: '%s'" % full_file)
+            data = np.loadtxt(full_file)
+
+            df_list = [] ; data_qqiq_list = []
+            for run_dir in run_dirs[array_type]:
+                filter_dir = os.path.join(run_dir, data_file + '_filter')
+                if os.path.exists(filter_dir + '/rg_x2.out'):
+                    result_df = pd.read_csv(filter_dir + '/rg_x2.out', sep='\t')
+                    data_qqiq = np.load(filter_dir + '/data_qqiq.npy')
+                    goal_qqiq = np.loadtxt(filter_dir + '/goal.qqiq')
+                else:
+                    result_df, data_qqiq, goal_iq = compare_run_to_qqiq(
+                        run_dir, data, ns[array_type], filter_dir)
+                run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
+                result_df['run'] = run_name
+                df_list.append(result_df)
+                data_qqiq_list.append(data_qqiq)
+                
+            # combine result DataFrames and data_iq arrays
+            x2rg_df = pd.concat(df_list)
+            x2rg_df.index = range(len(x2rg_df))
+            
+            all_data_qqiq = data_qqiq_list[0][:,0:1]
+            for data_qqiq in data_qqiq_list:
+                all_data_qqiq = np.concatenate((all_data_qqiq, data_qqiq[:,1:]), 
+                                             axis=1)
+            
+            plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
+
+def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
+    
+    for array_type in array_types:
+        for data_file in data_files[array_type]:
+            full_file = os.path.join(data_dir, data_file + data_ext)
+            assert os.path.exists(full_file), (
+                    "No such file: '%s'" % full_file)
+
+            df_list = [] ; data_iq_list = []
+            for run_dir in run_dirs[array_type]:
+                filter_dir = os.path.join(run_dir, data_file + '_filter')
+                if os.path.exists(filter_dir + '/rg_x2.out') and False:
+                    result_df = pd.read_csv(filter_dir + '/rg_x2.out', sep='\t')
+                    data_iq = np.load(filter_dir + '/data_iq.npy')
+                    goal_iq = np.loadtxt(filter_dir + '/goal.iq')
+                else:
+                    data = np.loadtxt(full_file)
+                    result_df, data_iq, goal_iq = compare_run_to_iq(
+                        run_dir, data, ns[array_type], filter_dir)
+                run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
+                result_df['run'] = run_name
+                df_list.append(result_df)
+                data_iq_list.append(data_iq)
+                
+            # combine result DataFrames and data_iq arrays
+            x2rg_df = pd.concat(df_list)
+            x2rg_df.index = range(len(x2rg_df))
+            
+            all_data_iq = data_iq_list[0][:,0:1]
+            for data_iq in data_iq_list:
+                all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]), 
+                                             axis=1)
+            
+            plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file)
+
+def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
+    
+    n_total = len(x2rg_df)
+    n_best = int(n_total * 0.1)
+    x2rg_best = x2rg_df.sort('X2')[:n_best]
+
+    plt.figure(figsize=(9, 7))
+    plt.suptitle(data_file, fontsize=14)
+    
+    # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9, 
+                        # wspace = 0.2, hspace = 0.2)
+    # plt.subplots_adjust(left=0.0, hspace=0.001)
+    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
+
+    ax = plt.subplot(221)
+    plt.title('all %d structures' % n_total)
+    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o')
+    # plt.xlim(rg_range)
+    plt.ylabel(r'$X^2$')
+    plt.xlabel(r'$R_g$')
+    # ax.xaxis.set_major_formatter(plt.NullFormatter())
+
+    # get the best, worst and average I(Q)
+    best_X2 = x2rg_df.X2.min()
+    best_series = x2rg_df[x2rg_df.X2 == best_X2]
+    i_best = best_series.index[0] + 1 # first column is the Q values
+    best = all_data_iq[:,i_best] 
+    worst_X2 = x2rg_df.X2.max()
+    worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
+    i_worst = worst_series.index[0] + 1 # first column is the Q values
+    worst = all_data_iq[:,i_worst] 
+    average = all_data_iq[:,1:].mean(axis=1)
+
+    ax = plt.subplot(222)
+    plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
+    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o',
+                label='exp')
+    ax.plot(all_data_iq[1:,0], best[1:], '-->', label='best (%d)' % i_best)
+    ax.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
+    ax.plot(all_data_iq[1:,0], worst[1:], '-^', label='worst (%d)' % i_worst)
+    plt.xlabel(r'$Q (\AA^{-1})$')
+    # ax.xaxis.set_major_formatter(plt.NullFormatter())
+    plt.ylabel(r'$I(Q)$')
+    plt.axis('tight')
+    plt.yscale('log')
+    plt.xscale('log')
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+
+    plt.subplot(223)
+    plt.title('best %d structures' %(n_best))
+    plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o')
+    plt.plot(x2rg_best.iloc[0]['Rg'], x2rg_best.iloc[0]['X2'], '>', 
+             markersize=8)
+    plt.plot(x2rg_best.iloc[1]['Rg'], x2rg_best.iloc[1]['X2'], 's', 
+             markersize=8)
+    plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^', 
+             markersize=8)
+    plt.ylabel(r'$X^2$')
+    plt.xlabel(r'$R_g$')
+    # plt.xlim(rg_range)
+
+    # update the worst and average I(Q)
+    # worst_X2 = x2rg_best.X2.max()
+    # worst_series = x2rg_best[x2rg_best.X2 == worst_X2]
+    # i_worst = worst_series.index[0] + 1 # first column is the Q values
+    # worst = all_data_iq[:,i_worst]
+    average = all_data_iq[:,1:].mean(axis=1)
+    i_1st = x2rg_best.index[0] + 1 # first column is the Q values
+    i_2nd = x2rg_best.index[1] + 1 # first column is the Q values
+    i_3rd = x2rg_best.index[2] + 1 # first column is the Q values
+    assert i_1st == i_best, 'incorrectly indexing'
+    
+    plt.subplot(224)
+    plt.title(r'best 3 $X^2$s = %0.1f, %0.1f, %0.1f' % (
+        best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
+    plt.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o', 
+                 label='exp')
+    # plt.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
+    plt.plot(all_data_iq[1:,0], best[1:], '-->', 
+             label=r'$1^{st}$ (%d)' % i_best)
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-s', 
+             label=r'$2^{nd}$ (%d)' % i_2nd)
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-^', 
+             label=r'$3^{rd}$ (%d)' % i_3rd)
+
+    plt.xlabel(r'$Q (\AA^{-1})$')
+    plt.ylabel(r'$I(Q)$')
+    plt.axis('tight')
+    plt.yscale('log')
+    plt.xscale('log')
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    
+    plt.tight_layout()
+    # plt.show()
+    
+    fig_file_name = os.path.join(os.getcwd(),data_file + '_fit.eps')
+    # plt.savefig(fig_file_name, bbox_inches='tight')
+    # plt.savefig(fig_file_name[:-3] + 'png')
+    plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+
+    return
+    
+
+if __name__ == '__main__':
+    test = False
+    if test:
+        # import doctest
+        # doctest.testmod()
+        
+        small = 0.3; dummy_scale = 10; dummy_offset = 0.5; N = 50
+        x = np.linspace(0.01, np.pi * 4, N)
+
+        er = np.linspace(0.1, 0.5, N)
+        y_rf = dummy_scale * np.sin(x)/x + dummy_offset
+        rf_data = np.vstack([x, y_rf, er]).T
+
+        y_in = np.sin(x)/x + (np.random.random(len(x)) - 0.5) * small
+        in_data = np.vstack([x,y_in]).T
+
+        compare_match(rf_data, in_data, dummy_scale, dummy_offset)
+        
+        y_rf = dummy_scale * np.sin(x)/x
+        rf_data = np.vstack([x, y_rf, er]).T
+
+        compare_match(rf_data, in_data, dummy_scale, 0)
+
+    else:
+        # fig_rg_v_conc()
+        fig_sub_rg_v_conc(show=True)
+        fig_rg_v_salt(show=True)
+        # data_rg_i0_df, data_files = examine_rg_i0(True)
+        
+        # sassie_run_dir = '/home/schowell/data/myData/sassieRuns'
+        # dimer_runs = glob.glob(sassie_run_dir + '/dimer/flex*/run*/')
+        # trimer_runs = glob.glob(sassie_run_dir + '/trimer/flex*/run*/')
+        # tetramer_runs = glob.glob(sassie_run_dir + '/tetramer/flex*/run*/')
+        # run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs}
+        
+        # data_dir = ('/home/schowell/data/'
+                    # 'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
+        # data_ext = '.i0q'
+
+        # array_types = ['di', 'tri', 'tet']
+        # # array_types = ['tri']
+        # # dq = {'di': 0.00512821, 'tri': 0.00833333,'tet': 0.00833333}
+        # ns = {'di': 40, 'tri': 25,'tet': 25}  # number of Q values from crysol
+        # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns)
+
+    ############################ pseudo code ###########################
+    # create a data frame containing the information for each structure
+       # columns: Rg, X2 I(Q), X2 QI(Q), X2 P(r), Psi, Phi, h
+       # rows: each structure
+
+    # create a data frame of the crysol output
+       # not sure if I should use columns or rows for each structure
+
+    print '\m/ >.< \m/'
