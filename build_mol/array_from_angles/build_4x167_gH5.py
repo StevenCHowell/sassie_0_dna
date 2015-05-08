@@ -552,31 +552,90 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     return complete
 
 def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
-    move_ncp = adjust_ncp.move_ncp
-    i_axes = adjust_ncp.i_axes # [which ncp, which axis]
-    angles = adjust_ncp.angles
-    assert len(i_axes) == len(angles) == len(move_ncp), (
-        'ERROR: mismatch in input')
-    
-    for (i, i_ncp) in enumerate(move_ncp):
+    method = adjust_ncp.method
+    if method == 'spread':
+        # determine the rotation axes 
+        v21 = ncp_origins[0] - ncp_origins[1]
+        v23 = ncp_origins[2] - ncp_origins[1]
+        v32 = -v23
+        v34 = ncp_origins[3] - ncp_origins[2]
+        ax2 = np.cross(v23, v21)
+        ax3 = np.cross(v32, v34)
+        spread_angle = adjust_ncp.spread_angle
+        ncp2_origin = ncp_origins[1]
+        ncp3_origin = ncp_origins[2]
         
-        # setup the rotation
-        ncp = ncp_list[i_ncp]
-        axis = ncp_axes[i_axes[i][0]][i_axes[i][1]]
-        
-        axes_coor = ncp_axes[i_ncp] + ncp_origins[i_ncp]
-        coor = ncp.coor()[0]
-        all_coor = np.concatenate((ncp_origins[i_ncp].reshape(1,3), axes_coor, 
-                                   coor))
+        # rotate NCP1
+        axes1_coor = ncp_axes[0] + ncp2_origin
+        all_coor1 = np.concatenate((ncp2_origin.reshape(1,3), axes1_coor, 
+                                    ncp_list[0].coor()[0]))
+        all_coor1 = geometry.rotate_about_v(all_coor1, ax2, spread_angle)
 
-        # perform the rotation
-        all_coor = geometry.rotate_about_v(all_coor, axis, angles[i])
+        # rotate NCP2
+        axes2_coor = ncp_axes[1] + ncp2_origin
+        all_coor2 = np.concatenate((ncp2_origin.reshape(1,3), axes2_coor, 
+                                    ncp_list[1].coor()[0]))
+        all_coor2 = geometry.rotate_about_v(all_coor2, ax2, spread_angle/2.0)
         
         # store the output
-        assert all(np.isclose(ncp_origins[i_ncp], all_coor[0])), (
-            'ERROR: origin shifted')
-        ncp_axes[i_ncp] = all_coor[1:4] - all_coor[0]
-        ncp.setCoor(np.array([all_coor[4:]]))
+        assert 6 == np.isclose((ncp2_origin, ncp2_origin), 
+                          (all_coor1[0], all_coor1[0])).sum(), (
+                              'ERROR: origin shifted') # sum(True) = 1
+        ncp_axes[0] = all_coor1[1:4] - all_coor1[0]
+        ncp_list[0].setCoor(np.array([all_coor1[4:]]))
+        ncp_axes[1] = all_coor2[1:4] - all_coor2[0]
+        ncp_list[1].setCoor(np.array([all_coor2[4:]]))
+
+        # rotate NCP3
+        axes3_coor = ncp_axes[2] + ncp3_origin
+        all_coor3 = np.concatenate((ncp3_origin.reshape(1,3), axes3_coor, 
+                                    ncp_list[2].coor()[0]))
+        all_coor3 = geometry.rotate_about_v(all_coor3, ax3, spread_angle)
+    
+        # rotate NCP4
+        axes4_coor = ncp_axes[3] + ncp3_origin
+        all_coor4 = np.concatenate((ncp3_origin.reshape(1,3), axes4_coor, 
+                                    ncp_list[3].coor()[0]))
+        all_coor4 = geometry.rotate_about_v(all_coor4, ax3, spread_angle)
+    
+        # store the output
+        assert 6 == np.isclose((ncp3_origin, ncp3_origin), 
+                               (all_coor3[0], all_coor3[0])).sum(), (
+                                   'ERROR: origin shifted') # sum(True) = 1
+        ncp_axes[2] = all_coor3[1:4] - all_coor3[0]
+        ncp_list[2].setCoor(np.array([all_coor3[4:]]))
+        ncp_axes[3] = all_coor4[1:4] - all_coor4[0]
+        ncp_list[3].setCoor(np.array([all_coor4[4:]]))
+    
+    elif method == 'twist':
+        mv_ncp = adjust_ncp.mv_ncp
+        i_axes = adjust_ncp.i_axes # [which ncp, which axis]
+        angles = adjust_ncp.angles
+        origin = adjust_ncp.origin
+        
+        assert len(i_axes) == len(angles) == len(mv_ncp) == len(origin), (
+            'ERROR: mismatch in input')
+        
+        for (i, i_ncp) in enumerate(mv_ncp):
+            
+            # setup the rotation
+            ncp = ncp_list[i_ncp]
+            ax2 = ncp_axes[i_axes[i][0]][i_axes[i][1]]
+            
+            rotation_origin = ncp_origins[origin[i]]
+            axes_coor = ncp_axes[i_ncp] + rotation_origin
+            coor = ncp.coor()[0]
+            all_coor = np.concatenate((rotation_origin.reshape(1,3), axes_coor, 
+                                       coor))
+    
+            # perform the rotation
+            all_coor = geometry.rotate_about_v(all_coor, ax2, angles[i])
+            
+            # store the output
+            assert all(np.isclose(rotation_origin, all_coor[0])), (
+                'ERROR: origin shifted')
+            ncp_axes[i_ncp] = all_coor[1:4] - all_coor[0]
+            ncp.setCoor(np.array([all_coor[4:]]))
 
 if __name__ == '__main__':
     # align_gH5_to_c11()

@@ -60,30 +60,50 @@ def load_crysol(saspath, i0):
     Rg = crysol_rg(nf, log)
     iq_data = load_crysol_iq(nf, log, i0)
 
-    return Rg, iq_data
+    return Rg, iq_data, log
 
 def load_foxs(saspath, i0=None):
     '''
     load in the FoXS output (Rg and I(Q))
     '''	
-
-    sasfilestring=saspath.split('/')[-2] + '_'
+    result_file = os.path.join(saspath, 'rg.csv')
 
     syn_files = glob.glob(os.path.join(saspath, '*.dat'))
 
-    data = []
-    rg = []
-    for syn_file in syn_files:
-        tmp_data = np.loadtxt(syn_file)
+    if os.path.isfile(result_file):
+        rg_df = pd.read_csv(result_file, sep='\t')
+        rg = list(rg_df['rg'].values)
+        save_rg = False
+    else:
+        rg = [None]*len(syn_files)
+        save_rg = True
+    
+    all_data = []
+    iq = []
+    q = [] 
+    label = []
+    for (i, syn_file) in enumerate(syn_files):
+        data = np.loadtxt(syn_file)
         if i0:
-            tmp_data[:,1:] /= tmp_data[0,1] * i0
-        data.append(tmp_data)
-        pdb_file = syn_file.replace('foxs', 'pdb').replace('.dat','')
-        rg.append(pdb_rg(pdb_file))
+            data[:,1:] /= data[0,1] * i0
+        all_data.append(data)
+        iq.append(data[:,1])
+        q.append(data[:,0])
+        label.append(os.path.basename(syn_file).split('.')[0])
+        if not rg[i]:
+            pdb_file = syn_file.replace('foxs', 'pdb').replace('.dat','')
+            rg[i] = pdb_rg(pdb_file)
 
-    iq_data = (nf, log, i0)
-
-    return Rg, iq_data
+    if save_rg:
+        rg_dict = {'rg': rg}
+        rg_df = pd.DataFrame(rg_dict, index=label)
+        rg_df.index.name = 'labels'
+        rg_df.to_csv(result_file, sep='\t')
+    rg = np.array(rg)
+        
+    iq_data = np.concatenate((q[0][..., None], np.array(iq).transpose()),axis=1)
+        
+    return rg, iq_data, label
 
 def pdb_rg(pdb_file):
     '''
@@ -131,7 +151,7 @@ def load_crysol_iq(ns, log, i0=None):
     # iq_data = DataFrame(allspec, columns=qvar, index=range(1,ns+1)).T
     # iq_data.columns.name = 'id' ; iq_data.index.name = 'Q'
 
-    # numpy seem to be the best option the I(Q) data
+    # numpy seem to be the best option the for storing the I(Q) data
     iq_data = np.zeros(((sln-nh),ns+1))
     iq_data[:,0] = qvar
     iq_data[:,1:] = allspec.T
@@ -225,14 +245,14 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     assert len(syn_files) > 0, 'no crysol output in %s' % syn_data_dir
     syn_files.sort()
 
-    # get the Rg and I(Q) for each structure from the crysol output
+    # get the Rg and I(Q) for each structure from the calculation rusults
     if ext[-3:] == 'int':
-        Rg, data_iq = load_crysol(syn_data_dir, goal[0,1])
+        Rg, data_iq, labels = load_crysol(syn_data_dir, goal[0,1])
     elif ext[-3:] == 'dat':
-        Rg, data_iq = load_foxs(syn_data_dir, goal[0,1])
+        Rg, data_iq, labels = load_foxs(syn_data_dir, goal[0,1])
     
     new_q = np.linspace(0,0.2,ns)
-    # interpolate crysol data to be on the intended grid
+    # interpolate calculated data to be on the intended grid
     if len(data_iq) != len(new_q) or not np.allclose(data_iq[-1,0], 0.2):
         interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0, 
                                              kind='cubic')
@@ -272,7 +292,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
         matc_iq[:,[0,i]], s[j], o[j], X2[j] = scale_offset(data_iq[:,[0,i]], 
                                                            goal_iq)
     
-    res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o}
+    res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o, 'labels':labels}
     result_df = DataFrame(res_dict, index=range(1,nf))
     result_df.index.name = 'id'
     
@@ -1131,7 +1151,10 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
-    
+    all_x2rg_dfs = []
+    all_data_iqs = []
+    all_goal_iqs = []
+    all_data_files = []
     for array_type in array_types:
         for data_file in data_files[array_type]:
             full_file = os.path.join(data_dir, data_file + data_ext)
@@ -1164,6 +1187,12 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
                                              axis=1)
             
             plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file)
+            all_x2rg_dfs.append(x2rg_df)
+            all_data_iqs.append(all_data_iq)
+            all_goal_iqs.append(goal_iq)
+            all_data_files.append(data_file)           
+    return  all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files
+    
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
     
@@ -1263,9 +1292,9 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
     # plt.show()
     
     fig_file_name = os.path.join(os.getcwd(),data_file + '_fit.eps')
-    # plt.savefig(fig_file_name, bbox_inches='tight')
     # plt.savefig(fig_file_name[:-3] + 'png')
     plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+    plt.savefig(fig_file_name, bbox_inches='tight')
 
     return
     
