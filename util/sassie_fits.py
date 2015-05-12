@@ -1237,9 +1237,9 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
     plt.xlabel(r'$Q (\AA^{-1})$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
     plt.ylabel(r'$I(Q)$')
-    plt.axis('tight')
     plt.yscale('log')
     plt.xscale('log')
+    plt.axis('tight')
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
@@ -1282,9 +1282,9 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
 
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
-    plt.axis('tight')
     plt.yscale('log')
     plt.xscale('log')
+    plt.axis('tight')
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     

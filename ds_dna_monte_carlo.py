@@ -997,15 +997,15 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
         else:
             dna_pass = True
 
-            # now check for collisions
+            # now recover an all-atom representation then check for collisions
             if len(r_coor_rot) > 0:   # only if rigids were rotated
                 # ~~~~ Check for overlap, DNA-rigid or rigid-rigid ~~~~~~#
                 d_coor_fix = d_coor[trialbead:]
                 d_coor_rot = d_coor[:trialbead]
 
-                # check for rigid-rigid overlap
+                # check for rigid-rigid overlap (not flexible DNA)
                 if 1 == f_overlap2(r_coor_rot, r_coor_fix, rigid_rigid_test):
-                    print 'Collision between 2 rigid components'
+                    print 'Collision between pre and post rigid components'
                     collision = 1
 
                 # check for DNA-rigid overlap
