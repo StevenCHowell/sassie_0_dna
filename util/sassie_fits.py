@@ -70,12 +70,14 @@ def load_foxs(saspath, i0=None):
 
     syn_files = glob.glob(os.path.join(saspath, '*.dat'))
 
+    rg = [None]*len(syn_files)
     if os.path.isfile(result_file):
         rg_df = pd.read_csv(result_file, sep='\t')
-        rg = list(rg_df['rg'].values)
+        rg_df.index = rg_df['labels']
         save_rg = False
+        for (i, syn_file) in enumerate(syn_files):
+            rg[i] = rg_df['rg'].loc[op.split(syn_file)[1].split('.')[0]]
     else:
-        rg = [None]*len(syn_files)
         save_rg = True
     
     all_data = []
@@ -242,7 +244,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     else:
         assert False, 'failed to find the calculated scattering data'
     syn_files = glob.glob(syn_data_dir + ext)
-    assert len(syn_files) > 0, 'no crysol output in %s' % syn_data_dir
+    assert len(syn_files) > 0, 'no scattering calculations in %s' % syn_data_dir
     syn_files.sort()
 
     # get the Rg and I(Q) for each structure from the calculation rusults
@@ -295,7 +297,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o, 'labels':labels}
     result_df = DataFrame(res_dict, index=range(1,nf))
     result_df.index.name = 'id'
-    
+    iq_df = DataFrame(matc_iq, columns=['Q']+labels)
     # save output to filter directory
     mkdir_p(filter_dir)
     out_file = os.path.join(filter_dir, 'rg_x2.out')
@@ -304,7 +306,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     np.save(os.path.join(filter_dir, 'data_iq.npy'), matc_iq)
     # np.savetxt('data.iq', data_iq) # too big to be useful as text file
     
-    return result_df, matc_iq, goal_iq
+    return result_df, matc_iq, iq_df, goal_iq
 
 def match_poly(in_data, rf_data):
     """
@@ -1152,7 +1154,7 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
     all_x2rg_dfs = []
-    all_data_iqs = []
+    all_iqs_dfs = []
     all_goal_iqs = []
     all_data_files = []
     for array_type in array_types:
@@ -1170,7 +1172,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
                     goal_iq = np.loadtxt(filter_dir + '/goal.iq')
                 else:
                     data = np.loadtxt(full_file)
-                    result_df, data_iq, goal_iq = compare_run_to_iq(
+                    result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
                         run_dir, data, ns[array_type], filter_dir)
                 run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
@@ -1181,17 +1183,17 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             x2rg_df = pd.concat(df_list)
             x2rg_df.index = range(len(x2rg_df))
             
-            all_data_iq = data_iq_list[0][:,0:1]
+            q = data_iq_list[0][:,:1]
             for data_iq in data_iq_list:
-                all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]), 
+                all_data_iq = np.concatenate((q, data_iq[:,1:]), 
                                              axis=1)
-            
             plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file)
+
             all_x2rg_dfs.append(x2rg_df)
-            all_data_iqs.append(all_data_iq)
+            all_iqs_dfs.append(iq_df)
             all_goal_iqs.append(goal_iq)
             all_data_files.append(data_file)           
-    return  all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files
+    return  all_x2rg_dfs, all_iqs_dfs, all_goal_iqs, all_data_files
     
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
