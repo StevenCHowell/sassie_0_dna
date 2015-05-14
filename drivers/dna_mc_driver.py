@@ -27,7 +27,7 @@ if __name__ == "__main__":
     svariables['refpdb']  = ('new_dsDNA60.pdb', 'string')
     svariables['psffile'] = ('new_dsDNA60.psf', 'string')
     svariables['ofile']   = ('new_dsDNA60_mc.dcd', 'string')
-    svariables['trials']  = ('1000', 'int')
+    svariables['trials']  = ('100', 'int')
     svariables['goback']  = ('50', 'int')
    
     # Molecule Specific Input

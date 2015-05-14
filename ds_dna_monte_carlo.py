@@ -895,7 +895,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     # pro_pro_cutoff = pro_bead_radius + pro_bead_radius
     # rigid_rigid_cutoff = rigid_radius + rigid_radius
     # cutoff_dist = 2.9
-    cutoff_dist = 0.85
+    cutoff_dist = 0.37
 
     # calculate the energy of the starting positions
     wca0 = numpy.zeros((cg_dna.natoms(),cg_dna.natoms()))
