@@ -338,7 +338,8 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     see also:
         align_gH5_to_c11
     '''
-    assert len(phi) == len(dxyz), 'ERROR: inconsistent inputs, unclear definition parameters'
+    assert len(phi) == len(dxyz), (
+    'ERROR: inconsistent inputs, unclear definition parameters')
     n_ncp = len(phi)
     
     # load in NCP1 if it is not already a sasmol object
@@ -349,7 +350,8 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     
     ncp_list = [ncp]
     
-    # setup the masks for getting the axes and origin (should be consistent regardless coordinates)
+    # setup the masks for getting the axes and origin 
+    # (should be consistent regardless coordinates)
     ncp_basis = ('(((segname[i] =="%s" and resid[i] >= %d and resid[i] <= %d ) or'
                  '  (segname[i] =="%s" and resid[i] <= %d and resid[i] >= %d) ) and'
                  '  name[i] == "C1\'")'
