@@ -13,8 +13,8 @@
 
 # import sassie.simulate.monte_carlo.ds_dna_monte_carlo.ds_dna_monte_carlo as ddmc
 # import sassie.simulate.monte_carlo.ds_dna_monte_carlo.special.input_filter as input_filter
-import sassie_1_na.ds_dna_monte_carlo as ddmc
-import sassie_1_na.special.input_filter as input_filter
+import x_dna.ds_dna_monte_carlo as ddmc
+import x_dna.special.input_filter as input_filter
 
 if __name__ == "__main__":
 
@@ -32,8 +32,8 @@ if __name__ == "__main__":
    
     # Molecule Specific Input
     svariables['n_flex_regions']        = ('1', 'int')
-    svariables['theta_max']             = ('15', 'float_array')
-    svariables['theta_z_max']           = ('5', 'float_array') # provide 's_theta_z_max' to use a different theta max for twisting vs bending
+    svariables['theta_max']             = ('10', 'float_array')
+    svariables['theta_z_max']           = ('2', 'float_array') # provide 's_theta_z_max' to use a different theta max for twisting vs bending
     svariables['first_res_per_region']  = ('16', 'int_array')
     svariables['n_cont_res_per_region'] = ('30', 'int_array')
     svariables['align_low_res']         = ('1', 'int')  # not yet implemented

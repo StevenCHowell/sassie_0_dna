@@ -176,6 +176,7 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
                 diff2=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)
                 dist=sqrt(diff2)
                 if(dist . LT . cutoff) then
+                    write (*,*) dist, i, j
                     check=1
                     exit
                 endif
@@ -256,6 +257,33 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2
                 z2=coor1b(j,3)
                 diff2=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)
                 dist((i-1)*n1a+j)=sqrt(diff2)
+  100       continue
+  200   continue
+
+        end
+C         1         2         3         4         5         6         7
+C123456789012345678901234567890123456789012345678901234567890123456789012
+
+        subroutine distances(coor,dist,n)
+        real coor(n,3),dist(n,n)
+        integer n
+        double precision x1,y1,z1,x2,y2,z2,diff2
+
+cf2py intent(in) :: coor,dist
+cf2py intent(in,out):: dist
+cf2py intent(hide)::n
+cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2
+
+        do 200,i=1,n-1
+            x1=coor(i,1)
+            y1=coor(i,2)
+            z1=coor(i,3)
+            do 100,j=i+1,n
+                x2=coor(j,1)
+                y2=coor(j,2)
+                z2=coor(j,3)
+                diff2=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)
+                dist(i,j)=sqrt(diff2)
   100       continue
   200   continue
 

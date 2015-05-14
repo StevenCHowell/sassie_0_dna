@@ -553,7 +553,7 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
 
 def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
     method = adjust_ncp.method
-    if method == 'spread':
+    if 'spread' in method:
         # determine the rotation axes 
         v21 = ncp_origins[0] - ncp_origins[1]
         v23 = ncp_origins[2] - ncp_origins[1]
@@ -607,7 +607,7 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
         ncp_axes[3] = all_coor4[1:4] - all_coor4[0]
         ncp_list[3].setCoor(np.array([all_coor4[4:]]))
     
-    elif method == 'twist':
+    if 'twist' in method:
         mv_ncp = adjust_ncp.mv_ncp
         i_axes = adjust_ncp.i_axes # [which ncp, which axis]
         angles = adjust_ncp.angles
@@ -685,7 +685,7 @@ if __name__ == '__main__':
     dxyz = np.loadtxt(dxyz_file)
 
     adjust_ncp = inputs()
-    adjust_ncp.move_ncp = [1,3]
+    adjust_ncp.mv_ncp = [1,3]
     adjust_ncp.i_axes = [[1,0],[3,0]]
     # adjust_ncp.i_axes = [[1,0],[1,0]]
     adjust_ncp.angles = [20, 20]
