@@ -138,7 +138,7 @@ def make_cg_dna(dna_segnames, dna_resids, bp_per_bead, aa_all, txtOutput,
 
     # populate the cg_dna sasmol object with semi-arbitrary atom properties
     cg_dna = sasmol.SasMol(0)
-    basis_filter = ("((name[i] == 'N1') and (resid[i] >= "+str(resid1[0])+
+    basis_filter = ("((name[i] == 'P') and (resid[i] >= "+str(resid1[0])+
                     " and resid[i] < "+str(resid1[0] + nbeads)+") and "
                     "(segname[i] == '"+dna1+"'))")
     error, mask = aa_dna.get_subset_mask(basis_filter)   #; print mask
@@ -897,8 +897,8 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     # cutoff_dist = 2.9
     cutoff_dist = 1.0
     heavy_mol = sasmol.SasMol(0)
-    error, mask = aa_all.get_subset_mask(" name[i][0] != 'H' ")
-    heavy_mol.copy_molecule_using_mask(heavy_mol, mask, 0)
+    error, heavy_mask = aa_all.get_subset_mask(" name[i][0] != 'H' ")
+    error = aa_all.copy_molecule_using_mask(heavy_mol, heavy_mask, 0)
     
     # calculate the energy of the starting positions
     wca0 = numpy.zeros((cg_dna.natoms(),cg_dna.natoms()))
@@ -1012,10 +1012,12 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             # ~~Combine aa Complete Structure~~
             aa_all.set_coor_using_mask(aa_dna, 0, aa_dna_mask)
             aa_all.set_coor_using_mask(rigid_mol, 0, rigid_mask)            
-
+            error, coor = aa_all.get_coor_using_mask(0, heavy_mask)
+            heavy_mol.setCoor(coor)
+            
             # check for overlap between DNA-rigid or rigid-rigid ~~~~~~#
-            d_coor_fix = d_coor[trialbead:] # these are cg_coor 
-            d_coor_rot = d_coor[:trialbead] # these are cg_coor
+            # d_coor_fix = d_coor[trialbead:] # these are cg_coor 
+            # d_coor_rot = d_coor[:trialbead] # these are cg_coor
 
             # # This had problems because of the cg_beads
             # # check for rigid-rigid overlap (not flexible DNA)
@@ -1032,7 +1034,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
                 # print 'Rigid-DNA (fix-rot) collision'
                 # collision = 1
             
-            if 1 == f_overlap1(aa_all.coor()[0], cutoff_dist):
+            if 1 == f_overlap1(heavy_mol.coor()[0], cutoff_dist):
                 print 'Collision occurred'
                 collision = 1
 
