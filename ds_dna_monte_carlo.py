@@ -140,7 +140,7 @@ def make_cg_dna(dna_segnames, dna_resids, bp_per_bead, aa_all, txtOutput,
     cg_dna = sasmol.SasMol(0)
     basis_filter = ('((name[i] == "C1\'") and (resid[i] >= '+str(resid1[0])+
                     ' and resid[i] < '+str(resid1[0] + nbeads)+') and '
-                    '(segname[i] == ''+dna1+''))')
+                    '(segname[i] == "' + dna1 + '"))')
     error, mask = aa_dna.get_subset_mask(basis_filter)   #; print mask
     s = numpy.sum(mask)
     if s != nbeads:
