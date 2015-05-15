@@ -177,8 +177,8 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
                 diff2=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)
                 dist=sqrt(diff2)
                 if(dist . LT . cutoff) then
-                    write (*,*) dist, i, j
-                    write (1,*) dist, i, j
+                    write (*,*) dist, i-1, j-1
+                    write (1,*) dist, i-1, j-1
                     close (1)
                     check=1
                     exit
@@ -221,7 +221,7 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
                 dist=sqrt(diff2)
                 if(dist . LT . cutoff) then
 C                    write (*,*) "collision between beads"
-                    write (*,*) dist, i, j
+                    write (*,*) dist, i-1, j-1
 C                    write (*,*) "b:", j
 C                    write (*,*) "dist",dist
                     check=1

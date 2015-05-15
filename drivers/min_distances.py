@@ -31,12 +31,12 @@ import os.path as op
 import pandas as pd
 
 # f_name = ['new_dsDNA60.pdb'] 
-# f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb'] 
+f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod_d.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/3x167/3x167.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11a.pdb']
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11b.pdb']
-f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
+# f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
 # f_name = ['/home/schowell/data/myData/1kx5/1kx5_ncp.pdb'] 
 # f_name = ['/home/schowell/data/myData/1zbb/1ZBB.pdb']
 
