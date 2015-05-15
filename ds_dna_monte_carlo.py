@@ -895,8 +895,11 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     # pro_pro_cutoff = pro_bead_radius + pro_bead_radius
     # rigid_rigid_cutoff = rigid_radius + rigid_radius
     # cutoff_dist = 2.9
-    cutoff_dist = 0.37
-
+    cutoff_dist = 1.0
+    heavy_mol = sasmol.SasMol(0)
+    error, mask = aa_all.get_subset_mask(" name[i][0] != 'H' ")
+    heavy_mol.copy_molecule_using_mask(heavy_mol, mask, 0)
+    
     # calculate the energy of the starting positions
     wca0 = numpy.zeros((cg_dna.natoms(),cg_dna.natoms()))
     Ub0 = energyBend(lp, u, l)

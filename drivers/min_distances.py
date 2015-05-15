@@ -27,16 +27,16 @@ import numpy as np
 import x_dna.util.basis_to_python as b2p
 import matplotlib.pyplot as plt
 import os.path as op
-import h5py
+# import h5py
 import pandas as pd
 
 # f_name = ['new_dsDNA60.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod_d.pdb'] 
-f_name = ['/home/schowell/data/myData/sassieRuns/3x167/3x167.pdb'] 
+# f_name = ['/home/schowell/data/myData/sassieRuns/3x167/3x167.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11a.pdb']
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11b.pdb']
-# f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
+f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
 # f_name = ['/home/schowell/data/myData/1kx5/1kx5_ncp.pdb'] 
 # f_name = ['/home/schowell/data/myData/1zbb/1ZBB.pdb']
 
@@ -61,7 +61,7 @@ for pdb in f_name:
     e, mask = in_mol.get_subset_mask(basis_filter)
     mol = sasmol.SasMol(0)
     e = in_mol.copy_molecule_using_mask(mol, mask, 0)
-    if op.exists(freq_file):
+    if op.exists(freq_file) and False:
         freq_df = pd.read_csv(freq_file, sep='\t')
     else:
         coor = np.array(mol.coor(), dtype=np.float32)
@@ -107,9 +107,12 @@ for pdb in f_name:
         seg2  = [mol.segname()[i] for i in c]
         name2 = [mol.name()[i]    for i in c]
         res2  = [mol.resid()[i]   for i in c]
+        ni1 = [sum(r[i] == r) for i in xrange(len(r))]
+        ni2 = [sum(c[i] == c) for i in xrange(len(c))]
+        
         dist_dict = {'i1': r, 'i2': c, 'distance': dist, 'segname1': seg1, 
                      'segname2': seg2, 'resid1': res1, 'resid2': res2, 'name1': 
-                     name1, 'name2': name2}
+                     name1, 'name2': name2, 'n i1': ni1, 'n i2': ni2}
         dist_df = pd.DataFrame(dist_dict)
         dist_df.sort('distance', inplace=True)
         dist_df.to_csv(pdb[:-4] + '_dist.txt', sep='\t')
@@ -122,14 +125,21 @@ for pdb in f_name:
         i_binned[i_binned[:,1].argsort()[::-1]]
         i_atom = i_binned[:,0]
         atom_frequency = i_binned[:,1]
+        
         segname = [mol.segname()[i] for i in i_atom]
         name    = [mol.name()[i] for i in i_atom]
         resid   = [mol.resid()[i] for i in i_atom]
-        distance = [np.nanmin([dist_df.loc[dist_df['i2'] == i]['distance'].max(),
-                               dist_df.loc[dist_df['i1'] == i]['distance'].max()])
-                    for i in i_atom]
+        mn_dist = [np.nanmin([dist_df.loc[dist_df['i2'] == i]['distance'].max(),
+                              dist_df.loc[dist_df['i1'] == i]['distance'].max()]
+                             ) for i in i_atom]
+        in_atom1 = [sum(dist_df['i1'] == i_atom[i]) for i in 
+                    xrange(len(i_atom))]
+        in_atom2 = [sum(dist_df['i2'] == i_atom[i]) for i in 
+                    xrange(len(i_atom))]
+
         freq_dict = {'i': i_atom, 'frequency': atom_frequency, 'resid': resid,
-                      'segname': segname, 'name': name, 'distance': distance}
+                      'segname': segname, 'name': name, 'distance': mn_dist,
+                      'in atom1': in_atom1, 'in atom2': in_atom2}
         freq_df = pd.DataFrame(freq_dict)
         freq_df.sort(['frequency', 'distance'], inplace=True, 
                      ascending=[False, True])
@@ -170,11 +180,22 @@ for pdb in f_name:
     print 'creating pdb without these atoms'
     # this will leave out all the hydrogen atoms (faster data transfer)
     e, mask = mol.get_subset_mask('all')
-    for i in xrange(len(freq_df)):
-        if freq_df.iloc[i]['name'] not in ['CA','P']:
-            mask[freq_df.iloc[i]['i']] = 0
+    for i in xrange(len(dist_df)):
+        if dist_df['name1'][i] in ['CA', 'P']:
+            mask[dist_df['i2'][i]] = 0
+        elif dist_df['name2'][i] in ['CA', 'P']:
+            mask[dist_df['i1'][i]] = 0
+        else:
+            if dist_df['n i2'][i] > dist_df['n i1'][i]:
+                mask[dist_df['i2'][i]] = 0
+            else:
+                mask[dist_df['i1'][i]] = 0
+
     new_mol = sasmol.SasMol(0)
     error = mol.copy_molecule_using_mask(new_mol, mask, 0)
-    new_mol.write_pdb(pdb[:-4] + '_d.pdb', 0, 'w')
+    out_pdb = pdb[:-4] + '_d.pdb'
+    new_mol.write_pdb(out_pdb, 0, 'w')
+    new_mol.read_pdb(out_pdb)   
+    new_mol.write_pdb(out_pdb, 0, 'w')
     
 print '\m/ >.< \m/'
