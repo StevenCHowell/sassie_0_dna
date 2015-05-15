@@ -891,16 +891,18 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
         if debug:
             print '>>> chain width, w, set to %d Angstroms (so w is < dist btwn beads)' %w
 
-    # pro_bead_radius = 1.0 # 2A min seperation of CA atoms in database
-    # rigid_radius = 1.0
-    # pro_pro_cutoff = pro_bead_radius + pro_bead_radius
-    # rigid_rigid_cutoff = rigid_radius + rigid_radius
-    # cutoff_dist = 2.9
-    cutoff_dist = 1
-    heavy_mol = sasmol.SasMol(0)
-    error, heavy_mask = aa_all.get_subset_mask(" name[i][0] != 'H' ")
-    error = aa_all.copy_molecule_using_mask(heavy_mol, heavy_mask, 0)
-    
+    dna_bead_radius = 0
+
+    # revision 229 of this file was modified to use every atom for calculating overlap
+    pro_bead_radius = 1.0 # 2A min seperation of CA atoms in database
+    rigid_radius = 1.0
+
+    pro_pro_test = pro_bead_radius + pro_bead_radius
+    dna_pro_test = dna_bead_radius + pro_bead_radius
+    rigid_rigid_test = rigid_radius + rigid_radius
+    dna_rigid_test = dna_bead_radius + rigid_radius
+
+
     # calculate the energy of the starting positions
     wca0 = numpy.zeros((cg_dna.natoms(),cg_dna.natoms()))
     Ub0 = energyBend(lp, u, l)
@@ -989,10 +991,8 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
                     print 'Warning: ~~> unclear OverflowError <~~ dU =', dU
                     print 'not sure where the error originated from'
 
-        old_coor = numpy.copy(cg_dna.coor()[0])  # backup old coordinates
-        old_xyz = numpy.copy(vecXYZ)             # backup old orientations
-        collision = 0
         test = numpy.random.random()
+        collision = 0
 
         if test >= probability:
             dna_pass = False
@@ -1000,66 +1000,38 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
         else:
             dna_pass = True
 
-            # recover an all-atom representation then check for collisions
- 
-            cg_dna.setCoor(numpy.array([d_coor]))    # update dna coordinates
-            rigid_mol.setCoor(numpy.array([r_coor])) # update rigid coordinates
-            vecXYZ = numpy.copy(xyz)                 # update dna orientations
-            
-            # ~~recover aa-DNA~~
-            error = recover_aaDNA_model(cg_dna, aa_dna, vecXYZ, all_beads,
-                                        dna_bead_masks)
-        
-            # ~~Combine aa Complete Structure~~
-            aa_all.set_coor_using_mask(aa_dna, 0, aa_dna_mask)
-            aa_all.set_coor_using_mask(rigid_mol, 0, rigid_mask)            
-            error, coor = aa_all.get_coor_using_mask(0, heavy_mask)
-            heavy_mol.setCoor(coor)
-            
-            # check for overlap between DNA-rigid or rigid-rigid ~~~~~~#
-            # d_coor_fix = d_coor[trialbead:] # these are cg_coor 
-            # d_coor_rot = d_coor[:trialbead] # these are cg_coor
+            # now check for collisions
+            if len(r_coor_rot) > 0:   # only if rigids were rotated
+                # ~~~~ Check for overlap, DNA-rigid or rigid-rigid ~~~~~~#
+                d_coor_fix = d_coor[trialbead:]
+                d_coor_rot = d_coor[:trialbead]
 
-            # # This had problems because of the cg_beads
-            # # check for rigid-rigid overlap (not flexible DNA)
-            # if 1 == f_overlap2(r_coor_rot, r_coor_fix, rigid_rigid_cutoff):
-                # print 'Collision between pre and post rigid components'
-                # collision = 1
+                # check for rigid-rigid overlap
+                if 1 == f_overlap2(r_coor_rot, r_coor_fix, rigid_rigid_test):
+                    print 'Collision between 2 rigid components'
+                    collision = 1
 
-            # # check for DNA-rigid overlap
-            # elif 1 == f_overlap2(r_coor_rot, d_coor_fix, dna_rigid_cutoff):
-                # print 'Rigid-DNA (rot-fix) collision'
-                # collision = 1
+                # check for DNA-rigid overlap
+                elif 1 == f_overlap2(r_coor_rot, d_coor_fix, dna_rigid_test):
+                    print 'Rigid-DNA (rot-fix) collision'
+                    collision = 1
 
-            # elif 1 == f_overlap2(r_coor_fix, d_coor_rot, dna_rigid_cutoff):
-                # print 'Rigid-DNA (fix-rot) collision'
-                # collision = 1
-            # cutoff_dist = 1.5
-            collision = f_overlap1(heavy_mol.coor()[0], cutoff_dist)
-            if collision:
-                dist, i1, i2 = numpy.loadtxt('atomid.out')
-                i1 = int(i1); i2 = int(i2)
-                seg1 = heavy_mol.segname()[i1] 
-                seg2 = heavy_mol.segname()[i2] 
-                res1 = heavy_mol.resid()[i1] 
-                res2 = heavy_mol.resid()[i2] 
-                name1= heavy_mol.name()[i1]
-                name2= heavy_mol.name()[i2]
-                print ('(segname %s and resid %d and name %s) or '
-                       '(segname %s and resid %d and name %s)' % 
-                       (seg1, res1, name1, seg2, res2, name2) )
-                print 'Distance of %0.2f between: %s %d %s and %s %d %s' % (
-                    dist, seg1, res1, name1, seg2, res2, name2)
-
+                elif 1 == f_overlap2(r_coor_fix, d_coor_rot, dna_rigid_test):
+                    print 'Rigid-DNA (fix-rot) collision'
+                    collision = 1
 
         if dna_pass and not collision:
             n_from_reload += 1
             steps_from_0[n_accept] = n_from_reload + n_reload[-1]
             n_accept += 1                      # increment accept counter
-
-            vecX_mol.setCoor(numpy.array([vecXYZ[0]]))
-            vecY_mol.setCoor(numpy.array([vecXYZ[1]]))
-            vecZ_mol.setCoor(numpy.array([vecXYZ[2]]))
+            # cg_dna.setCoor(d_coor) # <-- DO NOT use setCoor, want uniuqe mem
+            # cg_pro.setCoor(p_coor) # <-- DO NOT use setCoor, want uniuqe mem            
+            cg_dna.setCoor(numpy.array([d_coor])) # update dna coordinates
+            rigid_mol.setCoor(numpy.array([r_coor])) # update rigid coordinates
+            vecXYZ = numpy.copy(xyz)              # update dna orientations
+            vecX_mol.setCoor(numpy.array([vecXYZ[0]])) # independent of vecXYZ[0]
+            vecY_mol.setCoor(numpy.array([vecXYZ[1]])) # independent of vecXYZ[1]
+            vecZ_mol.setCoor(numpy.array([vecXYZ[2]])) # independent of vecXYZ[2]
 
             wca0 = numpy.copy(wca1)               # update DNA WCA energy        
             U_T0 = U_T1                           # update total energy
@@ -1075,7 +1047,16 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
 
             # save coordinates to a dcd
             if 0 == n_accept % n_dcd_write:
+                # ~~recover aa-DNA~~
+                error = recover_aaDNA_model(cg_dna, aa_dna, vecXYZ, all_beads,
+                                            dna_bead_masks)
+                # ~~recover aa-Protein~~
+                # recover_aaPro_model(aa_pgroup_masks, rigid_group_masks, rigid_mol,
+                                    # rigid_group_mols, aa_pro)
 
+                # ~~Combine aa Complete Structure~~
+                aa_all.set_coor_using_mask(aa_dna, 0, aa_dna_mask)
+                aa_all.set_coor_using_mask(rigid_mol, 0, rigid_mask)
                 # ~~Write DCD step~~
                 n_written += 1
                 aa_all.write_dcd_step(aa_all_dcd_out, 0, n_written)
@@ -1113,8 +1094,8 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             else:
                 fail_tally += 1                 # increment bead reject counter 
                 n_reject += 1                   # increment total reject counter
-                d_coor = numpy.copy(old_coor) # reset the dna coordinates
-                xyz = numpy.copy(old_xyz) 
+                d_coor = numpy.copy(cg_dna.coor()[0]) # reset the dna coordinates
+
             r_coor = numpy.copy(rigid_mol.coor()[0]) # reset the rigid coordinates
             xyz = numpy.copy(vecXYZ)              # reset the dna orientations
 
