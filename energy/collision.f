@@ -112,7 +112,7 @@ C123456789012345678901234567890123456789012345678901234567890123456789012
         double precision wca(n,n)
         double precision cutoff,w,rij
         double precision x2,y2,z2,dx2,dy2,dz2
-        double precision x1,y1,z1
+        double precision x1,y1,z1,dx,dy,dz
 
 cf2py intent(in) :: coor,tbead,w,wca,n
 cf2py intent(in,out):: wca
@@ -131,9 +131,9 @@ cf2py intent(hide):: x1,y1,z1
                y2=coor(j,2)
                z2=coor(j,3)
 
-               dx = x2-x1
-               dy = y2-y1
-               dz = z2-z1
+               dx=x2-x1
+               dy=y2-y1
+               dz=z2-z1
 
                dx2=dx*dx
                dy2=dy*dy
@@ -155,16 +155,17 @@ C123456789012345678901234567890123456789012345678901234567890123456789012
         subroutine overlap1(coor1,natoms1,cutoff,check)
         double precision coor1(natoms1,3)
         double precision cutoff
-        integer natoms1,check,count
+        integer natoms1,check,count,i,j
         double precision x1,y1,z1,x2,y2,z2,diff2,dist
 
 cf2py intent(in) :: coor1,cutoff
-cf2py intent(out):: check
+cf2py intent(out):: check,i,j
 cf2py intent(hide)::natoms1
 cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
 
         count = 1
         check = 0
+        open (unit=1,file="atomid.out",action="write",status="replace")
         do 200,i=1,natoms1-1
             x1=coor1(i,1)
             y1=coor1(i,2)
@@ -177,6 +178,8 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
                 dist=sqrt(diff2)
                 if(dist . LT . cutoff) then
                     write (*,*) dist, i, j
+                    write (1,*) dist, i, j
+                    close (1)
                     check=1
                     exit
                 endif
@@ -188,7 +191,7 @@ cf2py intent(hide)::x1,y1,z1,x2,y2,z2,diff2,dist
                 exit
             endif
   200   continue
-
+        close(1)
         end
 C         1         2         3         4         5         6         7
 C123456789012345678901234567890123456789012345678901234567890123456789012
@@ -267,7 +270,7 @@ C123456789012345678901234567890123456789012345678901234567890123456789012
         subroutine distances(coor,dist,n)
         real coor(n,3),dist(n,n)
         integer n
-        double precision x1,y1,z1,x2,y2,z2,diff2
+        real x1,y1,z1,x2,y2,z2,diff2
 
 cf2py intent(in) :: coor,dist
 cf2py intent(in,out):: dist

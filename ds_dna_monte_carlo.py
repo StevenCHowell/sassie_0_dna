@@ -783,6 +783,7 @@ def f_overlap1(coor, cutoff):
     '''
     this function checks for overlap using FORTRAN
     '''
+    
     # calculate the distance between moved DNA beads and all other DNA beads
     check = collision.overlap1(coor, cutoff)
 
@@ -895,7 +896,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     # pro_pro_cutoff = pro_bead_radius + pro_bead_radius
     # rigid_rigid_cutoff = rigid_radius + rigid_radius
     # cutoff_dist = 2.9
-    cutoff_dist = 1.0
+    cutoff_dist = 1
     heavy_mol = sasmol.SasMol(0)
     error, heavy_mask = aa_all.get_subset_mask(" name[i][0] != 'H' ")
     error = aa_all.copy_molecule_using_mask(heavy_mol, heavy_mask, 0)
@@ -1033,10 +1034,23 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             # elif 1 == f_overlap2(r_coor_fix, d_coor_rot, dna_rigid_cutoff):
                 # print 'Rigid-DNA (fix-rot) collision'
                 # collision = 1
-            
-            if 1 == f_overlap1(heavy_mol.coor()[0], cutoff_dist):
-                print 'Collision occurred'
-                collision = 1
+            # cutoff_dist = 1.5
+            collision = f_overlap1(heavy_mol.coor()[0], cutoff_dist)
+            if collision:
+                dist, i1, i2 = numpy.loadtxt('atomid.out')
+                i1 = int(i1); i2 = int(i2)
+                seg1 = heavy_mol.segname()[i1] 
+                seg2 = heavy_mol.segname()[i2] 
+                res1 = heavy_mol.resid()[i1] 
+                res2 = heavy_mol.resid()[i2] 
+                name1= heavy_mol.name()[i1]
+                name2= heavy_mol.name()[i2]
+                print ('(segname %s and resid %d and name %s) or '
+                       '(segname %s and resid %d and name %s)' % 
+                       (seg1, res1, name1, seg2, res2, name2) )
+                print 'Distance of %0.2f between: %s %d %s and %s %d %s' % (
+                    dist, seg1, res1, name1, seg2, res2, name2)
+
 
         if dna_pass and not collision:
             n_from_reload += 1

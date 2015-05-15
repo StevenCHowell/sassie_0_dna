@@ -40,8 +40,12 @@ f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
 # f_name = ['/home/schowell/data/myData/1kx5/1kx5_ncp.pdb'] 
 # f_name = ['/home/schowell/data/myData/1zbb/1ZBB.pdb']
 
+# minimized pdb files:
+# f_name = ['/home/schowell/data/code/pylib/x_dna/build_mol/c11_v2/c11_val/'
+          # 'minimization/c11_min.pdb']
+
 # N_closest = 100
-cutoff = 1
+cutoff = 1.2
 
 for pdb in f_name:
     in_mol = sasmol.SasMol(0)
@@ -56,7 +60,7 @@ for pdb in f_name:
     #s n0, bins0, patches0 = plt.hist(all_dist, 500, alpha=0.75, facecolor='green',
     #s                                label='min all: %f' % all_min)    
    
-    freq_file = pdb[:-4] + '_freq.txt'
+    freq_file = '%s_freq%s.txt' % (pdb[:-4], str(cutoff))
     basis_filter = "name[i][0] != 'H' "
     e, mask = in_mol.get_subset_mask(basis_filter)
     mol = sasmol.SasMol(0)
@@ -64,11 +68,11 @@ for pdb in f_name:
     if op.exists(freq_file) and False:
         freq_df = pd.read_csv(freq_file, sep='\t')
     else:
-        coor = np.array(mol.coor(), dtype=np.float32)
+        coor = np.array(mol.coor(), dtype=np.float32, order='F')
         n_heavy = coor.shape[1]
         # n_dist = n_heavy**2 #
         n_dist = n_heavy*(n_heavy-1)/2
-        heavy_dist = np.zeros((n_heavy, n_heavy), dtype=np.float32)
+        heavy_dist = np.zeros((n_heavy, n_heavy), dtype=np.float32, order='F')
         n_coor = n_heavy*3
         n_floats = n_dist + n_coor
         n_GB = n_floats * 4 / float(2**30) *2 # *2 b/c it will use this much mem
@@ -100,6 +104,7 @@ for pdb in f_name:
         heavy_dist = heavy_dist[heavy_dist > 0] # linearizes the array
         # heavy_dist = heavy_dist[heavy_dist<=max_dist]
         
+        print 'creating DataFrames'
         # i_dist = np.triu_indices(n_heavy,1)
         seg1  = [mol.segname()[i] for i in r]
         name1 = [mol.name()[i]    for i in r]
@@ -115,7 +120,8 @@ for pdb in f_name:
                      name1, 'name2': name2, 'n i1': ni1, 'n i2': ni2}
         dist_df = pd.DataFrame(dist_dict)
         dist_df.sort('distance', inplace=True)
-        dist_df.to_csv(pdb[:-4] + '_dist.txt', sep='\t')
+        dist_file = '%s_dist%s.txt' % (pdb[:-4], str(cutoff))
+        dist_df.to_csv(dist_file, sep='\t')
     
         # Get the most frequent close atoms
         i_close = np.concatenate((r, c))
@@ -193,7 +199,7 @@ for pdb in f_name:
 
     new_mol = sasmol.SasMol(0)
     error = mol.copy_molecule_using_mask(new_mol, mask, 0)
-    out_pdb = pdb[:-4] + '_d.pdb'
+    out_pdb = '%s_d%s.pdb' % (pdb[:-4], str(cutoff))
     new_mol.write_pdb(out_pdb, 0, 'w')
     new_mol.read_pdb(out_pdb)   
     new_mol.write_pdb(out_pdb, 0, 'w')
