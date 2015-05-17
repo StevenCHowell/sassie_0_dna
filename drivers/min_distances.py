@@ -31,12 +31,12 @@ import os.path as op
 import pandas as pd
 
 # f_name = ['new_dsDNA60.pdb'] 
-f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb'] 
+# f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod_d.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/3x167/3x167.pdb'] 
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11a.pdb']
 # f_name = ['/home/schowell/data/myData/sassieRuns/4x167/distances/c11b.pdb']
-# f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
+f_name = ['/home/schowell/data/myData/sassieRuns/4x167/c11.pdb']
 # f_name = ['/home/schowell/data/myData/1kx5/1kx5_ncp.pdb'] 
 # f_name = ['/home/schowell/data/myData/1zbb/1ZBB.pdb']
 
@@ -45,7 +45,7 @@ f_name = ['/home/schowell/data/myData/sassieRuns/2x167/dimer_mod.pdb']
           # 'minimization/c11_min.pdb']
 
 # N_closest = 100
-cutoff = 1.2
+cutoff = 2
 
 for pdb in f_name:
     in_mol = sasmol.SasMol(0)
@@ -61,7 +61,8 @@ for pdb in f_name:
     #s                                label='min all: %f' % all_min)    
    
     freq_file = '%s_freq%s.txt' % (pdb[:-4], str(cutoff))
-    basis_filter = "name[i][0] != 'H' "
+    # basis_filter = "name[i][0] != 'H' "
+    basis_filter = "name[i] == 'CA' "
     e, mask = in_mol.get_subset_mask(basis_filter)
     mol = sasmol.SasMol(0)
     e = in_mol.copy_molecule_using_mask(mol, mask, 0)

@@ -891,10 +891,12 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
         if debug:
             print '>>> chain width, w, set to %d Angstroms (so w is < dist btwn beads)' %w
 
+    # ~~~ Set the CUTOFF ~~~ #
     # revision 229 of this file calculated overlap using every atom
-    rigid_rigid_test = 1.0
-    # dna_rigid_test = 2.0 # this may need to be adjusted
-    dna_rigid_test = w # use the DNA width
+    rigid_rigid_test = 2.0 # CA atoms in database never closer than 2A
+    dna_rigid_test = 1 # this was the value I used before
+    # dna_rigid_test = 1.5 # this may need to be adjusted
+    # dna_rigid_test = w # use the DNA width
     p_cutoff = 4 # min distance btwn P atoms in c11 is 4.99
     p_mask = aa_dna.get_subset_mask(' name[i] == "P" ')[1]
     p_mol = sasmol.SasMol(0)
@@ -904,7 +906,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     wca0 = np.zeros((cg_dna.natoms(),cg_dna.natoms()))
     Ub0 = energyBend(lp, u, l)
 
-    (Uwca0, wca0) = f_energy_wca(w, d_coor, wca0, 0)
+    Uwca0, wca0 = f_energy_wca(w, d_coor, wca0, 0)
 
     U_T0 = Ub0 + Uwca0
     # print '(Ub0, Uwca0, Ub0/U_T0, Uwca0/U_T0) =', (Ub0, Uwca0, Ub0/U_T0, 
@@ -1006,6 +1008,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             # update the bead orientations and coordinates to test collisions
             cg_dna.setCoor(np.array([d_coor])) # update dna coordinates
             vecXYZ = np.copy(xyz)              # update dna orientations
+            updated_dna = True
             
             # ~~recover aa-DNA~~
             error = recover_aaDNA_model(cg_dna, aa_dna, vecXYZ, all_beads,
@@ -1030,8 +1033,6 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
                 print 'Distance of %0.2f between: %s %d %s and %s %d %s' % (
                     dist, seg1, res1, name1, seg2, res2, name2)
                 collision = 1
-                cg_dna.setCoor(np.array(old_d_coor)) # reset coordinates
-                vecXYZ = old_vecXYZ                       # reset orientations
 
             elif len(r_coor_rot) > 0:   # only if rigids were rotated
                 # ~~~~ Check for overlap, DNA-rigid or rigid-rigid ~~~~~~#
@@ -1097,7 +1098,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
                     vecY_mol.write_dcd_step(vecY_dcd_out, 0, n_written+1)   
                     vecZ_mol.write_dcd_step(vecZ_dcd_out, 0, n_written+1)                   
 
-        else :
+        else :          
             if fail_tally == goback:  
                 i_goback = rewind(seed, n_accept, cg_dna_ofile,
                                   cg_dna, rigid_ofile, rigid_mol, vecX_dcd_name, 
@@ -1118,6 +1119,9 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             else:
                 fail_tally += 1                 # increment bead reject counter 
                 n_reject += 1                   # increment total reject counter
+                if updated_dna:
+                    cg_dna.setCoor(np.array(old_d_coor)) # reset coordinates
+                    vecXYZ = old_vecXYZ                       # reset orientations                  
                 d_coor = np.copy(cg_dna.coor()[0]) # reset the dna coordinates
 
             r_coor = np.copy(rigid_mol.coor()[0]) # reset the rigid coordinates
