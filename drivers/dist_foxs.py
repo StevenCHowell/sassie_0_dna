@@ -237,7 +237,7 @@ def split_dcd(pdb_full_name, dcd_full_name, n_cpus, starting_dir):
             if n_cpus == 1:
                 rel_dcd_name = '../../../%s'%dcd_full_name
                 assert op.exists(rel_dcd_name), 'ERROR: did not find dcd file'
-                subprocess.call(['cp', rel_dcd_name, dcd_out_name])
+                subprocess.call(['ln', '-s', rel_dcd_name, dcd_out_name])
             else:
                 dcd_out_file = sub_mol.open_dcd_write(dcd_out_name)
                 for (i, frame) in enumerate(xrange(first, last)):
