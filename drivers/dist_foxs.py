@@ -114,7 +114,7 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
                 rg.append(mol.calcrg(0))
                 label.append(out_base[n_written-1]) # index from 1 (not 0)
         
-                cur_file = op.join(out_base[n_written] + '.pdb')
+                cur_file = op.join(out_base[n_written-1] + '.pdb')
                 sub_mol.setCoor(mol.get_coor_using_mask(0, mask)[1])
                 sub_mol.write_pdb(cur_file, 0, 'w')
     
