@@ -55,10 +55,19 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
 
     mol = sasmol.SasMol(0)
     mol.read_pdb(pdb_full_name)
+
+    # setup the molecule for calculating scattering using FoXS
     _, mask = mol.get_subset_mask(basis)
     assert sum(mask) > 0, 'ERROR: no atom selected using basis: %s' % basis
     sub_mol = sasmol.SasMol(0)
     mol.copy_molecule_using_mask(sub_mol, mask, 0)
+
+    # setup the molecule for checking for DNA overlap
+    p_basis = ' name[i] == "P" '
+    _, p_mask = mol.get_subset_mask(p_basis)
+    assert sum(p_mask) > 0, 'ERROR: no atoms selected using basis: %s' % p_basis
+    p_mol = sasmol.SasMol(0)
+    mol.copy_molecule_using_mask(p_mol, p_mask, 0)
 
     # setup the log file
     path, name = op.split(sub_dir)
@@ -97,15 +106,16 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
             
             # setup the input file
             mol.read_dcd_step(dcd_file, i_proc)
-            sub_mol.setCoor(mol.get_coor_using_mask(0, mask)[1])
-            cutoff = 1.5
-            if not ddmc.f_overlap1(sub_mol.coor()[0], cutoff):
+            p_mol.setCoor(mol.get_coor_using_mask(0, p_mask)[1])
+            cutoff = 3
+            if not ddmc.f_overlap1(p_mol.coor()[0], cutoff):
                 n_written += 1
                 mol.write_dcd_step(dcd_out_file, 0, n_written)
                 rg.append(mol.calcrg(0))
                 label.append(out_base[n_written-1]) # index from 1 (not 0)
         
                 cur_file = op.join(out_base[n_written] + '.pdb')
+                sub_mol.setCoor(mol.get_coor_using_mask(0, mask)[1])
                 sub_mol.write_pdb(cur_file, 0, 'w')
     
                 # run the calculation
@@ -144,9 +154,9 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
     
     log_file.write("Data stored in directory: %s\n\n" % res_dir)
     log_file.write("FoXS calculated %s DCD frames in %d s (%d frames/min)\n" 
-                   % (nf, toc, int(nf/toc*60)))
+                   % (n_written, toc, int(n_written/toc*60)))
     print "FoXS calculated %s DCD frames in %d s (%d frames/min)\n" % (
-        nf, toc, int(nf/toc*60))
+        n_written, toc, int(n_written/toc*60))
     log_file.close()
 
 def mkdir_p(path):
@@ -224,16 +234,22 @@ def split_dcd(pdb_full_name, dcd_full_name, n_cpus, starting_dir):
             sub_dcd_names.append(dcd_out_name)
             first = last_frame
             last = last_frame + n_frames_sub
-            dcd_out_file = sub_mol.open_dcd_write(dcd_out_name)
-            for (i, frame) in enumerate(xrange(first, last)):
-                sub_mol.read_dcd_step(dcd_file, frame)
-                sub_mol.write_dcd_step(dcd_out_file, 0, i+1)
+            if n_cpus == 1:
+                rel_dcd_name = '../../../%s'%dcd_full_name
+                assert op.exists(rel_dcd_name), 'ERROR: did not find dcd file'
+                subprocess.call(['cp', rel_dcd_name, dcd_out_name])
+            else:
+                dcd_out_file = sub_mol.open_dcd_write(dcd_out_name)
+                for (i, frame) in enumerate(xrange(first, last)):
+                    sub_mol.read_dcd_step(dcd_file, frame)
+                    sub_mol.write_dcd_step(dcd_out_file, 0, i+1)
 
-            sub_mol.close_dcd_write(dcd_out_file)
+                sub_mol.close_dcd_write(dcd_out_file)
 
         first_last.append([first, last])
         last_frame += n_frames_sub
-
+    mol.close_dcd_read(dcd_file[0])
+    
     return sub_dirs, sub_dcd_names, first_last
 
 def main(inputs):
@@ -278,12 +294,12 @@ def main(inputs):
 
     # run foxs instance on each folder
     py_basis = b2p.parse_basis(basis)
+    # split the dcd into subfolders
+    sub_dirs, sub_dcd_names, first_last = split_dcd(
+        pdb_full_name, dcd_full_name, n_cpus, foxs_path)        
+    processes = []
     
     if n_cpus > 1:
-    # split the dcd into subfolders
-        sub_dirs, sub_dcd_names, first_last = split_dcd(
-            pdb_full_name, dcd_full_name, n_cpus, foxs_path)        
-        processes = []
         for cpu in xrange(n_cpus):  # setup the processes
             foxs_args = (sub_dirs[cpu], sub_dcd_names[cpu], first_last[cpu], 
                          pdb_full_name, foxs_exe, py_basis, max_q, num_points)
@@ -296,7 +312,6 @@ def main(inputs):
         for p in processes: # exit the completed processes
             p.join()
     else:
-        
         foxs(sub_dirs[0], sub_dcd_names[0], first_last[0], pdb_full_name, 
              foxs_exe, py_basis, max_q, num_points)
 

@@ -27,8 +27,8 @@
 '''
 
 import sassie.sasmol.sasmol as sasmol
-# import sassie.simulate.monte_carlo.ds_dna_monte_carlo.collision as collision
-import x_dna.energy.collision as collision
+import sassie.simulate.monte_carlo.ds_dna_monte_carlo.collision as collision
+# import x_dna.energy.collision as collision
 import random, warnings, time, os, numpy as np
 import sassie.simulate.monte_carlo.ds_dna_monte_carlo.special.input_filter as input_filter
 from sassie.tools.merge_utilities import merge_dcd_files
@@ -894,10 +894,10 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
     # ~~~ Set the CUTOFF ~~~ #
     # revision 229 of this file calculated overlap using every atom
     rigid_rigid_test = 2.0 # CA atoms in database never closer than 2A
-    dna_rigid_test = 1 # this was the value I used before
+    dna_rigid_test = 1.0 # this was the value I used before
     # dna_rigid_test = 1.5 # this may need to be adjusted
     # dna_rigid_test = w # use the DNA width
-    p_cutoff = 4 # min distance btwn P atoms in c11 is 4.99
+    p_cutoff = 3 # min distance btwn P atoms in c11 is 4.99
     p_mask = aa_dna.get_subset_mask(' name[i] == "P" ')[1]
     p_mol = sasmol.SasMol(0)
     aa_dna.copy_molecule_using_mask(p_mol, p_mask, 0)
@@ -922,6 +922,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
         'each group needs its own theta_max: %d < %d'
         % (np.size(theta_max) - 1, np.max(beadgroups) ))
 
+    force = False
     # Main MC loop #
     while n_accept < trials:
 
@@ -1001,40 +1002,16 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
 
             # check for collisions
 
-            # backup bead orientations and coordinates
-            old_vecXYZ = np.copy(vecXYZ)
-            old_d_coor = np.copy(cg_dna.coor())
+            # # backup bead orientations and coordinates
+            # old_vecXYZ = np.copy(vecXYZ)
+            # old_d_coor = np.copy(cg_dna.coor())
             
-            # update the bead orientations and coordinates to test collisions
-            cg_dna.setCoor(np.array([d_coor])) # update dna coordinates
-            vecXYZ = np.copy(xyz)              # update dna orientations
-            updated_dna = True
+            # # update the bead orientations and coordinates to test collisions
+            # cg_dna.setCoor(np.array([d_coor])) # update dna coordinates
+            # vecXYZ = np.copy(xyz)              # update dna orientations
+            # updated_dna = True
             
-            # ~~recover aa-DNA~~
-            error = recover_aaDNA_model(cg_dna, aa_dna, vecXYZ, all_beads,
-                                        dna_bead_masks)    
-            p_coor = aa_dna.get_coor_using_mask(0, p_mask)[1]
-            
-            aa_dna.copy_molecule_using_mask(p_mol, p_mask, 0)
-            assert np.allclose(p_coor, p_mol.coor())
-            
-            if 1 == f_overlap1(p_coor[0], p_cutoff):
-                dist, i1, i2 = np.loadtxt('atomid.out')
-                i1 = int(i1); i2 = int(i2)
-                seg1 = p_mol.segname()[i1] 
-                seg2 = p_mol.segname()[i2] 
-                res1 = p_mol.resid()[i1] 
-                res2 = p_mol.resid()[i2] 
-                name1= p_mol.name()[i1]
-                name2= p_mol.name()[i2]
-                print ('(segname %s and resid %d and name %s) or '
-                       '(segname %s and resid %d and name %s)' % 
-                       (seg1, res1, name1, seg2, res2, name2) )
-                print 'Distance of %0.2f between: %s %d %s and %s %d %s' % (
-                    dist, seg1, res1, name1, seg2, res2, name2)
-                collision = 1
-
-            elif len(r_coor_rot) > 0:   # only if rigids were rotated
+            if len(r_coor_rot) > 0:   # only if rigids were rotated
                 # ~~~~ Check for overlap, DNA-rigid or rigid-rigid ~~~~~~#
                 d_coor_fix = d_coor[trialbead:]
                 d_coor_rot = d_coor[:trialbead]
@@ -1053,6 +1030,35 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
                     print 'Rigid-DNA (fix-rot) collision'
                     collision = 1
 
+                # else:
+                    # # ~~recover aa-DNA~~
+                    # error = recover_aaDNA_model(cg_dna, aa_dna, vecXYZ, 
+                                                # all_beads, dna_bead_masks)    
+                    # p_coor = aa_dna.get_coor_using_mask(0, p_mask)[1]
+
+                    # if 1 == f_overlap1(p_coor[0], p_cutoff):
+                        # aa_dna.copy_molecule_using_mask(p_mol, p_mask, 0)
+                        # assert np.allclose(p_coor, p_mol.coor())
+        
+                        # dist, i1, i2 = np.loadtxt('atomid.out')
+                        # i1 = int(i1); i2 = int(i2)
+                        # seg1 = p_mol.segname()[i1] 
+                        # seg2 = p_mol.segname()[i2] 
+                        # res1 = p_mol.resid()[i1] 
+                        # res2 = p_mol.resid()[i2] 
+                        # name1= p_mol.name()[i1]
+                        # name2= p_mol.name()[i2]
+                        # print ('(segname %s and resid %d and name %s) or '
+                               # '(segname %s and resid %d and name %s)' % 
+                               # (seg1, res1, name1, seg2, res2, name2) )
+                        # print 'Distance of %0.2f between: %s %d %s and %s %d %s' % (
+                            # dist, seg1, res1, name1, seg2, res2, name2)
+                        # collision = 1
+        if force:
+            print 'dna_pass, collision', (dna_pass, collision)
+            dna_pass = True
+            collision = 0
+            
         if dna_pass and not collision:
             n_from_reload += 1
             steps_from_0[n_accept] = n_from_reload + n_reload[-1]
@@ -1119,7 +1125,7 @@ def dna_mc(trials, i_loop, theta_max, theta_z_max, debug, goback, n_dcd_write,
             else:
                 fail_tally += 1                 # increment bead reject counter 
                 n_reject += 1                   # increment total reject counter
-                if updated_dna:
+                if 'updated_dna' in locals():
                     cg_dna.setCoor(np.array(old_d_coor)) # reset coordinates
                     vecXYZ = old_vecXYZ                       # reset orientations                  
                 d_coor = np.copy(cg_dna.coor()[0]) # reset the dna coordinates
