@@ -1152,7 +1152,8 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
-def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
+def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns, 
+                prefix='', do_plot='True'):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
@@ -1182,12 +1183,14 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             # combine result DataFrames and data_iq arrays
             x2rg_df = pd.concat(df_list)
             x2rg_df.index = range(len(x2rg_df))
+            x2rg_df.sort('X2', inplace=True)
             
             q = data_iq_list[0][:,:1]
             for data_iq in data_iq_list:
                 all_data_iq = np.concatenate((q, data_iq[:,1:]), 
                                              axis=1)
-            plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file)
+            if do_plot:
+                plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix)
 
             all_x2rg_dfs.append(x2rg_df)
             all_iqs_dfs.append(iq_df)
@@ -1196,7 +1199,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
     return  all_x2rg_dfs, all_iqs_dfs, all_goal_iqs, all_data_files
     
 
-def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
+def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     
     n_total = len(x2rg_df)
     n_best = int(n_total * 0.1)
@@ -1293,7 +1296,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file):
     plt.tight_layout()
     # plt.show()
     
-    fig_file_name = os.path.join(os.getcwd(),data_file + '_fit.eps')
+    fig_file_name = os.path.join(os.getcwd(), prefix + data_file + '_fit.eps')
     # plt.savefig(fig_file_name[:-3] + 'png')
     plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
     plt.savefig(fig_file_name, bbox_inches='tight')
