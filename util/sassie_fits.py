@@ -810,39 +810,24 @@ def fig_sub_rg_v_conc(show=False):
     tri_labels = []
     di_labels = []
     
-    dod.append(['N12merH5Mg1b_zeroCon', 'N12merH5Mg1bx4', 'N12merH5Mg1bx2', 
-                'N12merH5Mg1bx1'])
-    dod_labels.append(r'H5 1mM $Mg^{2+}$ B')
+    dod.append(['N12merTE_zeroCon', 'N12merTEx4', 'N12merTEx2', 'N12merTEx1'])
+    dod_labels.append(r'10mM $K^{+}$')
+
+    dod.append(['c000_12x167', 'N12merMg1x4', 'N12merMg1x2', 
+                'N12merMg1x1'])
+    dod_labels.append(r'1mM $Mg^{2+}$')
+
+    # dod.append(['N12merH5Mg1b_zeroCon', 'N12merH5Mg1bx4', 'N12merH5Mg1bx2', 
+                # 'N12merH5Mg1bx1'])
+    # dod_labels.append(r'H5 1mM $Mg^{2+}$ B')
 
     dod.append(['N12merH5Mg1a_zeroCon', 'N12merH5Mg1ax4', 'N12merH5Mg1ax2', 
                 'N12merH5Mg1ax1'])
-    dod_labels.append(r'H5 1mM $Mg^{2+}$ A')
+    dod_labels.append(r'H5 1mM $Mg^{2+}$')
 
     dod.append(['N12merH5TE_zeroCon', 'N12merH5TEx4', 'N12merH5TEx2', 
                 'N12merH5TEx1'])
     dod_labels.append(r'H5 10mM $K^+$')
-
-    dod.append(['N12merTE_zeroCon', 'N12merTEx4', 'N12merTEx2', 'N12merTEx1'])
-    dod_labels.append(r'10mM $K^{+}$')
-
-    dod.append(['N12merMg1_zeroCon', 'N12merMg1x4', 'N12merMg1x2', 
-                'N12merMg1x1'])
-    dod_labels.append(r'1mM $Mg^{2+}$')
-
-    tet.append(['N4merH5TE_zeroCon', 'N4merH5TEx4', 'N4merH5TEx2', 
-                'N4merH5TEx1'])
-    tet_labels.append(r'H5 10mM $K^{+}$')
-
-    tet.append(['N4merH5Mg1_zeroCon', 'N4merH5Mg1x4', 'N4merH5Mg1x2', 
-                'N4merH5Mg1x1'])
-    tet_labels.append(r'H5 1mM $Mg^{2+}$')
-
-    # tet.append(['N4merTE_zeroCon', 'N4merTEx4', 'N4merTEx2', 'N4merTEx1'])
-    # tet_labels.append(r'10mM $K^{+}$')
-
-    # These are definitely aggregated
-    # tet.append(['N4merMg1_zeroCon', 'N4merMg1x4', 'N4merMg1x2', 'N4merMg1x1'])
-    # tet_labels.append(r'1mM $Mg^{2+}$ C')
 
     # tri.append(['GW3merTek010_zeroCon', 'GW3merAtek010x8', 'GW3merAtek010x4', 
                 # 'GW3merAtek010x2', 'GW3merAtek010x1'])
@@ -851,7 +836,7 @@ def fig_sub_rg_v_conc(show=False):
                 'c125_3x167_k010', 
                 'c250_3x167_k010', 
                 'c500_3x167_k010'])
-    tri_labels.append(r'10mM $K^+$ C')
+    tri_labels.append(r'10mM $K^+$')
 
     # tri.append(['GW3merTek050_zeroCon', 'GW3merAtek050x4', 'GW3merAtek050x2', 
     # 'GW3merAtek050x1'])
@@ -859,7 +844,7 @@ def fig_sub_rg_v_conc(show=False):
                 'c125_3x167_k050',
                 'c250_3x167_k050',
                 'c500_3x167_k050'])
-    tri_labels.append(r'50mM $K^+$ C')
+    tri_labels.append(r'50mM $K^+$')
 
     # tri.append(['GW3merTek100_zeroCon', 'GW3merAtek100x4', 'GW3merAtek100x2', 
                 # 'GW3merAtek100x1'])
@@ -867,7 +852,7 @@ def fig_sub_rg_v_conc(show=False):
                 'c125_3x167_k100',
                 'c250_3x167_k100',
                 'c500_3x167_k100'])
-    tri_labels.append(r'100mM $K^+$ C')
+    tri_labels.append(r'100mM $K^+$')
 
     # tri.append(['GW3merTek200_zeroCon', 'GW3merAtek200x4', 'GW3merAtek200x2', 
                 # 'GW3merAtek200x1'])
@@ -875,7 +860,7 @@ def fig_sub_rg_v_conc(show=False):
                 'c125_3x167_k200',
                 'c250_3x167_k200',
                 'c500_3x167_k200'])
-    tri_labels.append(r'200mM $K^+$ C')
+    tri_labels.append(r'200mM $K^+$')
 
     # di.append(['diAtek010_zeroCon', 'diAtek010c012', 'diAtek010c025', 
                # 'diAtek010c050'])
@@ -883,31 +868,46 @@ def fig_sub_rg_v_conc(show=False):
                'c125_2x167_k010',
                'c250_2x167_k010',
                'c500_2x167_k010'])
-    di_labels.append(r'10mM $K^+$ A')
+    di_labels.append(r'10mM $K^+$')
 
     tet.append(['c000_4x167_k010',
                 'c125_4x167_k010',
                 'c250_4x167_k010',
                 'c500_4x167_k010'])
-    tet_labels.append(r'10mM $K^+$ A')
+    tet_labels.append(r'10mM $K^+$')
 
     tet.append(['c000_4x167_k050',
                 'c125_4x167_k050',
                 'c250_4x167_k050',
                 'c500_4x167_k050'])
-    tet_labels.append(r'50mM $K^+$ A')
+    tet_labels.append(r'50mM $K^+$')
 
     tet.append(['c000_4x167_k100',
                 'c125_4x167_k100',
                 'c250_4x167_k100',
                 'c500_4x167_k100'])
-    tet_labels.append(r'100mM $K^+$ A')
+    tet_labels.append(r'100mM $K^+$')
 
     tet.append(['c000_4x167_mg1',
                 'c125_4x167_mg1',
                 'c250_4x167_mg1',
                 'c500_4x167_mg1'])
-    tet_labels.append(r'1mM $Mg^{2+}$ A')
+    tet_labels.append(r'1mM $Mg^{2+}$')
+
+    tet.append(['c000_4x167_h5_k010', 'c200_4x167h5_k010', 
+                'c400_4x167h5_k010', 'c800_4x167h5_k010']) 
+    tet_labels.append(r'H5 10mM $K^{+}$')
+
+    tet.append(['c000_4x167_h5_mg1', 'c200_4x167h5_mg1', 
+                'c400_4x167h5_mg1', 'c800_4x167h5_mg1']) 
+    tet_labels.append(r'H5 1mM $Mg^{2+}$')
+
+    # tet.append(['N4merTE_zeroCon', 'N4merTEx4', 'N4merTEx2', 'N4merTEx1'])
+    # tet_labels.append(r'10mM $K^{+}$')
+
+    # These are definitely aggregated
+    # tet.append(['N4merMg1_zeroCon', 'N4merMg1x4', 'N4merMg1x2', 'N4merMg1x1'])
+    # tet_labels.append(r'1mM $Mg^{2+}$')
 
     # tet.append(['tetraCtek010_zeroCon', 'tetraCtek010c012', 'tetraCtek010c050'])
     # tet_labels.append(r'10mM $K^+$ C')
@@ -916,11 +916,12 @@ def fig_sub_rg_v_conc(show=False):
                 # 'tetraCtek050c050'])
     # tet_labels.append(r'50mM $K^+$ C')
 
-    fig = plt.figure(figsize = (14, 14))
+    fig = plt.figure(figsize = (14, 10))
     gs1 = gridspec.GridSpec(2, 2)
     gs1.update(hspace=0)
     x_range = [-0.1, 1.22]
 
+    ## SUBPLOT(1,1) a)
     ax = plt.subplot(gs1[0])
     for i in xrange(len(tri)):
         plt.errorbar(df['conc'].loc[tri[i]], df['Rg'].loc[tri[i]], 
@@ -932,15 +933,17 @@ def fig_sub_rg_v_conc(show=False):
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
-    plt.title(r'3x167', x=0.3, y=0.92)
+    # plt.title(r'3x167', x=0.3, y=0.92)
     ylim = np.array(plt.ylim())
-    ylim[1] *= 1.03 
+    ylim[1] *= 1.08 
     plt.ylim(ylim)
+    tri_ylim = ylim # store for dimer ylim
     plt.xlim(x_range)
     ax.get_xaxis().set_ticks([])
-    ax.text(0.03, 0.03, 'a)', verticalalignment='bottom', fontweight='bold', 
+    ax.text(0.03, 0.92, r'a) 3x167', verticalalignment='bottom', fontweight='bold', 
         horizontalalignment='left', transform=ax.transAxes)
     
+    ## SUBPLOT(2,1) b)
     ax = plt.subplot(gs1[2])
     for i in xrange(len(tet)):
         plt.errorbar(df['conc'].loc[tet[i]], df['Rg'].loc[tet[i]], 
@@ -952,17 +955,19 @@ def fig_sub_rg_v_conc(show=False):
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
-    plt.title(r'4x167', x=0.3, y=0.92)
+    # plt.title(r'4x167', x=0.3, y=0.92)
     ylim = np.array(plt.ylim())
-    ylim[1] *= 1.1
+    ylim[1] *= 1.3
     plt.ylim(ylim)
+    ax.set_yticks(ax.get_yticks()[:-2])
     plt.xlim(x_range)
-    ax.text(0.03, 0.03, 'b)', verticalalignment='bottom', fontweight='bold', 
+    ax.text(0.03, 0.92, r'b) 4x167', verticalalignment='bottom', fontweight='bold', 
         horizontalalignment='left', transform=ax.transAxes)
 
 
     x_range = [-0.1, 0.9]
 
+    ## SUBPLOT(1,2) c)
     ax = plt.subplot(gs1[1])
     # plt.figure()
     for i in xrange(len(di)):
@@ -975,15 +980,17 @@ def fig_sub_rg_v_conc(show=False):
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     # plt.xlabel(r'mg/mL')
-    plt.title('2x167', x=0.3, y=0.92)
+    # plt.title('2x167', x=0.3, y=0.92)
     # plt.text(.2, .9, r'2x167: $R_g$ vs mg/mL comparison',
              # horizontalalignment='center',
              # transform=plt.transAxes)
     plt.xlim(x_range)
+    plt.ylim(tri_ylim)
     ax.get_xaxis().set_ticks([])
-    ax.text(0.03, 0.03, 'c)', verticalalignment='bottom', fontweight='bold', 
+    ax.text(0.03, 0.92, r'c) 2x167', verticalalignment='bottom', fontweight='bold', 
         horizontalalignment='left', transform=ax.transAxes)
         
+    ## SUBPLOT(2,2) d)
     ax = plt.subplot(gs1[3])
     for i in xrange(len(dod)):
         plt.errorbar(df['conc'].loc[dod[i]], df['Rg'].loc[dod[i]], 
@@ -995,14 +1002,15 @@ def fig_sub_rg_v_conc(show=False):
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
-    plt.title(r'12x167', x=0.3, y=0.92)
+    # plt.title(r'12x167', x=0.3, y=0.92)
     ylim = np.array(plt.ylim())
+    ax.set_yticks(ax.get_yticks()[:-1])
     ylim[1] *= 1.03
     plt.ylim(ylim)
     plt.xlim(x_range)
-    ax.text(.03, .03, 'd)', verticalalignment='bottom', fontweight='bold', 
+    ax.text(0.03, 0.92, r'd) 12x167', verticalalignment='bottom', fontweight='bold', 
             horizontalalignment='left', transform=ax.transAxes) 
-    
+
     if show: plt.show()
     fig.tight_layout()
     fig.savefig('Rg_v_mgmL.png')
@@ -1058,7 +1066,8 @@ def fig_rg_v_salt(show=False):
     return
 
 def load_rg_csv():
-    output_csv = 'rg_i0.csv'
+    output_csv = ('/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data'
+                  '/rg_i0.csv')
     if os.path.exists(output_csv) and not debug:
         print '# READING Rg AND I(0) FROM CSV FILE'
         df = pd.read_csv(output_csv, sep='\t')
@@ -1067,7 +1076,7 @@ def load_rg_csv():
     else:
         print '# READING Rg AND I(0) FROM MATLAB AND GNOM OUTPUT'
         df = combine_rg_i0()
-        df.to_csv('rg_i0.csv', sep='\t')
+        df.to_csv(output_csv, sep='\t')
     return df
 
 def combine_rg_i0():
