@@ -1208,34 +1208,40 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 
     return  all_x2rg_dfs, all_iqs_dfs, all_goal_iqs, all_data_files
     
-def write_filter_output(run_dirs, df_list, cutoff, 
+def write_filter_output(run_dirs, df_list, cutoff, collect_dcd=True,
                         catdcd_exe='/home/myPrograms/bin/catdcd'):
     filter_dir = op.join(op.split(op.split(op.split(run_dirs[0])[0])[0])[0], 
                          'filter')
-    print 'saving output dcd and "rglowweights.txt" to %s' % filter_dir
+    txt_name =  'rglowweights.txt'
+    print 'saving output dcd and "%s" to %s' % (txt_name, filter_dir)
     mkdir_p(filter_dir)
     full_dcd_out = op.join(filter_dir, 
                            'collected_%s.dcd' % filter_dir.split('/')[-2])
     tmp_dcd_out = op.join(filter_dir, 'tmp.dcd')
-    for (i, run_dir) in enumerate(run_dirs):
-        dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
-        assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s' 
-                                     % dcd_file)
-        if i == 0:
-            bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
-            subprocess.Popen(bash_cmd.split())
-        else:
-            bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out, 
-                         full_dcd_out, dcd_name))
-            process = subprocess.Popen(bash_cmd1.split(), stdout=subprocess.PIPE)            
-            output = process.communicate()[0]
-            bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
-            process = subprocess.Popen(bash_cmd2.split(), stdout=subprocess.PIPE)
-            output = process.communicate()[0]
+    index = 0
+    with open(op.join(filter_dir, txt_name), 'w') as txt_file:
+        txt_file.write('# file generated on FILL THIS IN\n')
+        txt_file.write('# structure, Rg, weight\n')
+        for (i, run_dir) in enumerate(run_dirs):
+            for j in xrange(len(df_list[i])):
+                this_rg = df_list[i]['Rg'].iloc[j] 
+                accept = df_list[i]['X2'].iloc[j] < cutoff 
+                index += 1
+                txt_file.write('%d\t%0.6f\t%0.6f\n' % (index, this_rg, accept))
+            if collect_dcd:
+                dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
+                assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s' 
+                                             % dcd_file)
+                if i == 0:
+                    bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
+                    subprocess.call(bash_cmd.split())
+                else:
+                    bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out, 
+                                                     full_dcd_out, dcd_name))
+                    subprocess.call(bash_cmd1.split())            
+                    bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
+                    subprocess.call(bash_cmd2.split())
 
-
-        print ''
-    
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     
@@ -1410,6 +1416,8 @@ if __name__ == '__main__':
                 'c500_4x167_k050',
                 'c500_4x167_k100']
         di0 = ['c000_2x167_k010']
+        tet0 = ['c000_4x167_k010']
+        tri0 = ['c000_3x167_k010']
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0}
     
         sassie_run_dir = '/home/schowell/data/myData/bkSassieRuns'
@@ -1428,7 +1436,7 @@ if __name__ == '__main__':
         dq = {'di': 0.00512821, 'tri': 0.008,'tet': 0.008}
         ns = {'di': 40, 'tri': 26,'tet': 26}  # number of Q values from crysol
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=1000)
+                    cutoff=350)
 
     ############################ pseudo code ###########################
     # create a data frame containing the information for each structure
