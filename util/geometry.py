@@ -199,6 +199,71 @@ def rotate_about_v(coor3, v, theta):
     # return the modified positions
     return coor4[:, 0:3]
 
+def angle_btwn_v1_v2(v1, v2):
+    '''
+    get the angle between two arbitrary vectors 
+
+    Parameters
+    ----------
+    v1 : Nx3 np.array
+        set 1 of the vector/s to use in calculation 
+    v2 : Nx3 np.array
+        set 2 of the vector/s to use in calculation 
+    
+
+    Returns
+    -------
+    R : Nx1 np.array
+        The angles between v1 and v2
+
+
+    Notes
+    -----
+    Simple implementation of the cosine formula: cos \theta = u dot v
+
+    See Also
+    --------
+    rorate_v2_to_v1: get the rotation matrix using this angle
+    
+    Examples
+    --------
+    >>> v1 = np.array([0,0,1])
+    >>> v2 = np.array([1,0,0])
+    >>> R = rotate_v2_to_v1(v1, v2)
+    >>> print R
+    [[ 0.  0. -1.]
+     [ 0.  1.  0.]
+     [ 1.  0.  0.]]
+    >>> np.dot(R, v2) - v1
+    array([ 0.,  0.,  0.])
+
+    '''
+    if len(v2.shape) != len(v1.shape):
+        if len(v2.shape) > len(v1.shape):
+            new_v1 = np.zeros(v2.shape)
+            new_v1[:] = v1
+            v1 = new_v1
+        else:
+            pass # THIS WILL BREAK
+    
+    if len(v2.shape) == 1:
+        # make sure v1 and v2 are unit vectors:
+        v1 = v1/np.sqrt(v1.dot(v1))
+        v2 = v2/np.sqrt(v2.dot(v2))
+
+        c = np.dot(v2, v1)
+
+    else:
+        # make sure v1 and v2 are unit vectors:
+        v1 = np.einsum('ij,i->ij', v1, 1/np.sqrt(np.einsum('ij,ij->i', v1, v1)))
+        v2 = np.einsum('ij,i->ij', v2, 1/np.sqrt(np.einsum('ij,ij->i', v2, v2)))
+
+        # this could fail if a v1, v2 pair are nearly equal -> s~=0
+        c = np.einsum('ij,ij->i', v2, v1)
+
+    theta_rad = np.arccos(c)
+    theta_deg = theta_rad / np.pi * 180.0
+    return theta_deg, theta_rad
 
 def rotate_v2_to_v1(v1, v2):
     '''

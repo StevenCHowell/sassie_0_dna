@@ -238,6 +238,19 @@ if __name__ == '__main__':
 
     # geometry.show_ncps(all_ncp_plot_vars)
     
+    # Get the angle between x-axes
+    all_ncp_axes_array = np.array(all_ncp_axes)
+    angle_btwn_z_axes = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-1,2,:],
+                                                  all_ncp_axes_array[1:,2,:])
+    print 'angle between NCP z-axes: ', angle_btwn_z_axes[0]
+    
+    # Get the opening angles
+    all_ncp_origins_array = np.array(all_ncp_origins)
+    v_ncp1_to_ncp2 = all_ncp_origins_array[1:] - all_ncp_origins_array[:-1]
+    opening_angles = geometry.angle_btwn_v1_v2(-v_ncp1_to_ncp2[:-1], 
+                                               v_ncp1_to_ncp2[1:])
+    print 'opening angles between NCPs: ', opening_angles[0]
+    
     if False:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')

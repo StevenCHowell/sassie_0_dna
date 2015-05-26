@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import x_dna.util.gw_plot as gp
 import matplotlib.gridspec as gridspec
 import sassie.sasmol.sasmol as sasmol
+import subprocess
 debug = True
 
 # import sassie.sasmol.sasmol as sasmol
@@ -69,7 +70,8 @@ def load_foxs(saspath, i0=None):
     result_file = os.path.join(saspath, 'rg.csv')
 
     syn_files = glob.glob(os.path.join(saspath, '*.dat'))
-
+    syn_files.sort()
+    
     rg = [None]*len(syn_files)
     if os.path.isfile(result_file):
         rg_df = pd.read_csv(result_file, sep='\t')
@@ -235,7 +237,7 @@ def mkdir_p(path):
 def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     
     assert os.path.exists(run_dir), 'No such run directory: %s' % run_dir
-    if os.path.exists(os.path.join(run_dir,'crysol')):
+    if os.path.exists(os.path.join(run_dir,'crysol')) and False:
         syn_data_dir = os.path.join(run_dir,'crysol')
         ext = '/*.int'
     elif os.path.exists(os.path.join(run_dir,'foxs')):
@@ -293,7 +295,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
         # X2 = (diff2 / goal).sum() # Pearson's X2 test-statistic (crazy units)
         matc_iq[:,[0,i]], s[j], o[j], X2[j] = scale_offset(data_iq[:,[0,i]], 
                                                            goal_iq)
-    
+
     res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o, 'labels':labels}
     result_df = DataFrame(res_dict, index=range(1,nf))
     result_df.index.name = 'id'
@@ -810,27 +812,30 @@ def fig_sub_rg_v_conc(show=False):
     tri_labels = []
     di_labels = []
     
-    dod.append(['N12merTE_zeroCon', 'N12merTEx4', 'N12merTEx2', 'N12merTEx1'])
+    dod.append(['c000_12x167_k010',
+                'c125_12x167_k010',
+                'c250_12x167_k010',
+                'c500_12x167_k010'])
     dod_labels.append(r'10mM $K^{+}$')
-
-    dod.append(['c000_12x167', 'N12merMg1x4', 'N12merMg1x2', 
-                'N12merMg1x1'])
+    
+    dod.append(['c000_12x167_mg1',
+                'c125_12x167_mg1',
+                'c250_12x167_mg1',
+                'c500_12x167_mg1'])
     dod_labels.append(r'1mM $Mg^{2+}$')
 
-    # dod.append(['N12merH5Mg1b_zeroCon', 'N12merH5Mg1bx4', 'N12merH5Mg1bx2', 
-                # 'N12merH5Mg1bx1'])
-    # dod_labels.append(r'H5 1mM $Mg^{2+}$ B')
-
-    dod.append(['N12merH5Mg1a_zeroCon', 'N12merH5Mg1ax4', 'N12merH5Mg1ax2', 
-                'N12merH5Mg1ax1'])
-    dod_labels.append(r'H5 1mM $Mg^{2+}$')
-
-    dod.append(['N12merH5TE_zeroCon', 'N12merH5TEx4', 'N12merH5TEx2', 
-                'N12merH5TEx1'])
+    dod.append(['c000_12x167_h5_k010',
+                'c125_12x167_h5_k010',
+                'c250_12x167_h5_k010',
+                'c500_12x167_h5_k010'])
     dod_labels.append(r'H5 10mM $K^+$')
 
-    # tri.append(['GW3merTek010_zeroCon', 'GW3merAtek010x8', 'GW3merAtek010x4', 
-                # 'GW3merAtek010x2', 'GW3merAtek010x1'])
+    dod.append(['c000_12x167_h5_mg1',
+                'c125_12x167_h5_mg1',
+                'c250_12x167_h5_mg1',
+                'c500_12x167_h5_mg1'])
+    dod_labels.append(r'H5 1mM $Mg^{2+}$')
+
     tri.append(['c000_3x167_k010', 
                 'c068_3x167_k010', 
                 'c125_3x167_k010', 
@@ -838,32 +843,24 @@ def fig_sub_rg_v_conc(show=False):
                 'c500_3x167_k010'])
     tri_labels.append(r'10mM $K^+$')
 
-    # tri.append(['GW3merTek050_zeroCon', 'GW3merAtek050x4', 'GW3merAtek050x2', 
-    # 'GW3merAtek050x1'])
     tri.append(['c000_3x167_k050',
                 'c125_3x167_k050',
                 'c250_3x167_k050',
                 'c500_3x167_k050'])
     tri_labels.append(r'50mM $K^+$')
 
-    # tri.append(['GW3merTek100_zeroCon', 'GW3merAtek100x4', 'GW3merAtek100x2', 
-                # 'GW3merAtek100x1'])
     tri.append(['c000_3x167_k100',
                 'c125_3x167_k100',
                 'c250_3x167_k100',
                 'c500_3x167_k100'])
     tri_labels.append(r'100mM $K^+$')
 
-    # tri.append(['GW3merTek200_zeroCon', 'GW3merAtek200x4', 'GW3merAtek200x2', 
-                # 'GW3merAtek200x1'])
     tri.append(['c000_3x167_k200',
                 'c125_3x167_k200',
                 'c250_3x167_k200',
                 'c500_3x167_k200'])
     tri_labels.append(r'200mM $K^+$')
 
-    # di.append(['diAtek010_zeroCon', 'diAtek010c012', 'diAtek010c025', 
-               # 'diAtek010c050'])
     di.append(['c000_2x167_k010',
                'c125_2x167_k010',
                'c250_2x167_k010',
@@ -894,32 +891,22 @@ def fig_sub_rg_v_conc(show=False):
                 'c500_4x167_mg1'])
     tet_labels.append(r'1mM $Mg^{2+}$')
 
-    tet.append(['c000_4x167_h5_k010', 'c200_4x167h5_k010', 
-                'c400_4x167h5_k010', 'c800_4x167h5_k010']) 
+    tet.append(['c000_4x167_h5_k010', 
+                'c200_4x167_h5_k010', 
+                'c400_4x167_h5_k010', 
+                'c800_4x167_h5_k010']) 
     tet_labels.append(r'H5 10mM $K^{+}$')
 
-    tet.append(['c000_4x167_h5_mg1', 'c200_4x167h5_mg1', 
-                'c400_4x167h5_mg1', 'c800_4x167h5_mg1']) 
+    tet.append(['c000_4x167_h5_mg1', 
+                'c200_4x167_h5_mg1', 
+                'c400_4x167_h5_mg1', 
+                'c800_4x167_h5_mg1']) 
     tet_labels.append(r'H5 1mM $Mg^{2+}$')
-
-    # tet.append(['N4merTE_zeroCon', 'N4merTEx4', 'N4merTEx2', 'N4merTEx1'])
-    # tet_labels.append(r'10mM $K^{+}$')
-
-    # These are definitely aggregated
-    # tet.append(['N4merMg1_zeroCon', 'N4merMg1x4', 'N4merMg1x2', 'N4merMg1x1'])
-    # tet_labels.append(r'1mM $Mg^{2+}$')
-
-    # tet.append(['tetraCtek010_zeroCon', 'tetraCtek010c012', 'tetraCtek010c050'])
-    # tet_labels.append(r'10mM $K^+$ C')
-
-    # tet.append(['tetraCtek050_zeroCon', 'tetraCtek050c012', 'tetraCtek050c025', 
-                # 'tetraCtek050c050'])
-    # tet_labels.append(r'50mM $K^+$ C')
 
     fig = plt.figure(figsize = (14, 10))
     gs1 = gridspec.GridSpec(2, 2)
     gs1.update(hspace=0)
-    x_range = [-0.1, 1.22]
+    x_range = [-0.05, 1.45]
 
     ## SUBPLOT(1,1) a)
     ax = plt.subplot(gs1[0])
@@ -929,7 +916,7 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
                      mec=gp.color_order(i), mfc='none', ms=15)
     
-    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
@@ -951,13 +938,13 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
                      mec=gp.color_order(i), mfc='none', ms=15)
     
-    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
     # plt.title(r'4x167', x=0.3, y=0.92)
     ylim = np.array(plt.ylim())
-    ylim[1] *= 1.3
+    ylim[1] *= 1.03
     plt.ylim(ylim)
     ax.set_yticks(ax.get_yticks()[:-2])
     plt.xlim(x_range)
@@ -965,7 +952,7 @@ def fig_sub_rg_v_conc(show=False):
         horizontalalignment='left', transform=ax.transAxes)
 
 
-    x_range = [-0.1, 0.9]
+    x_range = [-0.05, 0.95]
 
     ## SUBPLOT(1,2) c)
     ax = plt.subplot(gs1[1])
@@ -976,7 +963,7 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
                      mec=gp.color_order(i), mfc='none', ms=15)
     
-    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     # plt.xlabel(r'mg/mL')
@@ -998,7 +985,7 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
                      mec=gp.color_order(i), mfc='none', ms=15)
         
-    lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
+    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
@@ -1022,11 +1009,6 @@ def fig_rg_v_salt(show=False):
     df = load_rg_csv()
     tetA = ['tetraAtek010_zeroCon', 'tetraAtek050_zeroCon', 
             'tetraAtek100_zeroCon']
-    # tetA = ['tetraAtek010_zeroCon', 'tetraAtek050_zeroCon', 
-            # 'tetraAtek100_zeroCon']
-    # tetC = ['tetraCtek010_zeroCon', 'tetraCtek050_zeroCon']
-    # triC = ['GW3merTek010_zeroCon', 'GW3merTek050_zeroCon', 
-            # 'GW3merTek100_zeroCon', 'GW3merTek200_zeroCon']
     tri0 = ['c000_3x167_k010',
             'c000_3x167_k050',
             'c000_3x167_k100',
@@ -1035,16 +1017,23 @@ def fig_rg_v_salt(show=False):
             'c500_3x167_k050',
             'c500_3x167_k100',
             'c500_3x167_k200']
+    tet0 = ['c000_4x167_k010',
+            'c000_4x167_k050',
+            'c000_4x167_k100']
+    tet5 = ['c500_4x167_k010',
+            'c500_4x167_k050',
+            'c500_4x167_k100']
     # triE = ['triEtek010_zeroCon', 'triEtek050_zeroCon',
             # 'triEtek100_zeroCon']
     di0 = ['c000_2x167_k010']
-    di5 = ['c050_2x167_k010']
-    series = [di0, di5, tri0, tri5, tetA]
+    di5 = ['c500_2x167_k010']
+    series = [di0, di5, tri0, tri5, tet0, tet5]
     labels = ['2x167 (0.0 mg/mL)', 
               '2x167 (0.5 mg/mL)', 
               '3x167 (0.0 mg/mL)',               
               '3x167 (0.5 mg/mL)',               
-              '4x167 (0.0 mg/mL)']
+              '4x167 (0.0 mg/mL)',
+              '4x167 (0.5 mg/mL)']
     fig = plt.figure()
     x_range = [-10, 220]
     for i in xrange(len(series)):
@@ -1162,7 +1151,7 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns, 
-                prefix='', do_plot='True'):
+                cutoff=None, prefix='', do_plot='True'):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
@@ -1176,11 +1165,14 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             df_list = [] ; data_iq_list = []
             for run_dir in run_dirs[array_type]:
                 filter_dir = os.path.join(run_dir, data_file + '_filter')
-                if os.path.exists(filter_dir + '/rg_x2.out') and False:
-                    result_df = pd.read_csv(filter_dir + '/rg_x2.out', sep='\t')
+                out_file = filter_dir + '/rg_x2.out'
+                if os.path.exists(out_file):
+                    print 'loading rg and X^2 values from %s' % out_file
+                    result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
                     goal_iq = np.loadtxt(filter_dir + '/goal.iq')
                 else:
+                    print 'loading rg then calculating X^2 values'
                     data = np.loadtxt(full_file)
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
                         run_dir, data, ns[array_type], filter_dir)
@@ -1188,6 +1180,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 result_df['run'] = run_name
                 df_list.append(result_df)
                 data_iq_list.append(data_iq)
+            if cutoff:
+                write_filter_output(run_dirs[array_type], df_list, cutoff)
                 
             # combine result DataFrames and data_iq arrays
             x2rg_df = pd.concat(df_list)
@@ -1195,17 +1189,52 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             x2rg_df.sort('X2', inplace=True)
             
             q = data_iq_list[0][:,:1]
-            for data_iq in data_iq_list:
-                all_data_iq = np.concatenate((q, data_iq[:,1:]), 
-                                             axis=1)
+            for (i, data_iq) in enumerate(data_iq_list):
+                if i == 0:
+                    all_data_iq = np.concatenate((q, data_iq[:,1:]), axis=1)
+                else:
+                    all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]), 
+                                                 axis=1)
             if do_plot:
                 plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix)
 
             all_x2rg_dfs.append(x2rg_df)
-            all_iqs_dfs.append(iq_df)
             all_goal_iqs.append(goal_iq)
             all_data_files.append(data_file)           
+            try:
+                all_iqs_dfs.append(iq_df)
+            except:
+                print 'all_iqs_dfs contains no output'
+                
     return  all_x2rg_dfs, all_iqs_dfs, all_goal_iqs, all_data_files
+    
+def write_filter_output(run_dirs, df_list, cutoff, 
+                        catdcd_exe='/home/myPrograms/bin/catdcd'):
+    filter_dir = op.join(op.split(op.split(op.split(run_dirs[0])[0])[0])[0], 
+                         'filter')
+    print 'saving output dcd and "rglowweights.txt" to %s' % filter_dir
+    mkdir_p(filter_dir)
+    full_dcd_out = op.join(filter_dir, 
+                           'collected_%s.dcd' % filter_dir.split('/')[-2])
+    tmp_dcd_out = op.join(filter_dir, 'tmp.dcd')
+    for (i, run_dir) in enumerate(run_dirs):
+        dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
+        assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s' 
+                                     % dcd_file)
+        if i == 0:
+            bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
+            subprocess.Popen(bash_cmd.split())
+        else:
+            bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out, 
+                         full_dcd_out, dcd_name))
+            process = subprocess.Popen(bash_cmd1.split(), stdout=subprocess.PIPE)            
+            output = process.communicate()[0]
+            bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
+            process = subprocess.Popen(bash_cmd2.split(), stdout=subprocess.PIPE)
+            output = process.communicate()[0]
+
+
+        print ''
     
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
@@ -1224,7 +1253,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
 
     ax = plt.subplot(221)
     plt.title('all %d structures' % n_total)
-    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o')
+    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec='b', mfc='none')
     # plt.xlim(rg_range)
     plt.ylabel(r'$X^2$')
     plt.xlabel(r'$R_g$')
@@ -1243,28 +1272,42 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
 
     ax = plt.subplot(222)
     plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
-    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o',
-                label='exp')
-    ax.plot(all_data_iq[1:,0], best[1:], '-->', label='best (%d)' % i_best)
-    ax.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
-    ax.plot(all_data_iq[1:,0], worst[1:], '-^', label='worst (%d)' % i_worst)
+    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = '-o',
+                label='exp', ms=8, mfc='none', c=gp.color_order(0),
+                mec=gp.color_order(0))
+    # ax.plot(all_data_iq[1:,0], best[1:], '-->', mfc='none', ms=8,
+    ax.plot(all_data_iq[1:,0], best[1:], '-', mfc='none', ms=8,
+            c=gp.color_order(1), mec=gp.color_order(1), 
+            label='best (%d)' % i_best)
+    # ax.plot(all_data_iq[1:,0], average[1:], '-.s', mfc='none', ms=8,
+    ax.plot(all_data_iq[1:,0], average[1:], '-', mfc='none', ms=8,
+            c=gp.color_order(2), mec=gp.color_order(2),label='average')
+    # ax.plot(all_data_iq[1:,0], worst[1:], '-^', mfc='none', ms=8, 
+    ax.plot(all_data_iq[1:,0], worst[1:], '-', mfc='none', ms=8, 
+            c=gp.color_order(3), mec=gp.color_order(3), 
+            label='worst (%d)' % i_worst)
     plt.xlabel(r'$Q (\AA^{-1})$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
+    gp.zoomout(ax, 0.1)
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
     plt.subplot(223)
     plt.title('best %d structures' %(n_best))
-    plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o')
+    plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec='b', mfc='none')
+    # plt.plot(x2rg_best['Rg'], x2rg_best['X2'], '.')
     plt.plot(x2rg_best.iloc[0]['Rg'], x2rg_best.iloc[0]['X2'], '>', 
+             mec=gp.color_order(1), mfc=gp.color_order(1), 
              markersize=8)
     plt.plot(x2rg_best.iloc[1]['Rg'], x2rg_best.iloc[1]['X2'], 's', 
+             mec=gp.color_order(2), mfc=gp.color_order(2), 
              markersize=8)
     plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^', 
+             mec=gp.color_order(3), mfc=gp.color_order(3), 
              markersize=8)
     plt.ylabel(r'$X^2$')
     plt.xlabel(r'$R_g$')
@@ -1281,24 +1324,31 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     i_3rd = x2rg_best.index[2] + 1 # first column is the Q values
     assert i_1st == i_best, 'incorrectly indexing'
     
-    plt.subplot(224)
+    ax = plt.subplot(224)
     plt.title(r'best 3 $X^2$s = %0.1f, %0.1f, %0.1f' % (
         best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
     plt.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o', 
-                 label='exp')
+                 label='exp', ms=8, mfc='none', c=gp.color_order(0),
+                mec=gp.color_order(0))
     # plt.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
-    plt.plot(all_data_iq[1:,0], best[1:], '-->', 
+    plt.plot(all_data_iq[1:,0], best[1:], '-', 
              label=r'$1^{st}$ (%d)' % i_best)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-s', 
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-', 
              label=r'$2^{nd}$ (%d)' % i_2nd)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-^', 
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-', 
              label=r'$3^{rd}$ (%d)' % i_3rd)
-
+    # plt.plot(all_data_iq[1:,0], best[1:], '-->', 
+             # label=r'$1^{st}$ (%d)' % i_best)
+    # plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-s', 
+             # label=r'$2^{nd}$ (%d)' % i_2nd)
+    # plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-^', 
+             # label=r'$3^{rd}$ (%d)' % i_3rd)
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
+    gp.zoomout(ax, 0.1)
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     
@@ -1307,6 +1357,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     
     fig_file_name = os.path.join(os.getcwd(), prefix + data_file + '_fit.eps')
     # plt.savefig(fig_file_name[:-3] + 'png')
+    print 'storing fit plot as: %s' % fig_file_name
     plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
     plt.savefig(fig_file_name, bbox_inches='tight')
 
@@ -1338,25 +1389,46 @@ if __name__ == '__main__':
 
     else:
         # fig_rg_v_conc()
-        fig_sub_rg_v_conc(show=True)
-        fig_rg_v_salt(show=True)
         # data_rg_i0_df, data_files = examine_rg_i0(True)
         
-        # sassie_run_dir = '/home/schowell/data/myData/sassieRuns'
-        # dimer_runs = glob.glob(sassie_run_dir + '/dimer/flex*/run*/')
-        # trimer_runs = glob.glob(sassie_run_dir + '/trimer/flex*/run*/')
-        # tetramer_runs = glob.glob(sassie_run_dir + '/tetramer/flex*/run*/')
-        # run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs}
-        
-        # data_dir = ('/home/schowell/data/'
-                    # 'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
-        # data_ext = '.i0q'
+        if False:
+            fig_sub_rg_v_conc(show=True)
+            fig_rg_v_salt(show=True)
 
-        # array_types = ['di', 'tri', 'tet']
-        # # array_types = ['tri']
-        # # dq = {'di': 0.00512821, 'tri': 0.00833333,'tet': 0.00833333}
-        # ns = {'di': 40, 'tri': 25,'tet': 25}  # number of Q values from crysol
-        # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns)
+        tri0 = ['c000_3x167_k010',
+                'c000_3x167_k050',
+                'c000_3x167_k100',
+                'c000_3x167_k200']
+        tri5 = ['c500_3x167_k010',
+                'c500_3x167_k050',
+                'c500_3x167_k100',
+                'c500_3x167_k200']
+        tet0 = ['c000_4x167_k010',
+                'c000_4x167_k050',
+                'c000_4x167_k100']
+        tet5 = ['c500_4x167_k010',
+                'c500_4x167_k050',
+                'c500_4x167_k100']
+        di0 = ['c000_2x167_k010']
+        data_files = {'di': di0, 'tri': tri0, 'tet': tet0}
+    
+        sassie_run_dir = '/home/schowell/data/myData/bkSassieRuns'
+        dimer_runs = glob.glob(sassie_run_dir + '/dimer/flex*/run*/')
+        trimer_runs = glob.glob(sassie_run_dir + '/trimer/flex*/run*/')
+        tetramer_runs = glob.glob(sassie_run_dir + '/tetramer/flex*/run*/')
+        run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs}
+        
+        data_dir = ('/home/schowell/data/'
+                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
+        data_ext = '.i0q'
+
+        array_types = ['di', 'tri', 'tet']
+        # array_types = ['tet']
+        # array_types = ['tri']
+        dq = {'di': 0.00512821, 'tri': 0.008,'tet': 0.008}
+        ns = {'di': 40, 'tri': 26,'tet': 26}  # number of Q values from crysol
+        evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
+                    cutoff=1000)
 
     ############################ pseudo code ###########################
     # create a data frame containing the information for each structure
