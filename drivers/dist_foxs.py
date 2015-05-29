@@ -2,7 +2,7 @@
 # Auther: Steven C. Howell
 # Purpose: Check that there is no overlap then run crysol (parrallel)
 # Created: 10/09/2014
-# $Id: parallel_crysol.py 183 2015-03-19 22:42:34Z xraylab $
+# $Id$
 
 import glob, shutil, os, subprocess, time
 import sassie.sasmol.sasmol as sasmol
