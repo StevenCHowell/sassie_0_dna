@@ -1246,7 +1246,7 @@ def write_filter_output(run_dirs, df_list, cutoff, collect_dcd=True,
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     
     n_total = len(x2rg_df)
-    n_best = int(n_total * 0.1)
+    n_best = max(int(n_total * 0.1), 3)
     x2rg_best = x2rg_df.sort('X2')[:n_best]
 
     plt.figure(figsize=(9, 7))

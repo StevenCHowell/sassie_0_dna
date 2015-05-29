@@ -609,6 +609,48 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
         ncp_axes[3] = all_coor4[1:4] - all_coor4[0]
         ncp_list[3].setCoor(np.array([all_coor4[4:]]))
     
+    if 'slide' in method:
+        mag = adjust_ncp.mag
+        for i in xrange(len(adjust_ncp.mv_ncp)):
+            mv_ncp = adjust_ncp.mv_ncp[i]
+            i_axes = adjust_ncp.i_axes[i]
+            ax1 = ncp_axes[i_axes[0][0]][i_axes[0][1]]
+            ax2 = ncp_axes[i_axes[1][0]][i_axes[1][1]] 
+            slide_axis = (ax1 + ax2)
+            slide_axis = slide_axis/np.sqrt(slide_axis.dot(slide_axis)) # unit v
+            displacement = mag * slide_axis
+            ncp_list[mv_ncp[0]].setCoor(ncp_list[mv_ncp[0]].coor() - displacement)
+            ncp_list[mv_ncp[1]].setCoor(ncp_list[mv_ncp[1]].coor() + displacement)
+
+    if 'rotate' in method:
+        center = np.array(ncp_origins).mean(axis=0)
+        angles = [adjust_ncp.angle[0], -adjust_ncp.angle[1]]
+        for i in xrange(len(adjust_ncp.mv_ncp)):
+            mv_ncp = adjust_ncp.mv_ncp[i] 
+            # # ~~~ the axis halfway between the two cylinder axes ~~~ #
+            # i_axes = adjust_ncp.i_axes[i]
+            # ax1 = ncp_axes[i_axes[0][0]][i_axes[0][1]]
+            # ax2 = ncp_axes[i_axes[1][0]][i_axes[1][1]] 
+            # slide_axis = (ax1 + ax2)
+            # # ~~~ the axis passing through the center of both NCPs ~~~ # 
+            slide_axis = ncp_origins[mv_ncp[1]] - ncp_origins[mv_ncp[0]]
+
+            slide_axis = slide_axis/np.sqrt(slide_axis.dot(slide_axis)) # unit v
+            for i in xrange(2):
+                ncp = ncp_list[mv_ncp[i]]
+                axes_coor = ncp_axes[mv_ncp[i]] + center
+                coor = ncp.coor()[0]
+                all_coor = np.concatenate((center.reshape(1,3), axes_coor, coor))
+                
+                # perform the rotation
+                all_coor = geometry.rotate_about_v(all_coor, slide_axis, angles[i])
+    
+                # store the output
+                assert all(np.isclose(center, all_coor[0])), (
+                    'ERROR: origin shifted, check input')
+                ncp_axes[mv_ncp[i]] = all_coor[1:4] - all_coor[0]
+                ncp.setCoor(np.array([all_coor[4:]]))            
+    
     if 'twist' in method:
         mv_ncp = adjust_ncp.mv_ncp
         i_axes = adjust_ncp.i_axes # [which ncp, which axis]

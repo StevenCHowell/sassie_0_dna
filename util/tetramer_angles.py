@@ -240,10 +240,13 @@ if __name__ == '__main__':
     
     # Get the angle between x-axes
     all_ncp_axes_array = np.array(all_ncp_axes)
-    angle_btwn_z_axes = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-1,2,:],
-                                                  all_ncp_axes_array[1:,2,:])
-    print 'angle between NCP z-axes: ', angle_btwn_z_axes[0]
-    
+    angle_btwn_z_axes = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-2,2,:],
+                                                  all_ncp_axes_array[2:,2,:])
+    print 'angle between sequenctial NCP z-axes: ', angle_btwn_z_axes[0]
+    angle_btwn_z_axes2 = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-2,2,:],
+                                                  all_ncp_axes_array[2:,2,:])
+    print 'angle between next-neighbor NCP z-axes: ', angle_btwn_z_axes2[0]
+ 
     # Get the opening angles
     all_ncp_origins_array = np.array(all_ncp_origins)
     v_ncp1_to_ncp2 = all_ncp_origins_array[1:] - all_ncp_origins_array[:-1]
