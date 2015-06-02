@@ -391,7 +391,7 @@ def get_X2(rf_data, mt_data):
     diff = mt_data[:,1] - rf_data[:,1]
     diff2 = diff * diff
     er2 = rf_data[:,2] * rf_data[:,2]
-    X2 = (diff2 / er2).sum()/(len(rf_data)-1)
+    X2 = (diff2 / er2).sum()/len(rf_data)
     return X2
 
 def scale_offset(in_data, rf_data):
