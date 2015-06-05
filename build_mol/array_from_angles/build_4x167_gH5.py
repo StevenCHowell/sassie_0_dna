@@ -252,7 +252,7 @@ def align_gH5_to_c11():
             assert s_link == s_c11, "filter for c11 has %d atoms but H5 has %d atoms" % (s_c11, s_link)
             linker.align(0, coor_sub_2, com_sub_2, coor_sub_1, com_sub_1)
             # sub_1: the molecule to align too
-            # sub_2: the molecule to bp aligned
+            # sub_2: the molecule to be aligned
     
             # write the output to a new file
             ncp_filename = "NCP%d.pdb" % (i + 1)
@@ -728,12 +728,13 @@ if __name__ == '__main__':
     phi = np.loadtxt(phi_file)
     dxyz = np.loadtxt(dxyz_file)
 
-    adjust_ncp = inputs()
-    adjust_ncp.mv_ncp = [1,3]
-    adjust_ncp.i_axes = [[1,0],[3,0]]
-    # adjust_ncp.i_axes = [[1,0],[1,0]]
-    adjust_ncp.angles = [20, 20]
-    save_name = 'gH5x4_20n1n3_a.pdb'
+    adjust_ncp = None
+    # adjust_ncp = inputs()
+    # adjust_ncp.mv_ncp = [1,3]
+    # adjust_ncp.i_axes = [[1,0],[3,0]]
+    # # adjust_ncp.i_axes = [[1,0],[1,0]]
+    # adjust_ncp.angles = [20, 20]
+    save_name = '150602_gH5x4.pdb'
 
     ncp_dna_resids = bps[[w601[0], w601[1]]]
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]

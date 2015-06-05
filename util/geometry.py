@@ -552,6 +552,94 @@ def show_cylinder(coor, params, nuc_origin, nuc_axes, dyad_origin, dyad_axes):
     plt.show()
 
 
+def show_ncp_geometry(all_ncp_plot_vars):
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    import x_dna.util.gw_plot as gwp
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    n_ncps = len(all_ncp_plot_vars)
+
+    axis_mag = [90, 130]
+    i = 0
+
+    
+    all_origins = [all_ncp_plot_vars[i].ncp_origin for i in xrange(n_ncps)]
+    all_origins = np.array(all_origins)
+
+    ncp_colors = [gwp.qual_color(2), gwp.qual_color(7),
+                  gwp.qual_color(8), gwp.qual_color(3)]
+    axes_colors = [gwp.qual_color(9), gwp.qual_color(0)]
+    for i in xrange(n_ncps):
+        ncp_origin  = all_ncp_plot_vars[i].ncp_origin
+        ncp_axes    = all_ncp_plot_vars[i].ncp_axes
+        
+        # NCP axes
+        labels = ['Cylinder Axes', 'Dyad Axes']
+        for (j, axis) in enumerate(ncp_axes[[2,0]]):
+            axes_vec = np.vstack((axis*(-axis_mag[j]/2) + ncp_origin, 
+                                  axis*(axis_mag[j]/2) + ncp_origin))
+            if i == 0:
+                ax.plot(axes_vec[:,0], axes_vec[:,1], axes_vec[:,2], 
+                        c=axes_colors[j], label=labels[j], linewidth=3)
+                ncp1_o = all_ncp_plot_vars[i].ncp_origin
+                if j == 1:
+                    ncp2_o = all_ncp_plot_vars[i+2].ncp_origin 
+                    stack_axis = ncp2_o - ncp1_o
+                    stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis))
+                    stack_vec = np.vstack((stack_axis*(-axis_mag[1]/2) + ncp1_o, 
+                                           stack_axis*(axis_mag[1]/2) + ncp2_o))
+                    ax.plot(stack_vec[:,0], stack_vec[:,1], stack_vec[:,2], 
+                            c=gwp.qual_color(5), linewidth=3, label='Stack Axes')                
+                    ax.plot(all_origins[:,0], all_origins[:,1], 
+                            all_origins[:,2], linewidth=2, c=gwp.qual_color(1), 
+                            label='Center-to-Center Segments')    
+            else:
+                ax.plot(axes_vec[:,0], axes_vec[:,1], axes_vec[:,2], 
+                        c=axes_colors[j], linewidth=3)
+
+    for i in xrange(n_ncps):
+        coor        = all_ncp_plot_vars[i].coor
+        # plot the coordinates the cylinder was fit to
+        coor_label = "NCP %d" % (i + 1)
+        ax.plot(coor[:,0], coor[:,1], coor[:,2], 'k', linewidth=5)
+        ax.plot(coor[:,0], coor[:,1], coor[:,2], c=ncp_colors[i], linewidth=4,
+                label=coor_label)        
+    
+    i = 1
+    ncp1_o = all_ncp_plot_vars[i].ncp_origin
+    ncp2_o = all_ncp_plot_vars[i+2].ncp_origin 
+    stack_axis = ncp2_o - ncp1_o
+    stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis))
+    stack_vec = np.vstack((stack_axis*(-axis_mag[0]/2) + ncp1_o, 
+                           stack_axis*(axis_mag[0]/2) + ncp2_o))
+    ax.plot(stack_vec[:,0], stack_vec[:,1], stack_vec[:,2], 
+            c=gwp.qual_color(5), linewidth=3)
+            
+    # Shrink current axis by 20%
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    # Put a legend 
+    ax.set_axis_off()
+    # plt.title('Nucleosome Array Geometry Definitions')
+    # plt.axis('equal')
+    axisEqual3D(ax)
+    lg = plt.legend(loc='upper left', numpoints=1, bbox_to_anchor=(1, 0.5))
+    lg.draw_frame(False)
+    plt.show()
+    return
+
+def axisEqual3D(ax):
+    extents = np.array([getattr(ax, 'get_{}lim'.format(dim))() for dim in 'xyz'])
+    sz = extents[:,1] - extents[:,0]
+    centers = np.mean(extents, axis=1)
+    maxsize = max(abs(sz))
+    r = maxsize/2
+    for ctr, dim in zip(centers, 'xyz'):
+        getattr(ax, 'set_{}lim'.format(dim))(ctr - r, ctr + r)
+
 def show_ncps(all_ncp_plot_vars, title='NCP array'):
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
@@ -587,7 +675,7 @@ def show_ncps(all_ncp_plot_vars, title='NCP array'):
         # origin_label = "NCP-%d origin" % n_ncp
         ax.plot([ncp_origin[0]], [ncp_origin[1]], [ncp_origin[2]], 'ms')
         styles = ['r-','g-','b-']
-        labels = ['X-axis', 'Y-axis', 'Z-axis']
+        labels = ['X-axes', 'Y-axes', 'Z-axes']
         for (j, axis) in enumerate(ncp_axes):
             axes_vec = np.vstack((ncp_origin, axis*80 + ncp_origin))
             if i_ncp == n_ncps:

@@ -278,6 +278,7 @@ if __name__ == '__main__':
 
     phi, dxyz, plot_title = get_tetramer_angles(all_ncp_axes, all_ncp_origins)
     # plot all NCPs:
+    geometry.show_ncp_geometry(all_ncp_plot_vars)
     geometry.show_ncps(all_ncp_plot_vars, title=plot_title)
 
     # plot NCP1-NCP2:
