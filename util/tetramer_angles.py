@@ -207,21 +207,60 @@ def main():
 
 
 if __name__ == '__main__':
-    pdb = 'gH5c11_r.pdb'  # rotated to be more perpendicular to the x-y plane
-    # pdb = 'gH5c11.pdb' # this creates a problem where the z-axes are anti-aligned
     bps = np.array([np.linspace(0,694,695), np.linspace(694, 0, 695)]).T
     dna_ids = [['DNA1', 'DNA2']]*4
     ncp_dna_resids = [bps[[26, 166]], bps[[193, 333]], bps[[360, 500]], bps[[527, 667]]]
     ncp_dyad_resids = [bps[96], bps[263], bps[430], bps[597]]
     ncp_ref_atom_resids = [37, 204, 371, 538]
+    # the 1ZBB structure with corrected DNA sequence and completed proteins (default)
+    pdb = 'gH5c11_r.pdb'  # rotated to be more perpendicular to the x-y plane
+    ## angle between sequenctial NCP z-axes:  [ 93.7409857   93.38903002  93.79568914]
+    ## angle between stacked NCP z-axes:      [ 12.58114363  13.1607299 ]
+    ## opening angles between NCPs:           [ 22.8974572   23.02477343]
+    ## stack distances:                       [57.807627493800133, 58.212257694966162]
+
+    # the unrotated 1ZBB structure # this creates a problem where the z-axes are anti-aligned
+    pdb = '/home/schowell/data/code/pylib/x_dna/build_mol/array_from_angles/gH5c11.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 93.74106829  93.38933082  93.79580714]
+    ## angle between stacked NCP z-axes:      [ 12.5809731   13.15984983]
+    ## opening angles between NCPs:           [ 22.89739159  23.02455461]
+    ## stack distances:                       [57.807471776623998, 58.211688477840951]
     
-    pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_2d.pdb'
-    bps = np.array([np.linspace(0,164,165), np.linspace(164, 0, 165)]).T
-    dna_ids = [['DNA1', 'DNA2'],['DNA3', 'DNA4'],['DNA5', 'DNA6'],['DNA7', 'DNA8']]
-    ncp_dna_resids = [bps[[12, 152]]]*4
-    ncp_dyad_resids = [bps[82]]*4
-    ncp_ref_atom_resids = [23]*4
+    # # parameters for rigid body models
+    # bps = np.array([np.linspace(0,164,165), np.linspace(164, 0, 165)]).T
+    # dna_ids = [['DNA1', 'DNA2'],['DNA3', 'DNA4'],['DNA5', 'DNA6'],['DNA7', 'DNA8']]
+    # ncp_dna_resids = [bps[[12, 152]]]*4
+    # ncp_dyad_resids = [bps[82]]*4
+    # ncp_ref_atom_resids = [23]*4
+
+    # the 2 degree opening adjustment using rigid body modification 
+    # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_2d.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 93.8890999   93.79122856  93.97284097]
+    ## angle between stacked NCP z-axes:      [ 14.99871346  15.36996521]
+    ## opening angles between NCPs:           [ 24.91176245  25.01137675]
+    ## stack distances:                       [62.745230145841695, 63.144230926884156]
     
+    # the opening starting structure
+    # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_0d.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 94.00369639  93.60561237  93.97278084]
+    ## angle between stacked NCP z-axes:      [ 12.62481159  13.19528317]
+    ## opening angles between NCPs:           [ 22.91110313  23.01163443]
+    ## stack distances:                       [57.809280925176395, 58.205898862508221]
+    
+    # # the -14 degree twist adjustment using rigid body modification 
+    # pdb = '/home/schowell/data/myData/manualStructures/gH5_xTwist/pdb/gH5x4_m14_n2n4_r24.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 107.99115398  107.37279955  107.69404907]
+    ## angle between stacked NCP z-axes:      [ 12.62481159  17.77834797]
+    ## opening angles between NCPs:           [ 22.91152629  23.01043624]
+    ## stack distances:                       [57.809280925176395, 58.203100113549787]
+    
+    # the twist starting structure
+    # pdb = '/home/schowell/data/myData/manualStructures/gH5_xTwist/pdb/gH5x4_p0_n2n4_r24.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 94.00369639  93.60561237  93.97278084]
+    ## angle between stacked NCP z-axes:      [ 12.62481159  13.19528317]
+    ## opening angles between NCPs:           [ 22.91110313  23.01163443]
+    ## stack distances:                       [57.809280925176395, 58.205898862508221]
+
     # get tetramer axes
     pkl_file = pdb[:-3] + 'pkl'
     try:
@@ -251,7 +290,7 @@ if __name__ == '__main__':
     print 'angle between sequenctial NCP z-axes: ', angle_btwn_z_axes[0]
     angle_btwn_z_axes2 = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-2,2,:],
                                                   all_ncp_axes_array[2:,2,:])
-    print 'angle between next-neighbor NCP z-axes: ', angle_btwn_z_axes2[0]
+    print 'angle between stacked NCP z-axes: ', angle_btwn_z_axes2[0]
  
     # Get the opening angles
     all_ncp_origins_array = np.array(all_ncp_origins)
