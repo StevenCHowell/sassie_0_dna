@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt    
+import matplotlib.colors as mcolors
 import numpy as np
 
 def zoomout(ax, factor):
@@ -151,8 +152,10 @@ def qual_color(i, style='set4'):
             [205,73,52],
             [128,147,203]]
     
+    mpl_set = plt.cm.Set3(np.linspace(0, 1, 12))[:,:3]*255.0
+    
     styles = {'set1': set1, 'pair': pair, 'dark': dark, 'set2': set2, 
-              'set3': set3, 'set4': set4, 'set5': set5}
+              'set3': set3, 'set4': set4, 'set5': set5, 'mpl_set': mpl_set}
     colors = styles[style]
     return np.array(colors[i%len(colors)])/255.0
 
@@ -192,32 +195,63 @@ def seq_color(i, sort=True):
 
     return colors[i%len(colors)]
 
+def make_colormap(seq):
+    """Return a LinearSegmentedColormap
+    seq: a sequence of floats and RGB-tuples. The floats should be increasing
+    and in the interval (0,1).
+    Example:
+        rvb = make_colormap([c('red'), c('violet'), 0.33, c('violet'), 
+            c('blue'), 0.66, c('blue')])
+    """
+    seq = [(None,) * 3, 0.0] + list(seq) + [1.0, (None,) * 3]
+    cdict = {'red': [], 'green': [], 'blue': []}
+    for i, item in enumerate(seq):
+        if isinstance(item, float):
+            r1, g1, b1 = seq[i - 1]
+            r2, g2, b2 = seq[i + 1]
+            cdict['red'].append([item, r1, r2])
+            cdict['green'].append([item, g1, g2])
+            cdict['blue'].append([item, b1, b2])
+    return mcolors.LinearSegmentedColormap('CustomMap', cdict)
+
+def diverge_map(low=qual_color(0), high=qual_color(1)):
+    c = mcolors.ColorConverter().to_rgb
+    if isinstance(low, basestring): low = c(low)
+    if isinstance(high, basestring): high = c(high)
+    return make_colormap([low, c('white'), 0.5, c('white'), high])
+
+    # def diverge_map(high=(0.565, 0.392, 0.173), low=(0.094, 0.310, 0.635)):
+        # c = mcolors.ColorConverter().to_rgb
+        # if isinstance(low, basestring): low = c(low)
+        # if isinstance(high, basestring): high = c(high)
+        # return make_colormap([low, c('white'), 0.5, c('white'), high])
+
 if __name__ == '__main__':
     import numpy as np
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt    
 
-    # j = 11
-    # x = np.array(range(j))
-    # y = np.ones(j)
-    # fig = plt.figure()
-    # for i in x:
-        # y[:] = i
-        # s = symbol_order(i, '-')
-        # plt.plot(x, y, s, mec=color_order(i), c=color_order(i), ms = 10,
-                 # mfc='none', label=str(color_order(i)))
-        # # plt.plot(x, y, s, ms = 10)
-        # # plt.scatter(x, y, s, markeredgecolor=color_order(i), facecolors='none')
-    # dy = 0.1
-    # plt.ylim([-dy, x[-1]+dy])
-    # leg = plt.legend(scatterpoints=1, numpoints=1)
-    # plt.show()
-    # name = 'python_symbol_color'
-    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
-    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
-    # fig.savefig('%s.eps' % name)
-    # fig.savefig('%s.png' % name)
+    j = 11
+    x = np.array(range(j))
+    y = np.ones(j)
+    fig = plt.figure()
+    for i in x:
+        y[:] = i
+        s = symbol_order(i, '-')
+        plt.plot(x, y, s, mec=color_order(i), c=color_order(i), ms = 10,
+                 mfc='none', label=str(color_order(i)), linewidth=10)
+        # plt.plot(x, y, s, ms = 10)
+        # plt.scatter(x, y, s, markeredgecolor=color_order(i), facecolors='none')
+    dy = 0.1
+    plt.ylim([-dy, x[-1]+dy])
+    leg = plt.legend(scatterpoints=1, numpoints=1)
+    plt.show()
+    name = 'python_symbol_color'
+    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
+    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
+    fig.savefig('%s.eps' % name)
+    fig.savefig('%s.png' % name)
     
     j = 12
     x = np.array(range(j))
@@ -227,11 +261,12 @@ if __name__ == '__main__':
     style = 'dark'
     style = 'set2'
     style = 'set4'
+    # style = 'mpl_set'
     for i in x:
         y[:] = i
         s = symbol_order(i, '-')
-        plt.plot(x, y, s, mec=qual_color(i, style), c=qual_color(i, style), ms = 10,
-                 mfc='none', label=str(qual_color(i, style)), linewidth=2)
+        plt.plot(x, y, s, mec=qual_color(i, style), c=qual_color(i, style), ms = 15,
+                 mfc='none', label=str(qual_color(i, style)), linewidth=10)
         # plt.plot(x, y, s, ms = 10)
         # plt.scatter(x, y, s, markeredgecolor=color_order(i, style), facecolors='none')
     dy = 0.1

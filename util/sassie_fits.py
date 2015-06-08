@@ -255,24 +255,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     elif ext[-3:] == 'dat':
         Rg, data_iq, labels = load_foxs(syn_data_dir, goal[0,1])
     
-    new_q = np.linspace(0,0.2,ns)
-    # interpolate calculated data to be on the intended grid
-    if len(data_iq) != len(new_q) or not np.allclose(data_iq[-1,0], 0.2):
-        interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0, 
-                                             kind='cubic')
-        data_int = np.zeros((len(new_q), len(data_iq[0,:])))
-        data_int[:,0] = new_q
-        data_int[:,1:] = interp_c(new_q)
-        data_iq = data_int
-    else:
-        new_q = data_iq[:,0]
-
-    # interpolate reference data to be on the same grid as the crysol I(Q)
-    interp_iq = interpolate.interp1d(goal[:,0], goal[:,1:], kind='cubic', 
-                                     axis=0)
-    goal_iq = np.zeros((len(new_q), 3))
-    goal_iq[:,0] = new_q
-    goal_iq[:,1:] = interp_iq(new_q)
+    data_iq, goal_iq = new_q_grid(ns, data_iq, goal)
 
     # # get the Kratky from the I(Q)
     # data_kratky = kratky(data_iq)
@@ -309,6 +292,27 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     # np.savetxt('data.iq', data_iq) # too big to be useful as text file
     
     return result_df, matc_iq, iq_df, goal_iq
+
+def new_q_grid(ns, data_iq, goal):
+    new_q = np.linspace(0,0.2,ns)
+    # interpolate calculated data to be on the intended grid
+    if len(data_iq) != len(new_q) or not np.allclose(data_iq[-1,0], 0.2):
+        interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0, 
+                                             kind='cubic')
+        data_int = np.zeros((len(new_q), len(data_iq[0,:])))
+        data_int[:,0] = new_q
+        data_int[:,1:] = interp_c(new_q)
+        data_iq = data_int
+    else:
+        new_q = data_iq[:,0]
+
+    # interpolate reference data to be on the same grid as the crysol I(Q)
+    interp_iq = interpolate.interp1d(goal[:,0], goal[:,1:], kind='cubic', 
+                                     axis=0)
+    goal_iq = np.zeros((len(new_q), 3))
+    goal_iq[:,0] = new_q
+    goal_iq[:,1:] = interp_iq(new_q)
+    return data_iq, goal_iq
 
 def match_poly(in_data, rf_data):
     """
@@ -353,7 +357,7 @@ def match_poly(in_data, rf_data):
 
 def scale(in_data, rf_data):
     """
-    determine the scale and offset to match the input data to the reference 
+    determine the scale to match the input data to the reference 
     data by minimizing the X2 calculation
 
     Parameters
@@ -378,14 +382,52 @@ def scale(in_data, rf_data):
                                                     ' reference x-grid')
 
     sigma2 = rf_data[:,2] * rf_data[:,2]
-    scale = ( (rf_data[:,1] * in_data[:,1] / rf_data[:,2]).sum() /
-              (in_data[:,1] * in_data[:,1] / rf_data[:,2]).sum() )
+    scale = ( (rf_data[:,1] * in_data[:,1] / sigma2).sum() /
+              (in_data[:,1] * in_data[:,1] / sigma2).sum() )
     
     mt_data = np.vstack([in_data[:,0], scale * in_data[:,1]]).T
 
     X2 = get_X2(rf_data, mt_data)
     
     return mt_data, scale, X2
+
+def offset(in_data, rf_data):
+    """
+    determine the offset to match the input data to the reference 
+    data by minimizing the X2 calculation
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx3 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    offset:   offset applied to the input data
+    X2:      X^2 comparison between the reference data and matched input data
+    
+    See also
+    --------
+    match_poly, match_lstsq, scale_offset, scale
+
+    """
+    assert (in_data[:,0]-rf_data[:,0]).sum() == 0, ('mismatch between input and'
+                                                    ' reference x-grid')
+
+    sigma2 = rf_data[:,2] * rf_data[:,2]
+    a = ( rf_data[:,1] / sigma2 ).sum()
+    b = ( in_data[:,1] / sigma2 ).sum()
+    c = ( 1 / sigma2 ).sum()
+    offset = (a - b) / c
+    
+    mt_data = np.vstack([in_data[:,0], in_data[:,1] + offset]).T
+
+    X2 = get_X2(rf_data, mt_data)
+    
+    return mt_data, offset, X2
 
 def get_X2(rf_data, mt_data):
     diff = mt_data[:,1] - rf_data[:,1]
@@ -788,8 +830,8 @@ def fig_rg_v_conc():
     for i in xrange(len(series)):
         plt.errorbar(df['conc'].loc[series[i]], df['Rg'].loc[series[i]], 
                      df['RgEr'].loc[series[i]], label=labels[i],  
-                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.qual_color(i), mfc='none', ms=15)
     
     lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -903,18 +945,18 @@ def fig_sub_rg_v_conc(show=False):
                 'c800_4x167_h5_mg1']) 
     tet_labels.append(r'H5 1mM $Mg^{2+}$')
 
-    fig = plt.figure(figsize = (14, 10))
+    fig = plt.figure(figsize = (13, 10))
     gs1 = gridspec.GridSpec(2, 2)
     gs1.update(hspace=0)
-    x_range = [-0.05, 1.45]
+    x_range = [-0.05, 1.5]
 
     ## SUBPLOT(1,1) a)
     ax = plt.subplot(gs1[0])
     for i in xrange(len(tri)):
         plt.errorbar(df['conc'].loc[tri[i]], df['Rg'].loc[tri[i]], 
                      df['RgEr'].loc[tri[i]], label=tri_labels[i],  
-                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
     
     lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -935,8 +977,8 @@ def fig_sub_rg_v_conc(show=False):
     for i in xrange(len(tet)):
         plt.errorbar(df['conc'].loc[tet[i]], df['Rg'].loc[tet[i]], 
                      df['RgEr'].loc[tet[i]], label=tet_labels[i],  
-                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
     
     lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -960,8 +1002,8 @@ def fig_sub_rg_v_conc(show=False):
     for i in xrange(len(di)):
         plt.errorbar(df['conc'].loc[di[i]], df['Rg'].loc[di[i]], 
                      df['RgEr'].loc[di[i]], label=di_labels[i],  
-                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
     
     lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -969,7 +1011,7 @@ def fig_sub_rg_v_conc(show=False):
     # plt.xlabel(r'mg/mL')
     # plt.title('2x167', x=0.3, y=0.92)
     # plt.text(.2, .9, r'2x167: $R_g$ vs mg/mL comparison',
-             # horizontalalignment='center',
+             # horizontalalignment='center',nn
              # transform=plt.transAxes)
     plt.xlim(x_range)
     plt.ylim(tri_ylim)
@@ -982,8 +1024,8 @@ def fig_sub_rg_v_conc(show=False):
     for i in xrange(len(dod)):
         plt.errorbar(df['conc'].loc[dod[i]], df['Rg'].loc[dod[i]], 
                      df['RgEr'].loc[dod[i]], label=dod_labels[i],  
-                     c=gp.color_order(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
         
     lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -998,10 +1040,10 @@ def fig_sub_rg_v_conc(show=False):
     ax.text(0.03, 0.92, r'd) 12x167', verticalalignment='bottom', fontweight='bold', 
             horizontalalignment='left', transform=ax.transAxes) 
 
-    if show: plt.show()
     fig.tight_layout()
     fig.savefig('Rg_v_mgmL.png')
     fig.savefig('Rg_v_mgmL.eps')
+    if show: plt.show()
     
     return
 
@@ -1039,8 +1081,8 @@ def fig_rg_v_salt(show=False):
     for i in xrange(len(series)):
         plt.errorbar(df['KCl'].loc[series[i]], df['Rg'].loc[series[i]], 
                      df['RgEr'].loc[series[i]], label=labels[i], 
-                     c = gp.color_order(i), fmt=gp.symbol_order(i, '--'),
-                     mec=gp.color_order(i), mfc='none', ms=15)
+                     c = gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
+                     mec=gp.qual_color(i), mfc='none', ms=15)
     
     lg = plt.legend(loc=0, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -1151,7 +1193,7 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns, 
-                cutoff=None, prefix='', do_plot='True'):
+                prefix='', do_plot='True', cutoff=None):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
@@ -1279,18 +1321,18 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     ax = plt.subplot(222)
     plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
     ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = '-o',
-                label='exp', ms=8, mfc='none', c=gp.color_order(0),
-                mec=gp.color_order(0))
+                label='exp', ms=8, mfc='none', c=gp.qual_color(0),
+                mec=gp.qual_color(0))
     # ax.plot(all_data_iq[1:,0], best[1:], '-->', mfc='none', ms=8,
     ax.plot(all_data_iq[1:,0], best[1:], '-', mfc='none', ms=8,
-            c=gp.color_order(1), mec=gp.color_order(1), 
+            c=gp.qual_color(1), mec=gp.qual_color(1), 
             label='best (%d)' % i_best)
     # ax.plot(all_data_iq[1:,0], average[1:], '-.s', mfc='none', ms=8,
     ax.plot(all_data_iq[1:,0], average[1:], '-', mfc='none', ms=8,
-            c=gp.color_order(2), mec=gp.color_order(2),label='average')
+            c=gp.qual_color(2), mec=gp.qual_color(2),label='average')
     # ax.plot(all_data_iq[1:,0], worst[1:], '-^', mfc='none', ms=8, 
     ax.plot(all_data_iq[1:,0], worst[1:], '-', mfc='none', ms=8, 
-            c=gp.color_order(3), mec=gp.color_order(3), 
+            c=gp.qual_color(3), mec=gp.qual_color(3), 
             label='worst (%d)' % i_worst)
     plt.xlabel(r'$Q (\AA^{-1})$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1307,13 +1349,13 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec='b', mfc='none')
     # plt.plot(x2rg_best['Rg'], x2rg_best['X2'], '.')
     plt.plot(x2rg_best.iloc[0]['Rg'], x2rg_best.iloc[0]['X2'], '>', 
-             mec=gp.color_order(1), mfc=gp.color_order(1), 
+             mec=gp.qual_color(1), mfc=gp.qual_color(1), 
              markersize=8)
     plt.plot(x2rg_best.iloc[1]['Rg'], x2rg_best.iloc[1]['X2'], 's', 
-             mec=gp.color_order(2), mfc=gp.color_order(2), 
+             mec=gp.qual_color(2), mfc=gp.qual_color(2), 
              markersize=8)
     plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^', 
-             mec=gp.color_order(3), mfc=gp.color_order(3), 
+             mec=gp.qual_color(3), mfc=gp.qual_color(3), 
              markersize=8)
     plt.ylabel(r'$X^2$')
     plt.xlabel(r'$R_g$')
@@ -1334,8 +1376,8 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     plt.title(r'best 3 $X^2$s = %0.1f, %0.1f, %0.1f' % (
         best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
     plt.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o', 
-                 label='exp', ms=8, mfc='none', c=gp.color_order(0),
-                mec=gp.color_order(0))
+                 label='exp', ms=8, mfc='none', c=gp.qual_color(0),
+                mec=gp.qual_color(0))
     # plt.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
     plt.plot(all_data_iq[1:,0], best[1:], '-', 
              label=r'$1^{st}$ (%d)' % i_best)
@@ -1397,7 +1439,7 @@ if __name__ == '__main__':
         # fig_rg_v_conc()
         # data_rg_i0_df, data_files = examine_rg_i0(True)
         
-        if False:
+        if True:
             fig_sub_rg_v_conc(show=True)
             fig_rg_v_salt(show=True)
 

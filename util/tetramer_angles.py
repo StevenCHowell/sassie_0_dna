@@ -210,11 +210,17 @@ if __name__ == '__main__':
     pdb = 'gH5c11_r.pdb'  # rotated to be more perpendicular to the x-y plane
     # pdb = 'gH5c11.pdb' # this creates a problem where the z-axes are anti-aligned
     bps = np.array([np.linspace(0,694,695), np.linspace(694, 0, 695)]).T
-
     dna_ids = [['DNA1', 'DNA2']]*4
     ncp_dna_resids = [bps[[26, 166]], bps[[193, 333]], bps[[360, 500]], bps[[527, 667]]]
     ncp_dyad_resids = [bps[96], bps[263], bps[430], bps[597]]
     ncp_ref_atom_resids = [37, 204, 371, 538]
+    
+    pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_2d.pdb'
+    bps = np.array([np.linspace(0,164,165), np.linspace(164, 0, 165)]).T
+    dna_ids = [['DNA1', 'DNA2'],['DNA3', 'DNA4'],['DNA5', 'DNA6'],['DNA7', 'DNA8']]
+    ncp_dna_resids = [bps[[12, 152]]]*4
+    ncp_dyad_resids = [bps[82]]*4
+    ncp_ref_atom_resids = [23]*4
     
     # get tetramer axes
     pkl_file = pdb[:-3] + 'pkl'
@@ -240,8 +246,8 @@ if __name__ == '__main__':
     
     # Get the angle between x-axes
     all_ncp_axes_array = np.array(all_ncp_axes)
-    angle_btwn_z_axes = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-2,2,:],
-                                                  all_ncp_axes_array[2:,2,:])
+    angle_btwn_z_axes = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-1,2,:],
+                                                  all_ncp_axes_array[1:,2,:])
     print 'angle between sequenctial NCP z-axes: ', angle_btwn_z_axes[0]
     angle_btwn_z_axes2 = geometry.angle_btwn_v1_v2(all_ncp_axes_array[:-2,2,:],
                                                   all_ncp_axes_array[2:,2,:])
@@ -253,6 +259,12 @@ if __name__ == '__main__':
     opening_angles = geometry.angle_btwn_v1_v2(-v_ncp1_to_ncp2[:-1], 
                                                v_ncp1_to_ncp2[1:])
     print 'opening angles between NCPs: ', opening_angles[0]
+    
+    # Get the NCP stack distance
+    stack_distance = all_ncp_origins_array[:2] - all_ncp_origins_array[2:] 
+    stack_distance = [np.sqrt(vec.dot(vec)) for vec in stack_distance]
+    print 'stack distances: ', stack_distance
+
     
     if False:
         fig = plt.figure()
