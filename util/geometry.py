@@ -557,7 +557,7 @@ def show_ncp_geometry(all_ncp_plot_vars):
     from mpl_toolkits.mplot3d import Axes3D
     import x_dna.util.gw_plot as gwp
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10,6))
     ax = fig.add_subplot(111, projection='3d')
     n_ncps = len(all_ncp_plot_vars)
 
@@ -568,18 +568,19 @@ def show_ncp_geometry(all_ncp_plot_vars):
     all_origins = [all_ncp_plot_vars[i].ncp_origin for i in xrange(n_ncps)]
     all_origins = np.array(all_origins)
 
-    ncp_colors = [gwp.qual_color(2), gwp.qual_color(7),
-                  gwp.qual_color(8), gwp.qual_color(3)]
-    axes_colors = [gwp.qual_color(9), gwp.qual_color(0)]
+    ncp_colors = [gwp.qual_color(0), gwp.qual_color(6),
+                  gwp.qual_color(8), gwp.qual_color(2)]
+    axes_colors = [gwp.qual_color(9), gwp.qual_color(1)]
+    limits = []
     for i in xrange(n_ncps):
         ncp_origin  = all_ncp_plot_vars[i].ncp_origin
         ncp_axes    = all_ncp_plot_vars[i].ncp_axes
-        
         # NCP axes
         labels = ['Cylinder Axes', 'Dyad Axes']
         for (j, axis) in enumerate(ncp_axes[[2,0]]):
             axes_vec = np.vstack((axis*(-axis_mag[j]/2) + ncp_origin, 
                                   axis*(axis_mag[j]/2) + ncp_origin))
+            limits.append(axes_vec)            
             if i == 0:
                 ax.plot(axes_vec[:,0], axes_vec[:,1], axes_vec[:,2], 
                         c=axes_colors[j], label=labels[j], linewidth=3)
@@ -590,14 +591,20 @@ def show_ncp_geometry(all_ncp_plot_vars):
                     stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis))
                     stack_vec = np.vstack((stack_axis*(-axis_mag[1]/2) + ncp1_o, 
                                            stack_axis*(axis_mag[1]/2) + ncp2_o))
+                    limits.append(stack_vec)
                     ax.plot(stack_vec[:,0], stack_vec[:,1], stack_vec[:,2], 
-                            c=gwp.qual_color(5), linewidth=3, label='Stack Axes')                
+                            c=gwp.qual_color(4), linewidth=3, label='Stack Axes')                
                     ax.plot(all_origins[:,0], all_origins[:,1], 
-                            all_origins[:,2], linewidth=2, c=gwp.qual_color(1), 
+                            all_origins[:,2], linewidth=2, c=gwp.qual_color(3), 
                             label='Center-to-Center Segments')    
             else:
                 ax.plot(axes_vec[:,0], axes_vec[:,1], axes_vec[:,2], 
                         c=axes_colors[j], linewidth=3)
+
+    center = np.array(all_origins).mean(axis=0)
+    ax.plot([center[0]], [center[1]], [center[2]], marker='*',
+            c=gwp.qual_color(7), ms=10, label='Array Center', linestyle='None')
+
 
     for i in xrange(n_ncps):
         coor        = all_ncp_plot_vars[i].coor
@@ -614,24 +621,41 @@ def show_ncp_geometry(all_ncp_plot_vars):
     stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis))
     stack_vec = np.vstack((stack_axis*(-axis_mag[0]/2) + ncp1_o, 
                            stack_axis*(axis_mag[0]/2) + ncp2_o))
+    limits.append(stack_vec)
     ax.plot(stack_vec[:,0], stack_vec[:,1], stack_vec[:,2], 
-            c=gwp.qual_color(5), linewidth=3)
-            
-    # Shrink current axis by 20%
+            c=gwp.qual_color(4), linewidth=3)
+
+    limits = np.array(limits).reshape(len(limits)*2,3)
+    extent = (limits.max(axis=0) - limits.min(axis=0)).max()/2
+    ax.set_xlim([center[0]-extent, center[0]+extent])
+    ax.set_ylim([center[1]-extent, center[1]+extent])
+    ax.set_zlim([center[2]-extent, center[2]+extent])
+    # DO NOT RESIZE THE IMAGE: it messes up the scale
+
+    # Shrink current axis by 40% so the legend is visible
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    ax.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 
     # Put a legend 
     ax.set_axis_off()
     # plt.title('Nucleosome Array Geometry Definitions')
-    # plt.axis('equal')
-    axisEqual3D(ax)
+
     lg = plt.legend(loc='upper left', numpoints=1, bbox_to_anchor=(1, 0.5))
     lg.draw_frame(False)
     plt.show()
     return
 
+def draw_cube(r):
+    #draw cube taken from: https://github.com/matplotlib/matplotlib/issues/1077
+    r = [-1, 1]
+    for s, e in combinations(np.array(list(product(r,r,r))), 2):
+        if np.sum(np.abs(s-e)) == r[1]-r[0]:
+            ax.plot3D(*zip(s,e))
+
 def axisEqual3D(ax):
+    '''
+    this did not work in it's current state 06/09/15
+    '''
     extents = np.array([getattr(ax, 'get_{}lim'.format(dim))() for dim in 'xyz'])
     sz = extents[:,1] - extents[:,0]
     centers = np.mean(extents, axis=1)

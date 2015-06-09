@@ -616,16 +616,16 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
             i_axes = adjust_ncp.i_axes[i]
             ax1 = ncp_axes[i_axes[0][0]][i_axes[0][1]]
             ax2 = ncp_axes[i_axes[1][0]][i_axes[1][1]] 
-            slide_axis = (ax1 + ax2)
-            slide_axis = slide_axis/np.sqrt(slide_axis.dot(slide_axis)) # unit v
-            displacement = mag * slide_axis
+            stack_axis = (ax1 + ax2)
+            stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis)) # unit v
+            displacement = mag * stack_axis
             ncp_list[mv_ncp[0]].setCoor(ncp_list[mv_ncp[0]].coor() - displacement)
             ncp_list[mv_ncp[1]].setCoor(ncp_list[mv_ncp[1]].coor() + displacement)
 
-    if 'rotate' in method:
+    if 'rotate_sym' in method:
         center = np.array(ncp_origins).mean(axis=0)
         angles = [adjust_ncp.angle[0], -adjust_ncp.angle[1]]
-        for i in xrange(len(adjust_ncp.mv_ncp)):
+        for (i, mv_ncp) in enumerate(adjust_ncp.mv_ncp):
             mv_ncp = adjust_ncp.mv_ncp[i] 
             # # ~~~ the axis halfway between the two cylinder axes ~~~ #
             # i_axes = adjust_ncp.i_axes[i]
@@ -633,9 +633,9 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
             # ax2 = ncp_axes[i_axes[1][0]][i_axes[1][1]] 
             # slide_axis = (ax1 + ax2)
             # # ~~~ the axis passing through the center of both NCPs ~~~ # 
-            slide_axis = ncp_origins[mv_ncp[1]] - ncp_origins[mv_ncp[0]]
+            stack_axis = ncp_origins[mv_ncp[1]] - ncp_origins[mv_ncp[0]]
 
-            slide_axis = slide_axis/np.sqrt(slide_axis.dot(slide_axis)) # unit v
+            stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis)) # unit v
             for i in xrange(2):
                 ncp = ncp_list[mv_ncp[i]]
                 axes_coor = ncp_axes[mv_ncp[i]] + center
@@ -643,7 +643,7 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
                 all_coor = np.concatenate((center.reshape(1,3), axes_coor, coor))
                 
                 # perform the rotation
-                all_coor = geometry.rotate_about_v(all_coor, slide_axis, angles[i])
+                all_coor = geometry.rotate_about_v(all_coor, stack_axis, angles[i])
     
                 # store the output
                 assert all(np.isclose(center, all_coor[0])), (
@@ -651,6 +651,34 @@ def reorient_ncps(ncp_list, ncp_axes, ncp_origins, adjust_ncp):
                 ncp_axes[mv_ncp[i]] = all_coor[1:4] - all_coor[0]
                 ncp.setCoor(np.array([all_coor[4:]]))            
     
+    if 'rotate_asym' in method:
+        center = np.array(ncp_origins).mean(axis=0)
+        for (i, mv_ncp) in enumerate(adjust_ncp.mv_ncp):
+            angles = [adjust_ncp.angle[i], -adjust_ncp.angle[i]]
+            # # ~~~ the axis halfway between the two cylinder axes ~~~ #
+            # i_axes = adjust_ncp.i_axes[i]
+            # ax1 = ncp_axes[i_axes[0][0]][i_axes[0][1]]
+            # ax2 = ncp_axes[i_axes[1][0]][i_axes[1][1]] 
+            # slide_axis = (ax1 + ax2)
+            # # ~~~ the axis passing through the center of both NCPs ~~~ # 
+            stack_axis = ncp_origins[mv_ncp[1]] - ncp_origins[mv_ncp[0]]
+
+            stack_axis = stack_axis/np.sqrt(stack_axis.dot(stack_axis)) # unit v
+            for (j, i_ncp) in enumerate(mv_ncp):
+                ncp = ncp_list[i_ncp]
+                axes_coor = ncp_axes[i_ncp] + center
+                coor = ncp.coor()[0]
+                all_coor = np.concatenate((center.reshape(1,3), axes_coor, coor))
+                
+                # perform the rotation
+                all_coor = geometry.rotate_about_v(all_coor, stack_axis, angles[j])
+    
+                # store the output
+                assert all(np.isclose(center, all_coor[0])), (
+                    'ERROR: origin shifted, check input')
+                ncp_axes[i_ncp] = all_coor[1:4] - all_coor[0]
+                ncp.setCoor(np.array([all_coor[4:]]))            
+        
     if 'twist' in method:
         mv_ncp = adjust_ncp.mv_ncp
         i_axes = adjust_ncp.i_axes # [which ncp, which axis]

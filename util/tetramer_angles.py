@@ -220,7 +220,7 @@ if __name__ == '__main__':
     ## stack distances:                       [57.807627493800133, 58.212257694966162]
 
     # the unrotated 1ZBB structure # this creates a problem where the z-axes are anti-aligned
-    pdb = '/home/schowell/data/code/pylib/x_dna/build_mol/array_from_angles/gH5c11.pdb'
+    # pdb = '/home/schowell/data/code/pylib/x_dna/build_mol/array_from_angles/gH5c11.pdb'
     ## angle between sequenctial NCP z-axes:  [ 93.74106829  93.38933082  93.79580714]
     ## angle between stacked NCP z-axes:      [ 12.5809731   13.15984983]
     ## opening angles between NCPs:           [ 22.89739159  23.02455461]
@@ -303,6 +303,10 @@ if __name__ == '__main__':
     stack_distance = all_ncp_origins_array[:2] - all_ncp_origins_array[2:] 
     stack_distance = [np.sqrt(vec.dot(vec)) for vec in stack_distance]
     print 'stack distances: ', stack_distance
+
+    # Get the array center
+    center = np.array(all_ncp_origins_array).mean(axis=0)
+    print 'tetranucleosome center: ', center
 
     
     if False:

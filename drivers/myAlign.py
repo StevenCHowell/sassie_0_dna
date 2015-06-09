@@ -13,7 +13,7 @@ After running this script, the patches can be pasted into a psfgen file.
 '''
 
 import sassie.sasmol.sasmol as sasmol
-import sassie.tools.align2 as a2
+import x_dna.util.align2 as a2
 import logging, sys
 import numpy as np
 

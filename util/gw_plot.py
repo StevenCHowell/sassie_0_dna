@@ -240,7 +240,7 @@ if __name__ == '__main__':
         y[:] = i
         s = symbol_order(i, '-')
         plt.plot(x, y, s, mec=color_order(i), c=color_order(i), ms = 10,
-                 mfc='none', label=str(color_order(i)), linewidth=10)
+                 mfc='none', label=str(color_order(i)), linewidth=5)
         # plt.plot(x, y, s, ms = 10)
         # plt.scatter(x, y, s, markeredgecolor=color_order(i), facecolors='none')
     dy = 0.1
