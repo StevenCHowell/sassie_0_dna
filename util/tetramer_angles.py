@@ -248,6 +248,8 @@ if __name__ == '__main__':
     ## opening angles between NCPs:           [ 12.90762848  13.01391677]
     ## stack distances:                       [32.972430152964371, 33.373636182110772]
 
+    pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_10d.pdb'
+
     # the opening starting structure
     # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_0d.pdb'
     ## angle between sequenctial NCP z-axes:  [ 94.00369639  93.60561237  93.97278084]
