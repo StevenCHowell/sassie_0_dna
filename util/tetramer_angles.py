@@ -8,6 +8,7 @@
 #
 #0000000011111111112222222222333333333344444444445555555555666666666677777777778
 #2345678901234567890123456789012345678901234567890123456789012345678901234567890
+#
 
 # import ncp_angles as na
 import sassie.sasmol.sasmol as sasmol
@@ -226,12 +227,12 @@ if __name__ == '__main__':
     ## opening angles between NCPs:           [ 22.89739159  23.02455461]
     ## stack distances:                       [57.807471776623998, 58.211688477840951]
     
-    # # parameters for rigid body models
-    # bps = np.array([np.linspace(0,164,165), np.linspace(164, 0, 165)]).T
-    # dna_ids = [['DNA1', 'DNA2'],['DNA3', 'DNA4'],['DNA5', 'DNA6'],['DNA7', 'DNA8']]
-    # ncp_dna_resids = [bps[[12, 152]]]*4
-    # ncp_dyad_resids = [bps[82]]*4
-    # ncp_ref_atom_resids = [23]*4
+    # parameters for rigid body models
+    bps = np.array([np.linspace(0,164,165), np.linspace(164, 0, 165)]).T
+    dna_ids = [['DNA1', 'DNA2'],['DNA3', 'DNA4'],['DNA5', 'DNA6'],['DNA7', 'DNA8']]
+    ncp_dna_resids = [bps[[12, 152]]]*4
+    ncp_dyad_resids = [bps[82]]*4
+    ncp_ref_atom_resids = [23]*4
 
     # the 2 degree opening adjustment using rigid body modification 
     # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_2d.pdb'
@@ -240,6 +241,13 @@ if __name__ == '__main__':
     ## opening angles between NCPs:           [ 24.91176245  25.01137675]
     ## stack distances:                       [62.745230145841695, 63.144230926884156]
     
+    # the -10 degree opening angle
+    pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_m10d.pdb'
+    ## angle between sequenctial NCP z-axes:  [ 94.52648864  92.37749212  93.97302923]
+    ## angle between stacked NCP z-axes:      [ 2.29559141  2.83792858]
+    ## opening angles between NCPs:           [ 12.90762848  13.01391677]
+    ## stack distances:                       [32.972430152964371, 33.373636182110772]
+
     # the opening starting structure
     # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_0d.pdb'
     ## angle between sequenctial NCP z-axes:  [ 94.00369639  93.60561237  93.97278084]
