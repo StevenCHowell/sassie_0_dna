@@ -326,7 +326,7 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
     
     inputs:
         ncp          : template ncp, either a sasmol object or filename for a pdb 
-        phi          : orientation angle
+        phi          : orientation angles
         dxyz         : translation distances
         dna_segnames : ...
         
@@ -723,7 +723,7 @@ if __name__ == '__main__':
     bps = np.array([np.linspace(0, 164, 165), np.linspace(165, 1, 165)]).T
     ref_atom_resid = 23
     
-    link_vars = inputs()
+    link_vars =  ()
     link_vars.pdb = 'linker.pdb'
     link_vars.segnames = ['DNA1', 'DNA2']
     link_vars.resids = np.array([[1, 7], [2, 6], [7, 1]])
