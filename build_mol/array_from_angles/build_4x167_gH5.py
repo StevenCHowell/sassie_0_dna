@@ -762,7 +762,7 @@ if __name__ == '__main__':
     # adjust_ncp.i_axes = [[1,0],[3,0]]
     # # adjust_ncp.i_axes = [[1,0],[1,0]]
     # adjust_ncp.angles = [20, 20]
-    save_name = '150602_gH5x4.pdb'
+    save_name = '150609_gH5x4_noLink.pdb'
 
     ncp_dna_resids = bps[[w601[0], w601[1]]]
     dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
