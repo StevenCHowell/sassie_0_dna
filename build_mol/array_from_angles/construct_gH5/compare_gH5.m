@@ -6,11 +6,11 @@ gh5_initial.raw = loadxy('manual_gH5x4.pdb.dat');
 gh5_protein.raw = loadxy('gH5x4_allProteins.pdb.dat');
 gh5_complete.raw = loadxy('complete_gH5x4.pdb.dat');
 
-t1zbb.n = [t1zbb.raw(:,1), t1zbb.n(:,2:end)/t1zbb.n(1,2)];
-c11.n = [c11.raw(:,1), c11.n(:,2:end)/c11.n(1,2)];
-gh5_initial.n = [gh5_initial.raw(:,1), gh5_initial.n(:,2:end)/gh5_initial.n(1,2)];
-gh5_protein.n = [gh5_protein.raw(:,1), gh5_protein.n(:,2:end)/gh5_protein.n(1,2)];
-gh5_complete.n = [gh5_complete.raw(:,1), gh5_complete.n(:,2:end)/gh5_complete.n(1,2)];
+t1zbb.n = [t1zbb.raw(:,1), t1zbb.raw(:,2:end)/t1zbb.raw(1,2)];
+c11.n = [c11.raw(:,1), c11.raw(:,2:end)/c11.raw(1,2)];
+gh5_initial.n = [gh5_initial.raw(:,1), gh5_initial.raw(:,2:end)/gh5_initial.raw(1,2)];
+gh5_protein.n = [gh5_protein.raw(:,1), gh5_protein.raw(:,2:end)/gh5_protein.raw(1,2)];
+gh5_complete.n = [gh5_complete.raw(:,1), gh5_complete.raw(:,2:end)/gh5_complete.raw(1,2)];
 
 %data = loadxy('/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/chess/iqdata/c000_4x167_h5_k010.i0q');
 data.raw = loadxy('/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/chess/iqdata/c000_4x167_h5_mg1.i0q');
@@ -25,19 +25,20 @@ gh5_complete.iq = scale_offset(gh5_complete.n, data.iq, match_type);
 
 figure;
 hold all
-xyerror(data.iq(2:end,:), 's');
-xyplot(t1zbb.n(2:end,:));
-xyplot(c11.n(2:end,:));
-xyplot(gh5_initial.n(2:end,:));
+xyerror(data.iq(2:end-1,:), 's');
+xyplot(t1zbb.n(2:end-1,:));
+xyplot(c11.n(2:end-1,:));
+xyplot(gh5_initial.n(2:end-1,:));
 % xyplot(gh5_protein.n(2:end,:));
-xyplot(gh5_complete.n(2:end,:));
+xyplot(gh5_complete.n(2:end-1,:));
 
 % legend('1. Exp 4x167 gH5', '2. PDB:1ZBB', '3. All DNA & Proteins added to 2', '4. 4 gH5 NCPs', '5. All Proteins added to 4', '6. All DNA added to 6', 'location', 'southwest');
-legend('1. Exp 4x167 gH5', '2. PDB:1ZBB', '3. All DNA & Proteins added to 2', '4. 4 gH5 NCPs', '5. All DNA & Proteins added to 4', 'location', 'southwest');
+lh = legend('1. Exp 4x167 gH5 in 1 mM MgCl_2', '2. PDBID:1ZBB', '3. Missing residues added to 2', '4. Positioned gH5 NCPs', '5. Missing residues added to 4', 'location', 'southwest');
 legend boxoff
 
 logxy;
 axis tight
+shift_underscore_legend_entries(lh)
 zoomout(0.1);
 iqlabel
 saveps(gcf, 'compare_gH5.eps')
