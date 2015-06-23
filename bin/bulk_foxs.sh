@@ -24,10 +24,15 @@ for file in "${files[@]}"
 do
     if [[ $file == *".pdb" ]]
     then
-        echo
-        # echo running: foxs -q $QMAX -s $PROFILESIZE $file 
-        eval \foxs -q $QMAX -s $PROFILESIZE $file
-        echo
+        if [ ! -f $file.dat ]
+            then
+            echo
+            # echo running: foxs -q $QMAX -s $PROFILESIZE $file 
+            eval \foxs -q $QMAX -s $PROFILESIZE $file
+            echo
+        else
+            echo $file.dat already calculated
+        fi
     fi
 done
 

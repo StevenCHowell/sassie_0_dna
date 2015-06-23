@@ -26,11 +26,16 @@ do
     if [[ $file == *".pdb" ]]
     then
         CAPPDB=${file%.pdb}$SUFFIX
-        echo
-        echo creating $CAPPDB then running:   foxs -q $QMAX -s $PROFILESIZE $CAPPDB 
-        eval \awk "'/ P / || / CA /'" $file > $CAPPDB
-        eval \foxs -q $QMAX -s $PROFILESIZE $CAPPDB
-        echo
+        if [ ! -f $CAPPDB.dat ]
+        then
+            echo
+            echo creating $CAPPDB then running:   foxs -q $QMAX -s $PROFILESIZE $CAPPDB 
+            eval \awk "'/ P / || / CA /'" $file > $CAPPDB
+            eval \foxs -q $QMAX -s $PROFILESIZE $CAPPDB
+            echo
+        else
+            echo $CAPPDB.dat already calculated
+        fi
     fi
 done
 
