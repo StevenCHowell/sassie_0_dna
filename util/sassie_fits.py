@@ -26,13 +26,6 @@ import sassie.sasmol.sasmol as sasmol
 import subprocess
 debug = True
 
-# import sassie.sasmol.sasmol as sasmol
-# import sassie_1_na.util.geometry as geometry
-# import sassie_1_na.util.basis_to_python as basis_to_python
-# from numpy.core.umath_tests import inner1d
-
-# from mpl_toolkits.mplot3d import Axes3D
-
 class MainError(Exception):
     pass
 
@@ -293,8 +286,15 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir):
     
     return result_df, matc_iq, iq_df, goal_iq
 
-def new_q_grid(ns, data_iq, goal):
-    new_q = np.linspace(0,0.2,ns)
+def new_q_grid(ns, data_iq, goal, grid_type='log', q_max=0.2):
+    ns -= 1
+    q_min = goal[1, 0]
+    if 'linear' == grid_type.lower():
+        new_q = np.linspace(q_min, q_max, ns)
+    elif 'log' == grid_type.lower():
+        e_min, e_max = np.log10([q_min, q_max])
+        new_q = np.logspace(e_min, e_max, ns)
+    new_q = np.concatenate(([0], new_q))
     # interpolate calculated data to be on the intended grid
     if len(data_iq) != len(new_q) or not np.allclose(data_iq[-1,0], 0.2):
         interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0, 
@@ -1000,10 +1000,11 @@ def fig_sub_rg_v_conc(show=False):
     ax = plt.subplot(gs1[1])
     # plt.figure()
     for i in xrange(len(di)):
+        this_color = gp.qual_color(i)
         plt.errorbar(df['conc'].loc[di[i]], df['Rg'].loc[di[i]], 
                      df['RgEr'].loc[di[i]], label=di_labels[i],  
-                     c=gp.qual_color(i), fmt=gp.symbol_order(i,'--'), 
-                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
+                     c=this_color, fmt=gp.symbol_order(i,'--'), 
+                     mec=this_color, mfc='none', ms=15, linewidth=2)
     
     lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
@@ -1208,7 +1209,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             for run_dir in run_dirs[array_type]:
                 filter_dir = os.path.join(run_dir, data_file + '_filter')
                 out_file = filter_dir + '/rg_x2.out'
-                if os.path.exists(out_file):
+                if os.path.exists(out_file) and False:
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
@@ -1462,7 +1463,7 @@ if __name__ == '__main__':
         tri0 = ['c000_3x167_k010']
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0}
     
-        sassie_run_dir = '/home/schowell/data/myData/bkSassieRuns'
+        sassie_run_dir = '/home/schowell/data/myData/sassieRuns/orig'
         dimer_runs = glob.glob(sassie_run_dir + '/dimer/flex*/run*/')
         trimer_runs = glob.glob(sassie_run_dir + '/trimer/flex*/run*/')
         tetramer_runs = glob.glob(sassie_run_dir + '/tetramer/flex*/run*/')
@@ -1476,7 +1477,7 @@ if __name__ == '__main__':
         # array_types = ['tet']
         # array_types = ['tri']
         dq = {'di': 0.00512821, 'tri': 0.008,'tet': 0.008}
-        ns = {'di': 40, 'tri': 26,'tet': 26}  # number of Q values from crysol
+        ns = {'di': 26, 'tri': 26,'tet': 26}  # number of Q values from crysol
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     cutoff=350)
 
