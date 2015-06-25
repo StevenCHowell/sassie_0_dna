@@ -228,7 +228,7 @@ def mkdir_p(path):
         else: raise
 
 def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
-                      q_log_base=False):
+                      q_base=1):
 
     assert op.exists(run_dir), 'No such run directory: %s' % run_dir
     if op.exists(op.join(run_dir,'crysol')) and False:
@@ -249,7 +249,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
     elif ext[-3:] == 'dat':
         Rg, data_iq, labels = load_foxs(syn_data_dir, goal[0,1])
 
-    data_iq, goal_iq = new_q_grid(ns, data_iq, goal, q_log_base=q_log_base,
+    data_iq, goal_iq = new_q_grid(ns, data_iq, goal, q_base=q_base,
                                   q_max=0.2)
 
     # # get the Kratky from the I(Q)
@@ -289,14 +289,10 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
 
     return result_df, matc_iq, iq_df, goal_iq
 
-def new_q_grid(ns, data_iq, goal, q_max=0.2, q_log_base=False):
+def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1):
     ns -= 1
     q_min = goal[1, 0]
-    if q_log_base:
-        e_min, e_max = np.log([q_min, q_max])/np.log(q_log_base)
-        new_q = np.logspace(e_min, e_max, ns, base=q_log_base)
-    else:
-        new_q = np.linspace(q_min, q_max, ns)
+    new_q = polyspace(q_min, q_max, q_base, ns)
 
     new_q = np.concatenate(([0], new_q))
     # interpolate calculated data to be on the intended grid
@@ -324,10 +320,29 @@ def new_q_grid(ns, data_iq, goal, q_max=0.2, q_log_base=False):
     goal_iq[:,1:] = interp_iq(new_q)
     return data_iq, goal_iq
 
+def polyspace(x1, x2, p, n):
+    '''
+    Usage:
+       poly = polyspace(x1, x2, P, N)
+
+    Purpose:
+       create an array parabolicly spaced between x1 and x2
+
+    Parameter(s):
+       x1: first value of the array
+       x2: second value of the array
+       P:  polynomial power
+
+    Return(s):
+       poly: array of quadratically spaced values
+    '''
+    grid = np.linspace(x1 ** (1.0/p), x2 ** (1.0/p), n) ** p
+    return grid
+
 def match_poly(in_data, rf_data):
     """
-    determine the scale and offset to match the input data to the reference
-    data using a polynomial fit
+    determine the scale and offset to match the input data to the
+    reference data using a polynomial fit
 
     Parameters
     ----------
@@ -1205,11 +1220,17 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 prefix='', do_plot='True', cutoff=None, join_dcd=False,
-                q_log_base=False):
+                q_base=1):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
     all_data_files = []
+
+    if q_base:
+        prefix += 'base%d_' % q_base
+    else:
+        prefix += 'lin_'
+
     for array_type in array_types:
         for data_file in data_files[array_type]:
             full_file = op.join(data_dir, data_file + data_ext)
@@ -1219,12 +1240,12 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             df_list = [] ; data_iq_list = []
             for run_dir in run_dirs[array_type]:
                 filter_dir = op.join(run_dir, data_file + '_filter')
-                if q_log_base:
-                    out_file = op.join(filter_dir, 'rg_x2_log%d.out' %
-                                       q_log_base)
+                if q_base:
+                    out_file = op.join(filter_dir, 'rg_x2_base%d.out' %
+                                       q_base)
                 else:
                     out_file = op.join(filter_dir, 'rg_x2_lin.out')
-                if op.exists(out_file) and False:
+                if op.exists(out_file):
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
@@ -1234,7 +1255,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     data = np.loadtxt(full_file)
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
                         run_dir, data, ns[array_type], filter_dir, out_file,
-                        q_log_base)
+                        q_base)
                 run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
                 df_list.append(result_df)
@@ -1256,10 +1277,6 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]),
                                                  axis=1)
             if do_plot:
-                if q_log_base:
-                    prefix += 'log%d_' % q_log_base
-                else:
-                    prefix += 'lin_'
                 plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix)
 
             all_x2rg_dfs.append(x2rg_df)
@@ -1465,23 +1482,27 @@ if __name__ == '__main__':
             fig_sub_rg_v_conc(show=True)
             fig_rg_v_salt(show=True)
 
-        tri0 = ['c000_3x167_k010',
-                'c000_3x167_k050',
-                'c000_3x167_k100',
-                'c000_3x167_k200']
         tri5 = ['c500_3x167_k010',
                 'c500_3x167_k050',
                 'c500_3x167_k100',
                 'c500_3x167_k200']
-        tet0 = ['c000_4x167_k010',
-                'c000_4x167_k050',
-                'c000_4x167_k100']
         tet5 = ['c500_4x167_k010',
                 'c500_4x167_k050',
                 'c500_4x167_k100']
+        # full
+        tri0 = ['c000_3x167_k010',
+                'c000_3x167_k050',
+                'c000_3x167_k100',
+                'c000_3x167_k200']
+        tet0 = ['c000_4x167_k010',
+                'c000_4x167_k050',
+                'c000_4x167_k100']
         di0 = ['c000_2x167_k010']
-        tet0 = ['c000_4x167_k010']
-        tri0 = ['c000_3x167_k010']
+
+        # quicker to run
+        # tet0 = ['c000_4x167_k010']
+        # tri0 = ['c000_3x167_k010']
+
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0}
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/orig'
@@ -1496,11 +1517,10 @@ if __name__ == '__main__':
 
         array_types = ['di', 'tri', 'tet']
         # array_types = ['tet']
-        array_types = ['tri']
-        dq = {'di': 0.00512821, 'tri': 0.008,'tet': 0.008}
+        # array_types = ['tri']
         ns = {'di': 26, 'tri': 26,'tet': 26}  # number of Q values from crysol
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=350, join_dcd=False, q_log_base=2)
+                    cutoff=350, join_dcd=False, q_base=2)
 
     ############################ pseudo code ###########################
     # create a data frame containing the information for each structure
