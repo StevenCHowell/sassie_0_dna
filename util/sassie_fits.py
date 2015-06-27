@@ -73,6 +73,18 @@ def load_foxs(saspath, i0=None):
         for (i, syn_file) in enumerate(syn_files):
             rg[i] = rg_df['rg'].loc[op.split(syn_file)[1].split('.')[0]]
     else:
+        try:
+            dcd_file = glob.glob(op.join(op.join(op.split(saspath)[0],
+                                                 'monte_carlo'),'*.dcd'))
+            assert len(dcd_file) == 1, 'ERROR: not clear which dcd file to use'
+            dcd_file = dcd_file[0]
+            pdb_file = glob.glob(op.join(op.split(op.split(saspath)[0])[0],
+                                         op.split(dcd_file)[1][:-4] + '*.pdb'))
+            assert len(pdb_file) == 1, 'ERROR: not clear which pdb file to use'
+            pdb_file = pdb_file[0]
+            rg = dcd_rg(pdb_file, dcd_file)
+        except:
+            print 'did not calculate Rg using dcd and pdb'
         save_rg = True
 
     all_data = []
@@ -101,6 +113,18 @@ def load_foxs(saspath, i0=None):
     iq_data = np.concatenate((q[0][..., None], np.array(iq).transpose()),axis=1)
 
     return rg, iq_data, label
+
+def dcd_rg(pdb_file, dcd_file):
+    '''
+    given a pdb filename, this will return the radius of gyration
+    '''
+    mol = sasmol.SasMol(0)
+    mol.read_pdb(pdb_file)
+    mol.read_dcd(dcd_file)
+    rg = []
+    for i in xrange(mol.number_of_frames()):
+        rg.append(mol.calcrg(i))
+    return rg
 
 def pdb_rg(pdb_file):
     '''
@@ -296,7 +320,7 @@ def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1):
 
     new_q = np.concatenate(([0], new_q))
     # interpolate calculated data to be on the intended grid
-    if np.allclose(data_iq[:,0], new_q):
+    if len(new_q) == len(data_iq[:,0]) and np.allclose(data_iq[:,0], new_q):
         new_q = data_iq[:,0]
     else:
         if new_q[0] < data_iq[0,0]:
@@ -915,6 +939,15 @@ def fig_sub_rg_v_conc(show=False):
                 'c250_3x167_k050',
                 'c500_3x167_k050'])
     tri_labels.append(r'50mM $K^+$')
+    inputs.run_name = 'run1'
+    inputs.dcd_path = 'run1/dna_mc/'
+    calc_foxs.main(inputs)
+    print 'finished %s' % op.split(inputs.dcd_path[:-1])[0]
+
+    inputs.run_name = 'run2'
+    inputs.dcd_path = 'run2/dna_mc/'
+    calc_foxs.main(inputs)
+    print 'finished %s' % op.split(inputs.dcd_path[:-1])[0]
 
     tri.append(['c000_3x167_k100',
                 'c125_3x167_k100',
@@ -1496,29 +1529,37 @@ if __name__ == '__main__':
                 'c000_3x167_k200']
         tet0 = ['c000_4x167_k010',
                 'c000_4x167_k050',
-                'c000_4x167_k100']
+                'c000_4x167_k100',
+                'c000_4x167_mg1']
         di0 = ['c000_2x167_k010']
+        h5 = ['c000_4x167_h5_k010',
+              'c000_4x167_h5_mg1']
 
         # quicker to run
-        # tet0 = ['c000_4x167_k010']
+        # tet0 = ['c000_4x167_mg1']
         # tri0 = ['c000_3x167_k010']
 
-        data_files = {'di': di0, 'tri': tri0, 'tet': tet0}
+        data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
-        sassie_run_dir = '/home/schowell/data/myData/sassieRuns/orig'
-        dimer_runs = glob.glob(sassie_run_dir + '/dimer/flex*/run*/')
-        trimer_runs = glob.glob(sassie_run_dir + '/trimer/flex*/run*/')
-        tetramer_runs = glob.glob(sassie_run_dir + '/tetramer/flex*/run*/')
-        run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs}
+        sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
+        dimer_runs = glob.glob(sassie_run_dir + 'orig/dimer/flex*/run*/')
+        trimer_runs = glob.glob(sassie_run_dir + 'orig/trimer/flex*/run*/')
+        tetramer_runs = glob.glob(sassie_run_dir + 'orig/tetramer/flex*/run*/')
+        dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/')
+        trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/')
+        tetramer_runs += glob.glob(sassie_run_dir + '4x167_k100/run1/')
+        run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
+                    'h5': tetramer_runs}
 
         data_dir = ('/home/schowell/data/'
                     'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
         data_ext = '.i0q'
 
         array_types = ['di', 'tri', 'tet']
-        # array_types = ['tet']
+        array_types = ['tet']
         # array_types = ['tri']
-        ns = {'di': 26, 'tri': 26,'tet': 26}  # number of Q values from crysol
+        # array_types = ['h5']
+        ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # N Q grid points
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     cutoff=350, join_dcd=False, q_base=2)
 
