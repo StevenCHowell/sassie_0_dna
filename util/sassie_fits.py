@@ -4,10 +4,10 @@
 # Purpose: Compare experimental data to the sassie structures
 # Created: 20 March 2015
 #
-# $Id: $
+# $Id$
 #
-#0000000011111111112222222222333333333344444444445555555555666666666677777777778
-#2345678901234567890123456789012345678901234567890123456789012345678901234567890
+#000000001111111111222222222233333333334444444444555555555566666666667777777777
+#234567890123456789012345678901234567890123456789012345678901234567890123456789
 
 
 import logging
@@ -1303,7 +1303,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             x2rg_df.sort('X2', inplace=True)
 
             best5 = x2rg_df.iloc[:5]
-            best5.to_csv(data_file + '_best.csv', float_format='%5.10f', 
+            best5.to_csv(data_file + '_best.csv', float_format='%5.10f',
                          sep='\t')
 
             q = data_iq_list[0][:,:1]
@@ -1540,6 +1540,7 @@ if __name__ == '__main__':
               'c000_4x167_h5_mg1']
 
         # quicker to run
+        # tet0 = [tet0[-1]]
         # tet0 = ['c000_4x167_mg1']
         # tri0 = ['c000_3x167_k010']
 
