@@ -1278,7 +1278,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                                        q_base)
                 else:
                     out_file = op.join(filter_dir, 'rg_x2_lin.out')
-                if op.exists(out_file):
+                if op.exists(out_file) and False:
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
@@ -1301,6 +1301,10 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             x2rg_df = pd.concat(df_list)
             x2rg_df.index = range(len(x2rg_df))
             x2rg_df.sort('X2', inplace=True)
+
+            best5 = x2rg_df.iloc[:5]
+            best5.to_csv(data_file + '_best.csv', float_format='%5.10f', 
+                         sep='\t')
 
             q = data_iq_list[0][:,:1]
             for (i, data_iq) in enumerate(data_iq_list):
@@ -1542,12 +1546,12 @@ if __name__ == '__main__':
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
-        dimer_runs = glob.glob(sassie_run_dir + 'orig/dimer/flex*/run*/')
-        trimer_runs = glob.glob(sassie_run_dir + 'orig/trimer/flex*/run*/')
-        tetramer_runs = glob.glob(sassie_run_dir + 'orig/tetramer/flex*/run*/')
-        dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/')
-        trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/')
-        tetramer_runs += glob.glob(sassie_run_dir + '4x167_k100/run1/')
+        dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/')
+        trimer_runs = glob.glob(sassie_run_dir + 'trimer/flex*/run*/')
+        tetramer_runs = glob.glob(sassie_run_dir + 'tetramer/flex*/run*/')
+        # dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/')
+        # trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/')
+        tetramer_runs += glob.glob(sassie_run_dir + '4x167_*/run*/')
         run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
                     'h5': tetramer_runs}
 
@@ -1555,8 +1559,8 @@ if __name__ == '__main__':
                     'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
         data_ext = '.i0q'
 
-        array_types = ['di', 'tri', 'tet']
-        array_types = ['tet']
+        array_types = ['di', 'tri', 'tet', 'h5']
+        # array_types = ['tet']
         # array_types = ['tri']
         # array_types = ['h5']
         ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # N Q grid points
