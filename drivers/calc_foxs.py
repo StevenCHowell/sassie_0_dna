@@ -185,27 +185,25 @@ def split_dcd(pdb_full_name, dcd_full_name, n_cpus, starting_dir):
     dcd_file = mol.open_dcd_read(dcd_full_name)
     total_frames = dcd_file[2]
     n_atoms = dcd_file[1]
-    # copy_mask = np.ones(n_atoms, dtype=np.int32)
     _, copy_mask = mol.get_subset_mask('all')
 
-    n_frames_sub = total_frames/n_cpus
+    n_frames_sub = np.array([total_frames/n_cpus] * n_cpus, dtype=int)
+    n_frames_sub[:total_frames%n_cpus] += 1
     last_frame = 0
     sub_dirs = []
     sub_dcd_names = []
     first_last = []
-    for cpu in xrange(1, n_cpus+2):
+    for cpu in xrange(1, n_cpus+1):
         sub_dir = op.join(starting_dir, 'sub%s' % str(cpu).zfill(2))
         sub_dirs.append(sub_dir)
         mkdir_p(sub_dir)
         sub_mol = sasmol.SasMol(0)
         mol.copy_molecule_using_mask(sub_mol, copy_mask, 0)
         with cd(sub_dir):
-            if cpu == n_cpus+1:
-                n_frames_sub = total_frames % n_cpus
             dcd_out_name = 'sub%s.dcd' % str(cpu).zfill(2)
             sub_dcd_names.append(dcd_out_name)
             first = last_frame
-            last = last_frame + n_frames_sub
+            last = last_frame + n_frames_sub[cpu-1]
             dcd_out_file = sub_mol.open_dcd_write(dcd_out_name)
             for (i, frame) in enumerate(xrange(first, last)):
                 sub_mol.read_dcd_step(dcd_file, frame)
@@ -214,7 +212,7 @@ def split_dcd(pdb_full_name, dcd_full_name, n_cpus, starting_dir):
             sub_mol.close_dcd_write(dcd_out_file)
 
         first_last.append([first, last])
-        last_frame += n_frames_sub
+        last_frame += n_frames_sub[cpu-1]
 
     return sub_dirs, sub_dcd_names, first_last
 
