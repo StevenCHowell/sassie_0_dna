@@ -1278,7 +1278,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                                        q_base)
                 else:
                     out_file = op.join(filter_dir, 'rg_x2_lin.out')
-                if op.exists(out_file) and False:
+                if op.exists(out_file):
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
@@ -1302,8 +1302,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             x2rg_df.index = range(len(x2rg_df))
             x2rg_df.sort('X2', inplace=True)
 
-            best5 = x2rg_df.iloc[:5]
-            best5.to_csv(data_file + '_best.csv', float_format='%5.10f',
+            best50 = x2rg_df.iloc[:50]
+            best50.to_csv(data_file + '_best.csv', float_format='%5.10f',
                          sep='\t')
 
             q = data_iq_list[0][:,:1]
@@ -1542,7 +1542,7 @@ if __name__ == '__main__':
         # quicker to run
         # tet0 = [tet0[-1]]
         # tet0 = ['c000_4x167_mg1']
-        # tri0 = ['c000_3x167_k010']
+        # tri0 = [tri0[-1]]
 
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
@@ -1550,9 +1550,13 @@ if __name__ == '__main__':
         dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/')
         trimer_runs = glob.glob(sassie_run_dir + 'trimer/flex*/run*/')
         tetramer_runs = glob.glob(sassie_run_dir + 'tetramer/flex*/run*/')
-        # dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/')
-        # trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/')
-        tetramer_runs += glob.glob(sassie_run_dir + '4x167_*/run*/')
+        dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/foxs/')
+        trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/foxs/')
+        tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
+        dimer_runs = [run.replace('foxs/','') for run in dimer_runs]
+        trimer_runs = [run.replace('foxs/','') for run in trimer_runs]
+        tetramer_runs = [run.replace('foxs/','') for run in tetramer_runs]
+
         run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
                     'h5': tetramer_runs}
 

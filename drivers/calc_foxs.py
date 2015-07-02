@@ -193,15 +193,15 @@ def split_dcd(pdb_full_name, dcd_full_name, n_cpus, starting_dir):
     sub_dirs = []
     sub_dcd_names = []
     first_last = []
-    for cpu in xrange(1, n_cpus+1):
+    for cpu in xrange(1, n_cpus+2):
         sub_dir = op.join(starting_dir, 'sub%s' % str(cpu).zfill(2))
         sub_dirs.append(sub_dir)
         mkdir_p(sub_dir)
         sub_mol = sasmol.SasMol(0)
         mol.copy_molecule_using_mask(sub_mol, copy_mask, 0)
         with cd(sub_dir):
-            if cpu == n_cpus:
-                n_frames_sub = n_frames_sub + total_frames % n_cpus
+            if cpu == n_cpus+1:
+                n_frames_sub = total_frames % n_cpus
             dcd_out_name = 'sub%s.dcd' % str(cpu).zfill(2)
             sub_dcd_names.append(dcd_out_name)
             first = last_frame
