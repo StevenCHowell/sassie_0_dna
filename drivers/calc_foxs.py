@@ -273,7 +273,6 @@ def main(inputs):
                          pdb_full_name, foxs_exe, py_basis, max_q, num_points)
             processes.append(mp.Process(target=foxs, args=foxs_args) )
 
-
         for p in processes: # start the processes
             p.start()
 
