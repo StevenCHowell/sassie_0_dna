@@ -1396,19 +1396,20 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
 
     ax = plt.subplot(222)
     plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
-    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = '-o',
+    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o',
                 label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
     # ax.plot(all_data_iq[1:,0], best[1:], '-->', mfc='none', ms=8,
     ax.plot(all_data_iq[1:,0], best[1:], '-', mfc='none', ms=8,
-            c=gp.qual_color(1), mec=gp.qual_color(1),
+            c=gp.qual_color(1), mec=gp.qual_color(1), linewidth=2,
             label='best (%d)' % i_best)
     # ax.plot(all_data_iq[1:,0], average[1:], '-.s', mfc='none', ms=8,
     ax.plot(all_data_iq[1:,0], average[1:], '-', mfc='none', ms=8,
-            c=gp.qual_color(2), mec=gp.qual_color(2),label='average')
+            c=gp.qual_color(2), mec=gp.qual_color(2), linewidth=2,
+            label='average')
     # ax.plot(all_data_iq[1:,0], worst[1:], '-^', mfc='none', ms=8,
     ax.plot(all_data_iq[1:,0], worst[1:], '-', mfc='none', ms=8,
-            c=gp.qual_color(3), mec=gp.qual_color(3),
+            c=gp.qual_color(3), mec=gp.qual_color(3), linewidth=2,
             label='worst (%d)' % i_worst)
     plt.xlabel(r'$Q (\AA^{-1})$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1420,18 +1421,20 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
+    best_colors = [gp.qual_color(1), gp.qual_color(8), gp.qual_color(9)]
+
     plt.subplot(223)
     plt.title('best %d structures' %(n_best))
     plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec='b', mfc='none')
     # plt.plot(x2rg_best['Rg'], x2rg_best['X2'], '.')
     plt.plot(x2rg_best.iloc[0]['Rg'], x2rg_best.iloc[0]['X2'], '>',
-             mec=gp.qual_color(1), mfc=gp.qual_color(1),
+             mec=gp.qual_color(1), mfc=best_colors[0],
              markersize=8)
     plt.plot(x2rg_best.iloc[1]['Rg'], x2rg_best.iloc[1]['X2'], 's',
-             mec=gp.qual_color(2), mfc=gp.qual_color(2),
+             mec=gp.qual_color(2), mfc=best_colors[1],
              markersize=8)
     plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^',
-             mec=gp.qual_color(3), mfc=gp.qual_color(3),
+             mec=gp.qual_color(3), mfc=best_colors[2],
              markersize=8)
     plt.ylabel(r'$X^2$')
     plt.xlabel(r'$R_g$')
@@ -1455,12 +1458,12 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
                  label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
     # plt.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
-    plt.plot(all_data_iq[1:,0], best[1:], '-',
+    plt.plot(all_data_iq[1:,0], best[1:], '-', c=best_colors[0], linewidth=2,
              label=r'$1^{st}$ (%d)' % i_best)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-',
-             label=r'$2^{nd}$ (%d)' % i_2nd)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-',
-             label=r'$3^{rd}$ (%d)' % i_3rd)
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-', c=best_colors[1],
+             linewidth=2, label=r'$2^{nd}$ (%d)' % i_2nd)
+    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-', c=best_colors[2],
+             linewidth=2, label=r'$3^{rd}$ (%d)' % i_3rd)
     # plt.plot(all_data_iq[1:,0], best[1:], '-->',
              # label=r'$1^{st}$ (%d)' % i_best)
     # plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-s',
@@ -1477,13 +1480,15 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     lg.draw_frame(False)
 
     plt.tight_layout()
-    # plt.show()
-
-    fig_file_name = op.join(os.getcwd(), prefix + data_file + '_fit.eps')
-    # plt.savefig(fig_file_name[:-3] + 'png')
-    print 'storing fit plot as: %s' % fig_file_name
-    plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
-    plt.savefig(fig_file_name, bbox_inches='tight')
+    show = False
+    if show:
+        plt.show()
+    else:
+        fig_file_name = op.join(os.getcwd(), prefix + data_file + '_fit.eps')
+        # plt.savefig(fig_file_name[:-3] + 'png')
+        print 'storing fit plot as: %s' % fig_file_name
+        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+        plt.savefig(fig_file_name, bbox_inches='tight')
 
     return
 
@@ -1550,8 +1555,8 @@ if __name__ == '__main__':
         dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/')
         trimer_runs = glob.glob(sassie_run_dir + 'trimer/flex*/run*/')
         tetramer_runs = glob.glob(sassie_run_dir + 'tetramer/flex*/run*/')
-        dimer_runs += glob.glob(sassie_run_dir + '2x167_*/run*/foxs/')
-        trimer_runs += glob.glob(sassie_run_dir + '3x167_*/run*/foxs/')
+        dimer_runs += glob.glob(sassie_run_dir + '2x167*/run*/foxs/')
+        trimer_runs += glob.glob(sassie_run_dir + '3x167*/run*/foxs/')
         tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
         dimer_runs = [run.replace('foxs/','') for run in dimer_runs]
         trimer_runs = [run.replace('foxs/','') for run in trimer_runs]
