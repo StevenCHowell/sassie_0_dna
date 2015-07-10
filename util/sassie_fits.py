@@ -252,7 +252,7 @@ def mkdir_p(path):
         else: raise
 
 def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
-                      q_base=1):
+                      q_base=1, i0=True):
 
     assert op.exists(run_dir), 'No such run directory: %s' % run_dir
     if op.exists(op.join(run_dir,'crysol')) and False:
@@ -274,7 +274,7 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
         Rg, data_iq, labels = load_foxs(syn_data_dir, goal[0,1])
 
     data_iq, goal_iq = new_q_grid(ns, data_iq, goal, q_base=q_base,
-                                  q_max=0.2)
+                                  q_max=0.2, i0=i0)
 
     # # get the Kratky from the I(Q)
     # data_kratky = kratky(data_iq)
@@ -313,35 +313,42 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
 
     return result_df, matc_iq, iq_df, goal_iq
 
-def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1):
-    ns -= 1
-    q_min = goal[1, 0]
+def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1, i0=True):
+
+    if i0:    ns -= 1
+    q_min = goal[goal[:, 0] > 0, 0].min()
     new_q = polyspace(q_min, q_max, q_base, ns)
+    if i0:    new_q = np.concatenate(([0], new_q))
 
-    new_q = np.concatenate(([0], new_q))
     # interpolate calculated data to be on the intended grid
-    if len(new_q) == len(data_iq[:,0]) and np.allclose(data_iq[:,0], new_q):
-        new_q = data_iq[:,0]
-    else:
-        if new_q[0] < data_iq[0,0]:
-            new_q[0] = data_iq[0,0]
-            print 'changing q_min from %f to %f' % (new_q[0], data_iq[0, 0])
-        if new_q[-1] > data_iq[-1,0]:
-            print 'changing q_max from %f to %f' % (new_q[-1], data_iq[-1, 0])
-            new_q[-1] = data_iq[-1,0]
-        interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0,
-                                             kind='cubic')
-        data_int = np.zeros((len(new_q), len(data_iq[0,:])))
-        data_int[:,0] = new_q
-        data_int[:,1:] = interp_c(new_q)
-        data_iq = data_int
+    if new_q[0] < data_iq[0,0]:
+        new_q[0] = data_iq[0,0]
+        print 'changing q_min from %f to %f' % (new_q[0], data_iq[0, 0])
+    if new_q[-1] > data_iq[-1,0]:
+        print 'changing q_max from %f to %f' % (new_q[-1], data_iq[-1, 0])
+        new_q[-1] = data_iq[-1,0]
+    interp_c = interpolate.interp1d(data_iq[:,0], data_iq[:,1:], axis=0,
+                                         kind='cubic')
+    data_int = np.zeros((len(new_q), len(data_iq[0,:])))
+    data_int[:,0] = new_q
+    data_int[:,1:] = interp_c(new_q)
+    data_iq = data_int
 
-    # interpolate reference data to be on the same grid as the crysol I(Q)
+    # interpolate reference data to be on the same grid as the calculated I(Q)
     interp_iq = interpolate.interp1d(goal[:,0], goal[:,1:], kind='cubic',
                                      axis=0)
     goal_iq = np.zeros((len(new_q), 3))
     goal_iq[:,0] = new_q
-    goal_iq[:,1:] = interp_iq(new_q)
+    interp_res = interp_iq(new_q)
+    try:
+        goal_iq[:,1:] = interp_res
+    except:
+        if np.allclose(interp_res[:,1], interp_res[:,2]):
+            interp_res = interp_res[:,:2]
+            goal_iq[:,1:] = interp_res
+        else:
+            assert False, 'ERROR: problem interpolating data'
+
     return data_iq, goal_iq
 
 def polyspace(x1, x2, p, n):
@@ -361,6 +368,7 @@ def polyspace(x1, x2, p, n):
        poly: array of quadratically spaced values
     '''
     grid = np.linspace(x1 ** (1.0/p), x2 ** (1.0/p), n) ** p
+    grid[0], grid[-1] = x1, x2
     return grid
 
 def match_poly(in_data, rf_data):
@@ -1253,7 +1261,7 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 prefix='', do_plot='True', cutoff=None, join_dcd=False,
-                q_base=1):
+                q_base=1, fresh=False):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
@@ -1274,11 +1282,16 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             for run_dir in run_dirs[array_type]:
                 filter_dir = op.join(run_dir, data_file + '_filter')
                 if q_base:
-                    out_file = op.join(filter_dir, 'rg_x2_base%d.out' %
-                                       q_base)
+                    out_file = op.join(filter_dir, 'rg_x2_base%d_ns%d.out' %
+                                       (q_base, ns[array_type]))
                 else:
-                    out_file = op.join(filter_dir, 'rg_x2_lin.out')
-                if op.exists(out_file):
+                    out_file = op.join(filter_dir, 'rg_x2_lin_ns%d.out' % ns)
+                if '0' in data_ext:
+                    out_file = out_file.replace('.out','_i0.out')
+                    i0 = True
+                else:
+                    i0 = False
+                if op.exists(out_file) and not fresh:
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
                     data_iq = np.load(filter_dir + '/data_iq.npy')
@@ -1288,7 +1301,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     data = np.loadtxt(full_file)
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
                         run_dir, data, ns[array_type], filter_dir, out_file,
-                        q_base)
+                        q_base, i0=i0)
                 run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
                 df_list.append(result_df)
@@ -1552,9 +1565,9 @@ if __name__ == '__main__':
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
-        dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/')
-        trimer_runs = glob.glob(sassie_run_dir + 'trimer/flex*/run*/')
-        tetramer_runs = glob.glob(sassie_run_dir + 'tetramer/flex*/run*/')
+        dimer_runs = [] # dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/foxs/')
+        trimer_runs = [] # glob.glob(sassie_run_dir + 'trimer/flex*/run*/foxs/')
+        tetramer_runs = [] # glob.glob(sassie_run_dir + 'tetramer/flex*/run*/foxs/')
         dimer_runs += glob.glob(sassie_run_dir + '2x167*/run*/foxs/')
         trimer_runs += glob.glob(sassie_run_dir + '3x167*/run*/foxs/')
         tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
@@ -1568,14 +1581,16 @@ if __name__ == '__main__':
         data_dir = ('/home/schowell/data/'
                     'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
         data_ext = '.i0q'
+        data_ext = '.iq'
 
         array_types = ['di', 'tri', 'tet', 'h5']
+        array_types = ['di']
         # array_types = ['tet']
         # array_types = ['tri']
         # array_types = ['h5']
         ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # N Q grid points
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=350, join_dcd=False, q_base=2)
+                    cutoff=350, join_dcd=False, q_base=2, fresh=True)
 
     ############################ pseudo code ###########################
     # create a data frame containing the information for each structure
