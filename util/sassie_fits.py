@@ -1287,7 +1287,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             df_list = [] ; data_iq_list = []
             for run_dir in run_dirs[array_type]:
                 filter_dir = op.join(run_dir, data_file + '_filter')
-                run_label = '_base%d_ns%d' % (q_base, ns[array_type])
+                run_label = '_base%d_ns%d_s%do%d' % (q_base, ns[array_type],
+                                                     s, o)
                 out_file = op.join(filter_dir, 'rg_x2%s.out' % run_label)
                 if op.exists(out_file) and not fresh:
                     print 'loading rg and X^2 values from %s' % out_file
@@ -1328,7 +1329,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                                                  axis=1)
             if do_plot:
                 plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file,
-                              prefix+run_label[1:])
+                              prefix+run_label[1:], i0=i0)
 
             all_x2rg_dfs.append(x2rg_df)
             all_goal_iqs.append(goal_iq)
@@ -1375,7 +1376,8 @@ def write_filter_output(run_dirs, df_list, cutoff, join_dcd=False,
                     subprocess.call(bash_cmd2.split())
 
 
-def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
+def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
+                  i0=True):
 
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
@@ -1401,6 +1403,10 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     best_X2 = x2rg_df.X2.min()
     best_series = x2rg_df[x2rg_df.X2 == best_X2]
     i_best = best_series.index[0] + 1 # first column is the Q values
+    if i0:
+        all_data_iq = all_data_iq[1:]
+        goal_iq = goal_iq[1:]
+
     best = all_data_iq[:,i_best]
     worst_X2 = x2rg_df.X2.max()
     worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
@@ -1410,19 +1416,19 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
 
     ax = plt.subplot(222)
     plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
-    ax.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o',
+    ax.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = 'o',
                 label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
-    # ax.plot(all_data_iq[1:,0], best[1:], '-->', mfc='none', ms=8,
-    ax.plot(all_data_iq[1:,0], best[1:], '-', mfc='none', ms=8,
+    # ax.plot(all_data_iq[:,0], best[:], '-->', mfc='none', ms=8,
+    ax.plot(all_data_iq[:,0], best[:], '-', mfc='none', ms=8,
             c=gp.qual_color(1), mec=gp.qual_color(1), linewidth=2,
             label='best (%d)' % i_best)
-    # ax.plot(all_data_iq[1:,0], average[1:], '-.s', mfc='none', ms=8,
-    ax.plot(all_data_iq[1:,0], average[1:], '-', mfc='none', ms=8,
+    # ax.plot(all_data_iq[:,0], average[:], '-.s', mfc='none', ms=8,
+    ax.plot(all_data_iq[:,0], average[:], '-', mfc='none', ms=8,
             c=gp.qual_color(2), mec=gp.qual_color(2), linewidth=2,
             label='average')
-    # ax.plot(all_data_iq[1:,0], worst[1:], '-^', mfc='none', ms=8,
-    ax.plot(all_data_iq[1:,0], worst[1:], '-', mfc='none', ms=8,
+    # ax.plot(all_data_iq[:,0], worst[:], '-^', mfc='none', ms=8,
+    ax.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8,
             c=gp.qual_color(3), mec=gp.qual_color(3), linewidth=2,
             label='worst (%d)' % i_worst)
     plt.xlabel(r'$Q (\AA^{-1})$')
@@ -1468,21 +1474,21 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix=''):
     ax = plt.subplot(224)
     plt.title(r'best 3 $X^2$s = %0.1f, %0.1f, %0.1f' % (
         best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
-    plt.errorbar(goal_iq[1:,0], goal_iq[1:,1], goal_iq[1:,2], fmt = 'o',
+    plt.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = 'o',
                  label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
-    # plt.plot(all_data_iq[1:,0], average[1:], '-.s', label='average')
-    plt.plot(all_data_iq[1:,0], best[1:], '-', c=best_colors[0], linewidth=2,
+    # plt.plot(all_data_iq[:,0], average[:], '-.s', label='average')
+    plt.plot(all_data_iq[:,0], best[:], '-', c=best_colors[0], linewidth=2,
              label=r'$1^{st}$ (%d)' % i_best)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-', c=best_colors[1],
+    plt.plot(all_data_iq[:,0], all_data_iq[:,i_2nd], '-', c=best_colors[1],
              linewidth=2, label=r'$2^{nd}$ (%d)' % i_2nd)
-    plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-', c=best_colors[2],
+    plt.plot(all_data_iq[:,0], all_data_iq[:,i_3rd], '-', c=best_colors[2],
              linewidth=2, label=r'$3^{rd}$ (%d)' % i_3rd)
-    # plt.plot(all_data_iq[1:,0], best[1:], '-->',
+    # plt.plot(all_data_iq[:,0], best[:], '-->',
              # label=r'$1^{st}$ (%d)' % i_best)
-    # plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_2nd], '-s',
+    # plt.plot(all_data_iq[:,0], all_data_iq[:,i_2nd], '-s',
              # label=r'$2^{nd}$ (%d)' % i_2nd)
-    # plt.plot(all_data_iq[1:,0], all_data_iq[1:,i_3rd], '-^',
+    # plt.plot(all_data_iq[:,0], all_data_iq[:,i_3rd], '-^',
              # label=r'$3^{rd}$ (%d)' % i_3rd)
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
