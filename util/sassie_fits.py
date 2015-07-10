@@ -252,7 +252,7 @@ def mkdir_p(path):
         else: raise
 
 def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
-                      q_base=1, i0=True):
+                      q_base=1, i0=True, s=True, o=True, run_label=''):
 
     assert op.exists(run_dir), 'No such run directory: %s' % run_dir
     if op.exists(op.join(run_dir,'crysol')) and False:
@@ -285,9 +285,9 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
 
     # compare I(Q) and/or Kratky of the experimental vs synthetic structures
     nf = data_iq.shape[1]
-    matc_iq = np.zeros(data_iq.shape)
-    s = np.zeros(nf-1)
-    o = np.zeros(nf-1)
+    match_iq = np.zeros(data_iq.shape)
+    iq_scale = np.zeros(nf-1)
+    iq_offset = np.zeros(nf-1)
     X2 = np.zeros(nf-1)
 
     for i in xrange(1, nf):
@@ -295,30 +295,41 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
         # compare_match(goal_iq, data_iq[:,[0,i]], log=True)
         # X2 = (diff2 / sigma2).sum() # non-reduced chi-square distribution
         # X2 = (diff2 / goal).sum() # Pearson's X2 test-statistic (crazy units)
-        matc_iq[:,[0,i]], s[j], o[j], X2[j] = scale_offset(data_iq[:,[0,i]],
-                                                           goal_iq)
+        if s and o:
+            match_iq[:,[0,i]], iq_scale[j], iq_offset[j], X2[j] = scale_offset(
+                data_iq[:,[0,i]], goal_iq)
+        elif s:
+            match_iq[:,[0,i]], iq_scale[j], X2[j] = scale(
+                data_iq[:,[0,i]], goal_iq)
+            iq_offset[j] = 0
+        elif o:
+            match_iq[:,[0,i]], iq_offset[j], X2[j] = offset(
+                data_iq[:,[0,i]], goal_iq)
+            iq_scale[j] = 0
 
-    res_dict = {'Rg':Rg, 'X2':X2, 'scale':s, 'offset':o, 'labels':labels}
+    res_dict = {'Rg':Rg, 'X2':X2, 'scale':iq_scale, 'offset':iq_offset, 'labels':labels}
     result_df = DataFrame(res_dict, index=range(1,nf))
     result_df.index.name = 'id'
-    iq_df = DataFrame(matc_iq, columns=['Q']+labels)
+    iq_df = DataFrame(match_iq, columns=['Q']+labels)
     # save output to filter directory
     mkdir_p(filter_dir)
     if not out_file:
         out_file = op.join(filter_dir, 'rg_x2.out')
     result_df.to_csv(out_file, float_format='%5.10f', sep='\t')
-    np.savetxt(op.join(filter_dir, 'goal.iq'), goal_iq) # small file
-    np.save(op.join(filter_dir, 'data_iq.npy'), matc_iq)
+    np.savetxt(op.join(filter_dir, 'goal%s.iq' % run_label), goal_iq) # small file
+    np.save(op.join(filter_dir, 'data_iq%s.npy' % run_label), match_iq)
     # np.savetxt('data.iq', data_iq) # too big to be useful as text file
 
-    return result_df, matc_iq, iq_df, goal_iq
+    return result_df, match_iq, iq_df, goal_iq
 
 def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1, i0=True):
 
-    if i0:    ns -= 1
+    if i0:
+        ns -= 1
     q_min = goal[goal[:, 0] > 0, 0].min()
     new_q = polyspace(q_min, q_max, q_base, ns)
-    if i0:    new_q = np.concatenate(([0], new_q))
+    if i0:
+        new_q = np.concatenate(([0], new_q))
 
     # interpolate calculated data to be on the intended grid
     if new_q[0] < data_iq[0,0]:
@@ -1261,47 +1272,36 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 prefix='', do_plot='True', cutoff=None, join_dcd=False,
-                q_base=1, fresh=False):
+                q_base=1, fresh=False, i0=True, s=True, o=True):
     all_x2rg_dfs = []
     all_iqs_dfs = []
     all_goal_iqs = []
     all_data_files = []
 
-    if q_base:
-        prefix += 'base%d_' % q_base
-    else:
-        prefix += 'lin_'
-
     for array_type in array_types:
         for data_file in data_files[array_type]:
-            full_file = op.join(data_dir, data_file + data_ext)
-            assert op.exists(full_file), (
-                    "No such file: '%s'" % full_file)
+            rg_file = op.join(data_dir, data_file + data_ext)
+            assert op.exists(rg_file), (
+                    "No such file: '%s'" % rg_file)
 
             df_list = [] ; data_iq_list = []
             for run_dir in run_dirs[array_type]:
                 filter_dir = op.join(run_dir, data_file + '_filter')
-                if q_base:
-                    out_file = op.join(filter_dir, 'rg_x2_base%d_ns%d.out' %
-                                       (q_base, ns[array_type]))
-                else:
-                    out_file = op.join(filter_dir, 'rg_x2_lin_ns%d.out' % ns)
-                if '0' in data_ext:
-                    out_file = out_file.replace('.out','_i0.out')
-                    i0 = True
-                else:
-                    i0 = False
+                run_label = '_base%d_ns%d' % (q_base, ns[array_type])
+                out_file = op.join(filter_dir, 'rg_x2%s.out' % run_label)
                 if op.exists(out_file) and not fresh:
                     print 'loading rg and X^2 values from %s' % out_file
                     result_df = pd.read_csv(out_file, sep='\t')
-                    data_iq = np.load(filter_dir + '/data_iq.npy')
-                    goal_iq = np.loadtxt(filter_dir + '/goal.iq')
+                    data_iq = np.load(op.join(filter_dir, 'data_iq%s.npy' %
+                                              run_label))
+                    goal_iq = np.loadtxt(op.join(filter_dir, 'goal%s.iq' %
+                                                 run_label))
                 else:
                     print 'loading rg then calculating X^2 values'
-                    data = np.loadtxt(full_file)
+                    data = np.loadtxt(rg_file)
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
                         run_dir, data, ns[array_type], filter_dir, out_file,
-                        q_base, i0=i0)
+                        q_base, run_label=run_label, i0=i0, s=s, o=o)
                 run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
                 df_list.append(result_df)
@@ -1327,7 +1327,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]),
                                                  axis=1)
             if do_plot:
-                plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix)
+                plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file,
+                              prefix+run_label[1:])
 
             all_x2rg_dfs.append(x2rg_df)
             all_goal_iqs.append(goal_iq)
@@ -1546,8 +1547,8 @@ if __name__ == '__main__':
                 'c500_4x167_k100']
         # full
         tri0 = ['c000_3x167_k010',
-                'c000_3x167_k050',
-                'c000_3x167_k100',
+                # 'c000_3x167_k050',
+                # 'c000_3x167_k100',
                 'c000_3x167_k200']
         tet0 = ['c000_4x167_k010',
                 'c000_4x167_k050',
@@ -1560,7 +1561,7 @@ if __name__ == '__main__':
         # quicker to run
         # tet0 = [tet0[-1]]
         # tet0 = ['c000_4x167_mg1']
-        # tri0 = [tri0[-1]]
+        tri0 = [tri0[-1]]
 
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
@@ -1581,23 +1582,16 @@ if __name__ == '__main__':
         data_dir = ('/home/schowell/data/'
                     'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
         data_ext = '.i0q'
-        data_ext = '.iq'
 
         array_types = ['di', 'tri', 'tet', 'h5']
-        array_types = ['di']
+        # array_types = ['di']
         # array_types = ['tet']
-        # array_types = ['tri']
+        array_types = ['tri']
         # array_types = ['h5']
-        ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # N Q grid points
+        i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
+        i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid points
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=350, join_dcd=False, q_base=2, fresh=True)
-
-    ############################ pseudo code ###########################
-    # create a data frame containing the information for each structure
-       # columns: Rg, X2 I(Q), X2 QI(Q), X2 P(r), Psi, Phi, h
-       # rows: each structure
-
-    # create a data frame of the crysol output
-       # not sure if I should use columns or rows for each structure
+                    cutoff=350, join_dcd=False, q_base=2, i0=i0, s=True,
+                    o=True, fresh=True)
 
     print '\m/ >.< \m/'
