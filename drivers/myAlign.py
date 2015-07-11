@@ -5,7 +5,7 @@
 # Created: 6 February 2015
 #
 # $Id$
-# 
+#
 '''
 This script loads a pdb structure file of DNA, and creates a '*.patches' file
 with the psfgen patches needed to use psfgen to create the structure.
@@ -15,7 +15,12 @@ After running this script, the patches can be pasted into a psfgen file.
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.align2 as a2
 import logging, sys
+import os.path as op
 import numpy as np
+
+class inputs():
+    def __init__(self, parent = None):
+        pass
 
 def parse():
     ''' Returns arguments in parser'''
@@ -47,23 +52,22 @@ def parse():
 def align(inputs):
     '''
     the inputs object should contain the following attributes
-    goal:    goal pdb            
-    ref:     reference pdb containing molecule info for moving pdb/dcd        
+    goal:    goal pdb
+    ref:     reference pdb containing molecule info for moving pdb/dcd
     move:    pdb/dcd to align
     out:     output dcd file
-    segname: segname to match
     path:    output path
-    max:     minimun residue to match 
-    min:     minimun residue to match
-    
-    note: inputs.ref and inputs.move are typically the same pdb/dcd
+    goal_filter:     goal basis filter
+    move_filter:     move basis filter
+
+    note: inputs.ref and inputs.move can ofter be the same pdb
     '''
     aa_goal_pdb    = inputs.goal
     aa_move_pdb    = inputs.ref
     aa_move_file   = inputs.move
     save_file      = inputs.out
     path           = inputs.path
-    
+
     try:
         goal_filter = inputs.goal_filter
     except:
@@ -75,7 +79,7 @@ def align(inputs):
         goal_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (goal_seg_or_ch, goal_segname, basis_atoms, goal_res_min, goal_res_max)
 
     try:
-        move_filter = inputs.move_filter            
+        move_filter = inputs.move_filter
     except:
         basis_atoms    = inputs.basis_atoms
         move_seg_or_ch = inputs.move_seg_or_chain
@@ -83,7 +87,12 @@ def align(inputs):
         move_res_max   = inputs.move_max
         move_res_min   = inputs.move_min
         move_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (move_seg_or_ch, move_segname, basis_atoms, move_res_min, move_res_max)
-        
+
+    # check input
+    assert op.exists(aa_move_file), 'ERROR: no such file - %s' % aa_move_file
+    assert op.exists(aa_move_pdb), 'ERROR: no such file - %s' % aa_move_pdb
+    assert op.exists(aa_goal_pdb), 'ERROR: no such file - %s' % aa_goal_pdb
+
     # create the SasMol objects
     sub_goal = sasmol.SasMol(0)
     sub_move = sasmol.SasMol(0)
@@ -103,14 +112,14 @@ def align(inputs):
         in_type = 'dcd'
     else:
         message = "\n~~~ ERROR, unknown input type ~~~\n"
-        print_failure(message, txtOutput) 
+        print_failure(message, txtOutput)
         return
 
     out_type = save_file[-3:].lower()
     if 'dcd' == out_type:
         dcd_out_file = aa_move.open_dcd_write(path+save_file)
     elif 'pdb' == out_type:
-        dcd_out_file = None        
+        dcd_out_file = None
 
     error, goal_seg_mask = aa_goal.get_subset_mask(goal_filter)
     error, move_seg_mask = aa_move.get_subset_mask(move_filter)
@@ -131,7 +140,7 @@ def align(inputs):
             com_sub_move = sub_move.calccom(0) # calculate the center of mass of the subset of m2
             sub_move.center(0)                 # move the subset of m2 to be centered at the origin
             coor_sub_move = sub_move.coor[0]   # get the new coordinates of the subset of m2
-            aa_move.align(i,coor_sub_move,com_sub_move,coor_sub_goal,com_sub_goal) # align m2 using the transformation from sub_m2 to sub_m1
+            aa_move.align(0,coor_sub_move,com_sub_move,coor_sub_goal,com_sub_goal) # align m2 using the transformation from sub_m2 to sub_m1
         elif in_type == 'pdb':
             aa_move.center(i)                  # move m2 to be centered at the origin
             error, sub_move.coor = aa_move.get_coor_using_mask(i, move_seg_mask)
@@ -141,7 +150,7 @@ def align(inputs):
             coor_sub_move = sub_move.coor[0]   # get the new coordinates of the subset of m2
             aa_move.align(i,coor_sub_move,com_sub_move,coor_sub_goal,com_sub_goal) # align m2 using the transformation from sub_m2 to sub_m1
 
-        a2.write_frame_to_file(aa_move,n_frames, i+1, path, save_file, out_type, dcd_out_file, in_type)
+        aa_move.write_dcd_step(dcd_out_file, 0, i+1)
 
     if in_type == 'dcd':
         aa_move.close_dcd_read(dcd_file[0])
@@ -149,20 +158,6 @@ def align(inputs):
         aa_move.close_dcd_write(dcd_out_file)
 
     print 'COMPLETE \m/ >.< \m/'
-
-if __name__ == "__main__":
-
-    import argparse
-    if '-v' in sys.argv:
-        logging.basicConfig(filename='_log-%s' %__name__, level=logging.DEBUG)
-        sys.argv.pop(sys.argv.index('-v'))
-    else:
-        logging.basicConfig()
-
-    # make ARGS global
-    ARGS = parse()
-    
-    align(ARGS)
 
 def align_mol(inputs):
     '''
@@ -173,7 +168,7 @@ def align_mol(inputs):
             aa_move:    sasmol object to align
             goal_basis: goal basis for alignment
             move_basis: move basis for alignment
-            
+
     returns:
     --------
         out: aligned sasmol object
@@ -184,7 +179,7 @@ def align_mol(inputs):
     aa_move = inputs.aa_move
     goal_basis = inputs.goal_basis
     move_basis = inputs.move_basis
-        
+
     # create the SasMol objects
     sub_goal = sasmol.SasMol(0)
     sub_move = sasmol.SasMol(0)
@@ -199,7 +194,7 @@ def align_mol(inputs):
     sub_goal.center(0)                         # center the m1 coordinates
     coor_sub_goal = sub_goal.coor()[0]         # get the m1 centered coordinates
 
-    aa_move.center(0)                  # move m2 to be centered at the origin 
+    aa_move.center(0)                  # move m2 to be centered at the origin
     error, sub_move.coor = aa_move.get_coor_using_mask(0, move_seg_mask)
     sub_move.setCoor(sub_move.coor)
     com_sub_move = sub_move.calccom(0) # calculate the center of mass of the subset of m2
@@ -221,5 +216,5 @@ if __name__ == "__main__":
 
     # make ARGS global
     ARGS = parse()
-    
+
     align(ARGS)

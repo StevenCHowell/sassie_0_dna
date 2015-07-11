@@ -13,17 +13,18 @@
 import logging
 LOGGER = logging.getLogger(__name__) #add module name manually
 
-import sys, os, glob, locale, errno, pickle, re
+import sys, os, glob, locale, errno, pickle, re, subprocess
 import os.path as op
 import numpy as np
 import pandas as pd
 from pandas import Series, DataFrame
 from scipy import interpolate
 import matplotlib.pyplot as plt
-import x_dna.util.gw_plot as gp
 import matplotlib.gridspec as gridspec
+import matplotlib.image as mpimg
 import sassie.sasmol.sasmol as sasmol
-import subprocess
+import x_dna.util.gw_plot as gp
+import x_dna.drivers.myAlign as align
 debug = True
 
 class MainError(Exception):
@@ -1271,10 +1272,10 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                prefix='', do_plot='True', cutoff=None, join_dcd=False,
+                prefix='', do_plot='True', cutoff=None, best_dcd=False,
                 q_base=1, fresh=False, i0=True, s=True, o=True):
     all_x2rg_dfs = []
-    all_iqs_dfs = []
+    all_data_iqs = []
     all_goal_iqs = []
     all_data_files = []
 
@@ -1309,7 +1310,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 data_iq_list.append(data_iq)
             if cutoff:
                 write_filter_output(run_dirs[array_type], df_list, cutoff,
-                                    join_dcd)
+                                    best_dcd=best_dcd, label=run_label)
 
             # combine result DataFrames and data_iq arrays
             x2rg_df = pd.concat(df_list)
@@ -1323,58 +1324,99 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             q = data_iq_list[0][:,:1]
             for (i, data_iq) in enumerate(data_iq_list):
                 if i == 0:
-                    all_data_iq = np.concatenate((q, data_iq[:,1:]), axis=1)
+                    run_data_iqs = np.concatenate((q, data_iq[:,1:]), axis=1)
                 else:
-                    all_data_iq = np.concatenate((all_data_iq, data_iq[:,1:]),
+                    run_data_iqs = np.concatenate((run_data_iqs, data_iq[:,1:]),
                                                  axis=1)
             if do_plot:
-                plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file,
+                plot_run_best(x2rg_df, run_data_iqs, goal_iq, data_file,
                               prefix+run_label[1:], i0=i0)
 
             all_x2rg_dfs.append(x2rg_df)
+            all_data_iqs.append(run_data_iqs)
             all_goal_iqs.append(goal_iq)
             all_data_files.append(data_file)
-            try:
-                all_iqs_dfs.append(iq_df)
-            except:
-                print 'all_iqs_dfs contains no output'
+            # try:
+                # all_iqs_dfs.append(iq_df)
+            # except:
+                # print 'all_iqs_dfs contains no output'
 
-    return  all_x2rg_dfs, all_iqs_dfs, all_goal_iqs, all_data_files
+    return  all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files
 
-def write_filter_output(run_dirs, df_list, cutoff, join_dcd=False,
-                        catdcd_exe='/home/myPrograms/bin/catdcd'):
-    filter_dir = op.join(op.split(op.split(op.split(run_dirs[0])[0])[0])[0],
-                         'filter')
-    txt_name =  'rglowweights.txt'
-    print 'saving output dcd and "%s" to %s' % (txt_name, filter_dir)
-    mkdir_p(filter_dir)
-    full_dcd_out = op.join(filter_dir,
-                           'collected_%s.dcd' % filter_dir.split('/')[-2])
-    tmp_dcd_out = op.join(filter_dir, 'tmp.dcd')
+def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
+                        catdcd_exe='/home/schowell/data/myPrograms/bin/catdcd',
+                        do_align=False):
+    txt_name =  'rglowweights%s.txt' % label
     index = 0
-    with open(op.join(filter_dir, txt_name), 'w') as txt_file:
+
+    with open(op.join(txt_name), 'w') as txt_file:
         txt_file.write('# file generated on FILL THIS IN\n')
         txt_file.write('# structure, Rg, weight\n')
-        for (i, run_dir) in enumerate(run_dirs):
-            for j in xrange(len(df_list[i])):
-                this_rg = df_list[i]['Rg'].iloc[j]
-                accept = df_list[i]['X2'].iloc[j] < cutoff
-                index += 1
-                txt_file.write('%d\t%0.6f\t%0.6f\n' % (index, this_rg, accept))
-            if join_dcd:
-                dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
-                assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s'
-                                             % dcd_file)
-                if i == 0:
-                    bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
-                    subprocess.call(bash_cmd.split())
-                else:
-                    bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out,
-                                                     full_dcd_out, dcd_name))
-                    subprocess.call(bash_cmd1.split())
-                    bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
-                    subprocess.call(bash_cmd2.split())
 
+        if best_dcd:
+            n_accept = 0
+            # read pdb (grab a random one from a preceding directory, DANGEROUS)
+            random_pdb = glob.glob(op.split(op.split(
+                run_dirs[0])[0])[0] + '/*.pdb')[0]
+            print 'reference pdb: %s' % random_pdb
+            mol = sasmol.SasMol(0)
+            mol.read_pdb(random_pdb)
+
+            align_inputs = align.inputs()
+            ref = sasmol.SasMol(0)
+            ref.read_pdb(random_pdb)
+            align_inputs.aa_goal = ref
+            align_basis = ('((name[i] == "CA") and (segname[i] == "3H2A") and '
+                           '(resid[i] > 105) and (resid[i] < 115))')
+            align_inputs.goal_basis = align_basis
+            align_inputs.move_basis = align_basis
+
+            dcd_out = mol.open_dcd_write('x2_lt%d%s.dcd' % (int(cutoff), label))
+
+            for (i, run_dir) in enumerate(run_dirs):
+                # create read dcd pointer
+                dcd_filename = glob.glob(run_dir + 'monte_carlo/*.dcd')
+                assert len(dcd_filename) == 1, ('ERROR: %d dcd files in "%s"' %
+                                                (len(dcd_filename), run_dir))
+                dcd_in = mol.open_dcd_read(dcd_filename[0])
+
+                for j in xrange(len(df_list[i])):
+                    this_rg = df_list[i]['Rg'].iloc[j]
+                    accept = df_list[i]['X2'].iloc[j] < cutoff
+                    index += 1
+                    txt_file.write('%d\t%0.6f\t%0.6f\n' % (index, this_rg, accept))
+                    if accept:
+                        n_accept += 1
+                        # read specified dcd frame then save to dcd output
+                        mol.read_dcd_step(dcd_in, df_list[i]['id'].iloc[j])
+                        # this is much slower than aligning all frames at once
+                        if do_align:
+                            align_inputs.aa_move = mol
+                            align.align_mol(align_inputs)
+                        mol.write_dcd_step(dcd_out, 0, n_accept)
+
+                        # dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
+                        # assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s'
+                                                     # % dcd_file)
+                        # if i == 0:
+                            # bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
+                            # subprocess.call(bash_cmd.split())
+                        # else:
+                            # bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out,
+                                                             # full_dcd_out, dcd_name))
+                            # subprocess.call(bash_cmd1.split())
+                            # bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
+                            # subprocess.call(bash_cmd2.split())
+                mol.close_dcd_read(dcd_in[0])
+            mol.close_dcd_write(dcd_out)
+
+        else:
+            for (i, run_dir) in enumerate(run_dirs):
+                for j in xrange(len(df_list[i])):
+                    this_rg = df_list[i]['Rg'].iloc[j]
+                    accept = df_list[i]['X2'].iloc[j] < cutoff
+                    index += 1
+                    txt_file.write('%d\t%0.6f\t%0.6f\n' % (index, this_rg, accept))
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
                   i0=True):
@@ -1476,7 +1518,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
     plt.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = 'o',
                  label='exp', ms=8, mfc='none', c=gp.qual_color(0),
-                mec=gp.qual_color(0))
+                 mec=gp.qual_color(0))
     # plt.plot(all_data_iq[:,0], average[:], '-.s', label='average')
     plt.plot(all_data_iq[:,0], best[:], '-', c=best_colors[0], linewidth=2,
              label=r'$1^{st}$ (%d)' % i_best)
@@ -1485,11 +1527,11 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.plot(all_data_iq[:,0], all_data_iq[:,i_3rd], '-', c=best_colors[2],
              linewidth=2, label=r'$3^{rd}$ (%d)' % i_3rd)
     # plt.plot(all_data_iq[:,0], best[:], '-->',
-             # label=r'$1^{st}$ (%d)' % i_best)
+                # label=r'$1^{st}$ (%d)' % i_best)
     # plt.plot(all_data_iq[:,0], all_data_iq[:,i_2nd], '-s',
-             # label=r'$2^{nd}$ (%d)' % i_2nd)
+                # label=r'$2^{nd}$ (%d)' % i_2nd)
     # plt.plot(all_data_iq[:,0], all_data_iq[:,i_3rd], '-^',
-             # label=r'$3^{rd}$ (%d)' % i_3rd)
+                # label=r'$3^{rd}$ (%d)' % i_3rd)
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
@@ -1501,6 +1543,92 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     plt.tight_layout()
     show = False
+    if show:
+        plt.show()
+    else:
+        fig_file_name = op.join(os.getcwd(), prefix + data_file + '_fit.eps')
+        # plt.savefig(fig_file_name[:-3] + 'png')
+        print 'storing fit plot as: %s' % fig_file_name
+        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+        plt.savefig(fig_file_name, bbox_inches='tight')
+
+    return
+
+def pub_plot(x2rg_df, all_data_iq, goal_iq, data_file, density_plot, prefix='',
+             i0=False, cutoff=None):
+
+    n_total = len(x2rg_df)
+    n_best = max(int(n_total * 0.1), 3)
+    x2rg_best = x2rg_df.sort('X2')[:n_best]
+
+    plt.figure(figsize=(14, 5))
+
+    # plt.suptitle(data_file, fontsize=14)
+    # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
+                        # wspace = 0.2, hspace = 0.2)
+    # plt.subplots_adjust(left=0.0, hspace=0.001)
+    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
+
+    ax = plt.subplot(131)
+    # plt.title('all %d structures' % n_total)
+    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec='b', mfc='none')
+    # plt.xlim(rg_range)
+    plt.ylabel(r'$X^2$')
+    plt.xlabel(r'$R_g$')
+    # ax.xaxis.set_major_formatter(plt.NullFormatter())
+
+    # get the best, worst and average I(Q)
+    best_X2 = x2rg_df.X2.min()
+    best_series = x2rg_df[x2rg_df.X2 == best_X2]
+    i_best = best_series.index[0] + 1 # first column is the Q values
+    if i0:
+        all_data_iq = all_data_iq[1:]
+        goal_iq = goal_iq[1:]
+
+    best = all_data_iq[:,i_best]
+    worst_X2 = x2rg_df.X2.max()
+    worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
+    i_worst = worst_series.index[0] + 1 # first column is the Q values
+    worst = all_data_iq[:,i_worst]
+    average = all_data_iq[:,1:].mean(axis=1)
+    colors = gp.color_order  # gp.qual_color
+
+    ax = plt.subplot(132)
+    plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
+    # plot errorbar in two parts to get label order correct
+    ax.plot(goal_iq[:,0], goal_iq[:,1], 'o', ms=8, mfc='none',
+            edgecolor=colors(0), label='exp')
+                # label='exp', ms=8, mfc='none', color='b')
+    ax.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = None, color='blue')
+
+    ax.plot(all_data_iq[:,0], best[:], '-', mfc='none', ms=8,
+            c=colors(1), mec=colors(1), linewidth=2,
+            label='best (%d)' % i_best)
+
+    ax.plot(all_data_iq[:,0], average[:], '-', mfc='none', ms=8,
+            c=colors(2), mec=colors(2), linewidth=2,
+            label='average')
+
+    ax.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8,
+            c=colors(3), mec=colors(3), linewidth=2,
+            label='worst (%d)' % i_worst)
+    plt.xlabel(r'$Q (\AA^{-1})$')
+
+    plt.ylabel(r'$I(Q)$')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.axis('tight')
+    gp.zoomout(ax, 0.1)
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+
+    best_colors = [colors(1), colors(8), colors(9)]
+
+    ax = plt.subplot(133)
+    img = mpimg.imread(density_plot)
+    imgplot = plt.imshow(img)
+
+    show = True
     if show:
         plt.show()
     else:
@@ -1597,7 +1725,7 @@ if __name__ == '__main__':
         i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
         i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid points
         evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=350, join_dcd=False, q_base=2, i0=i0, s=True,
+                    cutoff=350, best_dcd=False, q_base=2, i0=i0, s=True,
                     o=True, fresh=True)
 
     print '\m/ >.< \m/'

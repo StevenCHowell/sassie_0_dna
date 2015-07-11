@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ def user_parameters():
     desired_modules =    {
         "Contrast Calculator"         :    "NO",
         "Docking"                     :    "NO",
-        "TAMD"                        :    "NO",
+        "Torsion Angle MD"            :    "NO",
         "SasCalc"                     :    "NO",
         "Center Frames"               :    "YES",
         "Align Frames"                :    "YES",
@@ -38,23 +38,24 @@ def user_parameters():
         "Monomer Monte Carlo"         :    "NO",
         "Complex Monte Carlo"         :    "NO",
         "Structure Minimization"      :    "YES",
+        "Energy Minimization"         :    "YES",
         "Structure Open Minimization" :    "NO",
         "Two-Body Grid"               :    "YES",
         "Xtal2sas"                    :    "NO",
         "Cryson"                      :    "NO",
         "Crysol"                      :    "YES",
-        "Scattering Length Density"   :    "NO",
-        "Hydropro"                    :    "NO",   
-        "EM to SANS"                  :    "YES",   
+        "SLD MOL"                     :    "NO",
+        "Hydropro"                    :    "NO",
+        "EM to SANS"                  :    "YES",
         "Chi-Square Filter"           :    "YES",
         "Density Plot"                :    "YES",
         "APBS"                        :    "NO"
-    }    
+    }
 
     desired_font_sizes =     {
 
         'default_font'    : 'YES',
-        'button_font'    : ('Helvetica',8,'bold'),    
+        'button_font'    : ('Helvetica',8,'bold'),
         'local_font'    : ('Helvetica',8,'bold'),
         'button_pady'    : 6
 
@@ -87,19 +88,19 @@ class Prog(Frame):
         desired_modules,desired_font_sizes,enable_saslock = user_parameters()
 
         if(enable_saslock == 'YES' or enable_saslock == 'yes'):
-            if(os.path.isfile('.saslock')): 
+            if(os.path.isfile('.saslock')):
                 message_warning =  "\nWARNING: ANOTHER INSTANCE OF SASSIE MAY BE RUNNING IN THIS DIRECTORY"
                 print message_warning ; print message_warning ; print message_warning+'\n' ; print os.getcwd()+'\n'
                 title = 'SASLOCK FILE FOUND IN CURRENT DIRECTORY'
                 txt='\n\nPress "OK" to delete saslock file and continue \nPress cancel to quit now\n'
                 ans=Message(title=message_warning,message=title+txt,default='cancel',icon=QUESTION,type='okcancel').show()
                 self.update_idletasks()
-                if(str(ans)=="ok"):        
+                if(str(ans)=="ok"):
                     print 'removing old saslock file from current directory'
                     rmst='rm -f .saslock'
                     os.system(rmst)
                     write_saslock()
-                elif(str(ans)=="cancel"):        
+                elif(str(ans)=="cancel"):
                     self.quitnow()
             else:
                 write_saslock()
@@ -107,7 +108,7 @@ class Prog(Frame):
 
         license="""
     SASSIE  Copyright (C) 2011 Joseph E. Curtis, Ph.D.
-    This program comes with ABSOLUTELY NO WARRANTY; 
+    This program comes with ABSOLUTELY NO WARRANTY;
     This is free software. You are welcome to redistribute it under certain
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 
@@ -195,7 +196,7 @@ def OnExit():
     os.system('rm -f .saslock')
     root.destroy()
 
-if __name__=='__main__': 
+if __name__=='__main__':
 
     root = Tk()
     app = Prog(root)
