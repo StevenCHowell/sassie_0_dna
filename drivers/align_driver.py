@@ -107,24 +107,23 @@ start_dir = os.getcwd()
 
 all_dcds = ['4x167/run0/monte_carlo/test.dcd']
 
-dimer = '/home/schowell/myData/sassieRuns/2x167_k010_s1_min.pdb'
-trimer = '/home/schowell/myData/sassieRuns/3x167_min.pdb'
-tetramer = '/home/schowell/myData/sassieRuns/c11_min.pdb'
-
-
-
 align_basis = ('((name[i] == "CA") and (segname[i] == "3H2A") and '
                '(resid[i] > 105) and (resid[i] < 115))')
 
 inputs = align.inputs()
-inputs.goal = tetramer
-inputs.ref = tetramer
+
 
 inputs.path = ''
 inputs.goal_filter = align_basis
 inputs.move_filter = align_basis
 
-for dcd in all_dcds:
+dimer = '/home/schowell/myData/sassieRuns/2x167_k010_s1_min.pdb'
+trimer = '/home/schowell/myData/sassieRuns/3x167_min.pdb'
+tetramer = '/home/schowell/myData/sassieRuns/c11_min.pdb'
+
+inputs.goal = inputs.ref = dimer
+for dcd in dimer_dcds:
+    print 'aligning %s' % dcd
     inputs.move = os.path.join(start_dir, dcd)
     inputs.out = inputs.move.replace('.dcd', '_al.dcd')
     align.align(inputs)
