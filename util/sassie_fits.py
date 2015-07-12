@@ -25,6 +25,7 @@ import matplotlib.image as mpimg
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
 import x_dna.drivers.myAlign as align
+import x_dna.util.plt_inset as plt_inset
 debug = True
 
 class MainError(Exception):
@@ -1310,7 +1311,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                 data_iq_list.append(data_iq)
             if cutoff:
                 write_filter_output(run_dirs[array_type], df_list, cutoff,
-                                    best_dcd=best_dcd, label=run_label)
+                                    best_dcd=best_dcd, label='_%s%s' %
+                                    (data_file, run_label))
 
             # combine result DataFrames and data_iq arrays
             x2rg_df = pd.concat(df_list)
@@ -1371,7 +1373,8 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
             align_inputs.goal_basis = align_basis
             align_inputs.move_basis = align_basis
 
-            dcd_out = mol.open_dcd_write('x2_lt%d%s.dcd' % (int(cutoff), label))
+            dcd_out = mol.open_dcd_write('x2_lt%s%s.dcd' %
+                                         (str(cutoff).replace('.','p'), label))
 
             for (i, run_dir) in enumerate(run_dirs):
                 # create read dcd pointer
@@ -1554,91 +1557,130 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     return
 
-def pub_plot(x2rg_df, all_data_iq, goal_iq, data_file, density_plot, prefix='',
-             i0=False, cutoff=None):
-
+def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
+             inset_loc=[], prefix='', i0=False, cutoff=None):
+    from matplotlib.gridspec import GridSpec
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
     x2rg_best = x2rg_df.sort('X2')[:n_best]
+    plt.close()
+    colors = gp.color_order  # gp.qual_color
 
-    plt.figure(figsize=(14, 5))
-
+    fig = plt.figure(figsize=(11, 4))
+    # # ~~ code for adding and positioning a suptitle ~~
     # plt.suptitle(data_file, fontsize=14)
     # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
                         # wspace = 0.2, hspace = 0.2)
-    # plt.subplots_adjust(left=0.0, hspace=0.001)
-    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
 
-    ax = plt.subplot(131)
-    # plt.title('all %d structures' % n_total)
-    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec='b', mfc='none')
+    gs1 =  GridSpec(1, 2, left=0.075, right=0.75, wspace=0.1, hspace=0,
+                    top=0.95)
+    ax1 = plt.subplot(gs1[:, 0])
+    ax1.text(0.6, 0.01, '%d structures' % n_total, verticalalignment='bottom',
+            horizontalalignment='left', transform=ax1.transAxes)
+
+    ax1.text(-0.05, -0.1, '(a)', verticalalignment='bottom',
+            horizontalalignment='left', transform=ax1.transAxes)
+    ax1.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=colors(0), mfc='none')
+    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
     # plt.xlim(rg_range)
     plt.ylabel(r'$X^2$')
     plt.xlabel(r'$R_g$')
-    # ax.xaxis.set_major_formatter(plt.NullFormatter())
+    ax1.xaxis.set_major_formatter(plt.NullFormatter())
+    for (i, inset) in enumerate(inset_files):
+        ax = plt_inset.add_inset(ax1, inset_loc[i], axisbg='None')
+        # img = mpimg.imread(inset)
+        img = plt.imread(inset)
+        ax.imshow(img)
+        ax.axis('off')
 
-    # get the best, worst and average I(Q)
-    best_X2 = x2rg_df.X2.min()
-    best_series = x2rg_df[x2rg_df.X2 == best_X2]
-    i_best = best_series.index[0] + 1 # first column is the Q values
     if i0:
         all_data_iq = all_data_iq[1:]
         goal_iq = goal_iq[1:]
 
-    best = all_data_iq[:,i_best]
-    worst_X2 = x2rg_df.X2.max()
-    worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
-    i_worst = worst_series.index[0] + 1 # first column is the Q values
-    worst = all_data_iq[:,i_worst]
-    average = all_data_iq[:,1:].mean(axis=1)
-    colors = gp.color_order  # gp.qual_color
+    # get the best, worst and average I(Q)
+    ax2 = plt.subplot(gs1[:, 1])
+    ax2.text(-0.05, -0.1, '(b)', verticalalignment='bottom',
+            horizontalalignment='left', transform=ax2.transAxes)
 
-    ax = plt.subplot(132)
-    plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
     # plot errorbar in two parts to get label order correct
-    ax.plot(goal_iq[:,0], goal_iq[:,1], 'o', ms=8, mfc='none',
-            edgecolor=colors(0), label='exp')
+    ax2.plot(goal_iq[:,0], goal_iq[:,1], 'o', ms=8, mfc='none',
+            mec=colors(0), label='exp')
                 # label='exp', ms=8, mfc='none', color='b')
-    ax.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = None, color='blue')
+    ax2.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = None,
+                ecolor=colors(0))
 
-    ax.plot(all_data_iq[:,0], best[:], '-', mfc='none', ms=8,
-            c=colors(1), mec=colors(1), linewidth=2,
-            label='best (%d)' % i_best)
+    best_X2 = x2rg_df.X2.min()
+    if 3 == all_data_iq.shape[1]:
+        best = all_data_iq[:, 1]
+    else:
+        best_series = x2rg_df[x2rg_df.X2 == best_X2]
+        i_best = best_series.index[0] + 1 # first column is the Q values
+        best = all_data_iq[:, i_best]
+    ax2.plot(all_data_iq[:,0], best[:], '-', mfc='none', ms=8,
+            c=colors(1), linewidth=2, label=(r'best $X^2$= %0.1f' % best_X2))
 
-    ax.plot(all_data_iq[:,0], average[:], '-', mfc='none', ms=8,
-            c=colors(2), mec=colors(2), linewidth=2,
-            label='average')
+    # average = all_data_iq[:,1:].mean(axis=1)
+    # ax2.plot(all_data_iq[:,0], average[:], '-', mfc='none', ms=8,
+            # c=colors(3), linewidth=2,
+            # label='average')
 
-    ax.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8,
-            c=colors(3), mec=colors(3), linewidth=2,
-            label='worst (%d)' % i_worst)
+    worst_X2 = x2rg_df.X2.max()
+    if 3 == all_data_iq.shape[1]:
+        worst = all_data_iq[:, 2]
+    else:
+        worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
+        i_worst = worst_series.index[0] + 1 # first column is the Q values
+        worst = all_data_iq[:,i_worst]
+    ax2.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8,
+            c=colors(2), linewidth=2, label=(r'worst $X^2$= %0.1f' % worst_X2))
+
     plt.xlabel(r'$Q (\AA^{-1})$')
-
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
-    gp.zoomout(ax, 0.1)
+    gp.zoomout(ax2, 0.1)
+    ax2.get_yaxis().set_ticks([])
+    ax2.xaxis.labelpad = -10
+    ax2.yaxis.labelpad = -1
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
     best_colors = [colors(1), colors(8), colors(9)]
 
-    ax = plt.subplot(133)
-    img = mpimg.imread(density_plot)
-    imgplot = plt.imshow(img)
+    gs2 = GridSpec(2, 1, left=0.75, bottom=0, right=1, top=1,
+                        wspace=0, hspace=0)
+    ax3 = plt.subplot(gs2[0, 0])
+    ax3.text(0.01, 0.05, '(c)', verticalalignment='bottom',
+               horizontalalignment='left', transform=ax3.transAxes)
+    # img1 = mpimg.imread(density_plots[0])
+    img1 = plt.imread(density_plots[0])
+    ax3.imshow(img1)
+    ax3.tick_params(axis='both', which='both', bottom='off', top='off',
+                      labelbottom='off', right='off', left='off', labelleft='off')
+    ax3.axis('off')
 
-    show = True
+    ax4 = plt.subplot(gs2[1, 0])
+    ax4.text(0.01, 0.04, '(d)', verticalalignment='bottom',
+               horizontalalignment='left', transform=ax4.transAxes)
+    # img2 = mpimg.imread(density_plots[1])
+    img2 = plt.imread(density_plots[1])
+    ax4.imshow(img2)
+    ax4.tick_params(axis='both', which='both', bottom='off', top='off',
+                      labelbottom='off', right='off', left='off', labelleft='off')
+    ax4.axis('off')
+
+    show = False
     if show:
         plt.show()
     else:
-        fig_file_name = op.join(os.getcwd(), prefix + data_file + '_fit.eps')
-        # plt.savefig(fig_file_name[:-3] + 'png')
-        print 'storing fit plot as: %s' % fig_file_name
+        out_file = 'result.eps'
+        if prefix:
+            out_file = '%s_%s' % (prefix, out_file)
+        fig_file_name = op.join(os.getcwd(), out_file)
+        print 'storing pub plot as: %s' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, bbox_inches='tight')
-
-    return
 
 
 if __name__ == '__main__':
