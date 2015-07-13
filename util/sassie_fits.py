@@ -13,11 +13,17 @@
 import logging
 LOGGER = logging.getLogger(__name__) #add module name manually
 
-import sys, os, glob, locale, errno, pickle, re, subprocess
-import os.path as op
+# import sys
+import os
+import glob
+import locale
+import errno
+# import re
+# import subprocess
+import shutil
 import numpy as np
 import pandas as pd
-from pandas import Series, DataFrame
+# from pandas import Series, DataFrame
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -27,6 +33,7 @@ import x_dna.util.gw_plot as gp
 import x_dna.drivers.myAlign as align
 import x_dna.util.plt_inset as plt_inset
 debug = True
+op = os.path
 
 class MainError(Exception):
     pass
@@ -1558,7 +1565,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     return
 
 def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
-             inset_loc=[], prefix='', i0=False, cutoff=None):
+             inset_loc=[], prefix='', i0=False, cutoff=None, show = False):
     from matplotlib.gridspec import GridSpec
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
@@ -1566,7 +1573,10 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
     plt.close()
     colors = gp.color_order  # gp.qual_color
 
-    fig = plt.figure(figsize=(11, 4))
+    inset_fontsize = 11
+    default_fontsize = 13
+
+    fig = plt.figure(figsize=(10, 3.5))
     # # ~~ code for adding and positioning a suptitle ~~
     # plt.suptitle(data_file, fontsize=14)
     # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
@@ -1575,23 +1585,27 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
     gs1 =  GridSpec(1, 2, left=0.075, right=0.75, wspace=0.1, hspace=0,
                     top=0.95)
     ax1 = plt.subplot(gs1[:, 0])
-    ax1.text(0.6, 0.01, '%d structures' % n_total, verticalalignment='bottom',
-            horizontalalignment='left', transform=ax1.transAxes)
-
-    ax1.text(-0.05, -0.1, '(a)', verticalalignment='bottom',
-            horizontalalignment='left', transform=ax1.transAxes)
-    ax1.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=colors(0), mfc='none')
-    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
-    # plt.xlim(rg_range)
-    plt.ylabel(r'$X^2$')
-    plt.xlabel(r'$R_g$')
-    ax1.xaxis.set_major_formatter(plt.NullFormatter())
+    best_wrst_titles = [r'best $\chi^2$ model', r'worst $\chi^2$ model']
     for (i, inset) in enumerate(inset_files):
         ax = plt_inset.add_inset(ax1, inset_loc[i], axisbg='None')
         # img = mpimg.imread(inset)
         img = plt.imread(inset)
         ax.imshow(img)
         ax.axis('off')
+        ax.set_title(best_wrst_titles[i],fontsize=inset_fontsize, y=0.92)
+    ax1.text(0.6, 0.01, '%d structures' % n_total, verticalalignment='bottom',
+             horizontalalignment='left', transform=ax1.transAxes,
+             fontsize=inset_fontsize)
+    ax1.text(-0.03, -0.15, '(a)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax1.transAxes,
+             fontsize=default_fontsize)
+    ax1.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=colors(0), mfc='none')
+    # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
+    # plt.xlim(rg_range)
+    ax1.set_ylabel(r'$X^2$', fontsize=default_fontsize)
+    ax1.set_xlabel(r'$R_g$', fontsize=default_fontsize)
+    ax1.set_zorder(ax.get_zorder()+1) # put ax1 in front of ax
+    ax1.patch.set_visible(False) # hide the 'canvas'
 
     if i0:
         all_data_iq = all_data_iq[1:]
@@ -1599,8 +1613,9 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 
     # get the best, worst and average I(Q)
     ax2 = plt.subplot(gs1[:, 1])
-    ax2.text(-0.05, -0.1, '(b)', verticalalignment='bottom',
-            horizontalalignment='left', transform=ax2.transAxes)
+    ax2.text(-0.03, -0.15, '(b)', verticalalignment='bottom',
+            horizontalalignment='left', transform=ax2.transAxes,
+            fontsize=default_fontsize)
 
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:,0], goal_iq[:,1], 'o', ms=8, mfc='none',
@@ -1631,19 +1646,20 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
         i_worst = worst_series.index[0] + 1 # first column is the Q values
         worst = all_data_iq[:,i_worst]
-    ax2.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8,
-            c=colors(2), linewidth=2, label=(r'worst $X^2$= %0.1f' % worst_X2))
+    ax2.plot(all_data_iq[:,0], worst[:], '-', mfc='none', ms=8, c=colors(2),
+             linewidth=2, label=(r'worst $X^2$= %0.1f' % worst_X2))
 
-    plt.xlabel(r'$Q (\AA^{-1})$')
-    plt.ylabel(r'$I(Q)$')
+    plt.xlabel(r'$Q (\AA^{-1})$', fontsize=default_fontsize)
+    plt.ylabel(r'$I(Q)$', fontsize=default_fontsize)
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
     gp.zoomout(ax2, 0.1)
     ax2.get_yaxis().set_ticks([])
-    ax2.xaxis.labelpad = -10
+    ax2.xaxis.labelpad = -1
     ax2.yaxis.labelpad = -1
-    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1,
+                    prop={'size': default_fontsize})
     lg.draw_frame(False)
 
     best_colors = [colors(1), colors(8), colors(9)]
@@ -1652,7 +1668,8 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
                         wspace=0, hspace=0)
     ax3 = plt.subplot(gs2[0, 0])
     ax3.text(0.01, 0.05, '(c)', verticalalignment='bottom',
-               horizontalalignment='left', transform=ax3.transAxes)
+               horizontalalignment='left', transform=ax3.transAxes,
+               fontsize=default_fontsize)
     # img1 = mpimg.imread(density_plots[0])
     img1 = plt.imread(density_plots[0])
     ax3.imshow(img1)
@@ -1661,8 +1678,9 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
     ax3.axis('off')
 
     ax4 = plt.subplot(gs2[1, 0])
-    ax4.text(0.01, 0.04, '(d)', verticalalignment='bottom',
-               horizontalalignment='left', transform=ax4.transAxes)
+    ax4.text(0.01, 0.02, '(d)', verticalalignment='bottom',
+               horizontalalignment='left', transform=ax4.transAxes,
+               fontsize=default_fontsize)
     # img2 = mpimg.imread(density_plots[1])
     img2 = plt.imread(density_plots[1])
     ax4.imshow(img2)
@@ -1670,7 +1688,6 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
                       labelbottom='off', right='off', left='off', labelleft='off')
     ax4.axis('off')
 
-    show = False
     if show:
         plt.show()
     else:
@@ -1680,7 +1697,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         fig_file_name = op.join(os.getcwd(), out_file)
         print 'storing pub plot as: %s' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
-        plt.savefig(fig_file_name, bbox_inches='tight')
+        plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
 
 if __name__ == '__main__':
@@ -1764,10 +1781,68 @@ if __name__ == '__main__':
         # array_types = ['tet']
         array_types = ['tri']
         # array_types = ['h5']
-        i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
-        i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid points
-        evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
-                    cutoff=350, best_dcd=False, q_base=2, i0=i0, s=True,
-                    o=True, fresh=True)
+        # i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
+        # i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid points
+        i0 = False; ns = {'di': 50, 'tri': 50,'tet': 50, 'h5': 50}  # Q grid points
+
+        best_dcd = False
+        maxX2 = 4.5
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        ns, cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        q_base=2, i0=i0, fresh=False))
+
+        for (i, data_file) in enumerate(all_data_files):
+            best_X2 = all_x2rg_dfs[i].X2.min()
+            best_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == best_X2]
+            i_best = best_series.index[0] + 1 # first column is the Q values
+            wrst_X2 = all_x2rg_dfs[i].X2.max()
+            wrst_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == wrst_X2]
+            i_worst = wrst_series.index[0] + 1 # first column is the Q values
+
+            all_x2rg_dfs[i].index.name = 'index'
+            all_x2rg_dfs[i].to_csv(data_file + '_x2rg.csv', sep=',')
+            np.savetxt(data_file + '_bst_wrst.iq',
+                       all_data_iqs[i][:, [0, i_best, i_worst]],
+                       header='Q, best I(Q), worst I(Q)')
+            np.savetxt(data_file + '_exp.iq', all_goal_iqs[i],
+                       header='Q, I(Q), Error I(Q)')
+
+            # save the best and worst dcd frame as a pdb
+            mol = sasmol.SasMol(0)
+            random_pdb = glob.glob(op.join(sassie_run_dir, op.split(
+                best_series.iloc[0]['run'])[0], '*.pdb'))[0]
+            mol.read_pdb(random_pdb)
+
+            best_mc_dir = op.join(sassie_run_dir, best_series.iloc[0]['run'],
+                                  'monte_carlo')
+            best_dcd = glob.glob(op.join(best_mc_dir, '*.dcd'))
+            assert len(best_dcd) == 1, 'ERROR: multiple dcd in %s' % best_mc_dir
+            best_dcd = best_dcd[0]
+            mol.read_single_dcd_step(best_dcd, best_series.iloc[0]['id'])
+            mol.write_pdb(data_file + '_best.pdb', 0, 'w')
+
+            wrst_mc_dir = op.join(sassie_run_dir, wrst_series.iloc[0]['run'],
+                                  'monte_carlo')
+            wrst_dcd = glob.glob(op.join(wrst_mc_dir, '*.dcd'))
+            assert len(wrst_dcd) == 1, 'ERROR: multiple dcd in %s' % wrst_mc_dir
+            wrst_dcd = wrst_dcd[0]
+            mol.read_single_dcd_step(wrst_dcd, wrst_series.iloc[0]['id'])
+            mol.write_pdb(data_file + '_wrst.pdb', 0, 'w')
+
+            # cp the psf-file to local directory
+            random_psf = glob.glob(op.join(sassie_run_dir, op.split(
+                best_series.iloc[0]['run'])[0], '*.psf'))[0]
+            shutil.copy(random_psf, './')
+
+        density_plots = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167face_x2_lt_4p5_6A_voxels.png',
+                          '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167side_x2_lt_4p5_6A_voxels.png']]
+        best_wrst = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_best_face.tga',
+                       '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_wrst_side.tga']]
+        inset_loc = [[[0.1, 0.2, 0.3, 0.3], [0.5, 0.6, 0.3, 0.3]]]
+        pub_plot(all_x2rg_dfs[0], all_data_iqs[0], all_goal_iqs[0],
+                             density_plots[0], prefix=all_data_files[0],
+                             inset_files = best_wrst[0], inset_loc=inset_loc[0])
+
 
     print '\m/ >.< \m/'
