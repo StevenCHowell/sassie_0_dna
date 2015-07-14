@@ -27,7 +27,6 @@ import pandas as pd
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import matplotlib.image as mpimg
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
 import x_dna.drivers.myAlign as align
@@ -1564,6 +1563,55 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     return
 
+def auto_crop(img):
+    if img.max() == 255:
+        white = 255 * 3
+    elif img.max() == 1.0:
+        white = 1.0 * 3
+    else:
+        print 'WARNING: no white pixels in image, error possible'
+        return img
+
+    r, c = img.shape[0:2]
+    val_white_row = white * c
+    val_white_col = white * r
+    white_rows = [i for i in xrange(r) if img[i,:].sum() == val_white_row]
+    white_cols = [j for j in xrange(c) if img[:,j].sum() == val_white_col]
+
+    return np.delete(np.delete(img, white_cols, axis=1), white_rows, axis=0)
+
+def auto_crop_group(images):
+    n_images = len(images)
+    white_rows = [None] * n_images
+    white_cols = [None] * n_images
+    r = [None] * n_images
+    c = [None] * n_images
+    size = [None] * n_images
+
+    for (k, img) in enumerate(images):
+        if img.max() == 255:
+            white = 255 * 3
+        elif img.max() == 1.0:
+            white = 1.0 * 3
+        else:
+            print 'WARNING: no white pixels in image %d, error possible', k
+        r[k], c[k] = img.shape[0:2]
+        val_white_row = white * c[k]
+        val_white_col = white * r[k]
+        white_rows[k] = [i for i in xrange(r[k])
+                         if img[i,:].sum() == val_white_row]
+        white_cols[k] = [i for i in xrange(c[k])
+                         if img[:,i].sum() == val_white_col]
+
+    crop_rows = [i for i in white_rows[0] for wr in white_rows[1:] if i in wr]
+    crop_cols = [i for i in white_cols[0] for wc in white_cols[1:] if i in wc]
+
+    for (k, img) in enumerate(images):
+        images[k] = np.delete(np.delete(img, crop_cols, axis=1),
+                               crop_rows[k], axis=0)
+
+    return images
+
 def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
              inset_loc=[], prefix='', i0=False, cutoff=None, show = False):
     from matplotlib.gridspec import GridSpec
@@ -1586,13 +1634,18 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
                     top=0.95)
     ax1 = plt.subplot(gs1[:, 0])
     best_wrst_titles = [r'best $\chi^2$ model', r'worst $\chi^2$ model']
-    for (i, inset) in enumerate(inset_files):
+    inset_images = auto_crop_group([plt.imread(inset_files[0]),
+                                    plt.imread(inset_files[1])])
+    for (i, img) in enumerate(inset_images):
         ax = plt_inset.add_inset(ax1, inset_loc[i], axisbg='None')
-        # img = mpimg.imread(inset)
-        img = plt.imread(inset)
-        ax.imshow(img)
+        mask = np.tile(np.atleast_3d(np.any(img != 255, axis=2)),
+                      (1, 1, img.shape[2])) # this should mask the white
+        img = np.ma.masked_where(mask, img)
+        ax.imshow(img, interpolation='none')
         ax.axis('off')
-        ax.set_title(best_wrst_titles[i],fontsize=inset_fontsize, y=0.92)
+        ax.set_title(best_wrst_titles[i],fontsize=inset_fontsize, y=0.95)
+        ax.patch.set_visible(False) # hide the 'canvas'
+
     ax1.text(0.6, 0.01, '%d structures' % n_total, verticalalignment='bottom',
              horizontalalignment='left', transform=ax1.transAxes,
              fontsize=inset_fontsize)
@@ -1600,6 +1653,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
              horizontalalignment='left', transform=ax1.transAxes,
              fontsize=default_fontsize)
     ax1.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=colors(0), mfc='none')
+
     # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
     # plt.xlim(rg_range)
     ax1.set_ylabel(r'$X^2$', fontsize=default_fontsize)
@@ -1664,26 +1718,25 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 
     best_colors = [colors(1), colors(8), colors(9)]
 
-    gs2 = GridSpec(2, 1, left=0.75, bottom=0, right=1, top=1,
+    gs2 = GridSpec(2, 1, left=0.76, bottom=0.01, right=0.99, top=0.99,
                         wspace=0, hspace=0)
     ax3 = plt.subplot(gs2[0, 0])
     ax3.text(0.01, 0.05, '(c)', verticalalignment='bottom',
                horizontalalignment='left', transform=ax3.transAxes,
                fontsize=default_fontsize)
-    # img1 = mpimg.imread(density_plots[0])
-    img1 = plt.imread(density_plots[0])
-    ax3.imshow(img1)
-    ax3.tick_params(axis='both', which='both', bottom='off', top='off',
-                      labelbottom='off', right='off', left='off', labelleft='off')
-    ax3.axis('off')
-
     ax4 = plt.subplot(gs2[1, 0])
-    ax4.text(0.01, 0.02, '(d)', verticalalignment='bottom',
-               horizontalalignment='left', transform=ax4.transAxes,
-               fontsize=default_fontsize)
-    # img2 = mpimg.imread(density_plots[1])
-    img2 = plt.imread(density_plots[1])
+    ax4.text(0.01, 0.09, '(d)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax4.transAxes,
+             fontsize=default_fontsize)
+
+    img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
+                                  plt.imread(density_plots[1])])
+    ax3.imshow(img1)
     ax4.imshow(img2)
+
+    ax3.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax3.axis('off')
     ax4.tick_params(axis='both', which='both', bottom='off', top='off',
                       labelbottom='off', right='off', left='off', labelleft='off')
     ax4.axis('off')
