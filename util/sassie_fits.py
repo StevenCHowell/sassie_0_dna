@@ -13,13 +13,11 @@
 import logging
 LOGGER = logging.getLogger(__name__) #add module name manually
 
-import os, glob, locale, errno
-import shutil
+import os, glob, locale, errno, shutil
 import numpy as np
 import pandas as pd
 from scipy import interpolate
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 from matplotlib.gridspec import GridSpec
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
@@ -310,9 +308,9 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
             iq_scale[j] = 0
 
     res_dict = {'Rg':Rg, 'X2':X2, 'scale':iq_scale, 'offset':iq_offset, 'labels':labels}
-    result_df = DataFrame(res_dict, index=range(1,nf))
+    result_df = pd.DataFrame(res_dict, index=range(1,nf))
     result_df.index.name = 'id'
-    iq_df = DataFrame(match_iq, columns=['Q']+labels)
+    iq_df = pd.DataFrame(match_iq, columns=['Q']+labels)
     # save output to filter directory
     mkdir_p(filter_dir)
     if not out_file:
@@ -1033,7 +1031,7 @@ def fig_sub_rg_v_conc(show=False):
     tet_labels.append(r'H5 1mM $Mg^{2+}$')
 
     fig = plt.figure(figsize = (13, 10))
-    gs1 = gridspec.GridSpec(2, 2)
+    gs1 = GridSpec(2, 2)
     gs1.update(hspace=0)
     x_range = [-0.05, 1.5]
 
