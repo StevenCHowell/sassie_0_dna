@@ -13,20 +13,14 @@
 import logging
 LOGGER = logging.getLogger(__name__) #add module name manually
 
-# import sys
-import os
-import glob
-import locale
-import errno
-# import re
-# import subprocess
+import os, glob, locale, errno
 import shutil
 import numpy as np
 import pandas as pd
-# from pandas import Series, DataFrame
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib.gridspec import GridSpec
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
 import x_dna.drivers.myAlign as align
@@ -511,6 +505,14 @@ def get_X2(rf_data, mt_data):
     er2 = rf_data[:,2] * rf_data[:,2]
     X2 = (diff2 / er2).sum()/len(rf_data)
     return X2
+
+def get_X2_components(rf_data, mt_data):
+    diff = mt_data[:,1] - rf_data[:,1]
+    diff2 = diff * diff
+    er2 = rf_data[:,2] * rf_data[:,2]
+    components = (diff2 / er2)/len(rf_data)
+    X2 = components.sum()
+    return X2, components
 
 def scale_offset(in_data, rf_data):
     """
@@ -1555,13 +1557,79 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     if show:
         plt.show()
     else:
-        fig_file_name = op.join(os.getcwd(), prefix + data_file + '_fit.eps')
+        fig_file_name = op.join(os.getcwd(), '%s_%s_fit.eps' %
+                                (prefix, data_file))
         # plt.savefig(fig_file_name[:-3] + 'png')
         print 'storing fit plot as: %s' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, bbox_inches='tight')
 
-    return
+    plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
+                       prefix=(prefix + '_' + data_file))
+
+def plot_x2_components(rf_data, mt_data, prefix=None, show=False):
+    '''
+    plot the point-by-point components of the X^2 summation
+    '''
+    colors = gp.color_order # gp.qual_color
+    x2, components = get_X2_components(rf_data, mt_data)
+    components *= 100/x2
+    plt.figure(figsize=(4, 3))
+    default_fontsize = 13
+    if prefix:
+        plt.suptitle(prefix)
+    gs1 = GridSpec(4, 1, left=0.1, right=0.925, bottom=0.075, top=0.925,
+                   hspace=0, wspace=0)
+    ax1 = plt.subplot(gs1[:3, :])
+    ax1.plot(rf_data[:,0], rf_data[:,1], 'o', ms=8, mfc='none',
+             mec=colors(0), label='exp')
+                # label='exp', ms=8, mfc='none', color='b')
+    ax1.errorbar(rf_data[:,0], rf_data[:,1], rf_data[:,2], fmt = None,
+                 ecolor=colors(0))
+    ax1.plot(mt_data[:,0], mt_data[:,1], '-', mfc='none', ms=8,
+             c=colors(1), linewidth=2, label=(r'best $X^2$= %0.1f' % x2))
+    plt.ylabel(r'$I(Q)$', fontsize=default_fontsize)
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.axis('tight')
+    gp.zoomout(ax1, 0.1)
+    ax1.get_yaxis().set_ticks([])
+    ax1.yaxis.labelpad = -.5
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1,
+                    prop={'size': default_fontsize})
+    lg.draw_frame(False)
+    xlim = ax1.get_xlim()
+    ax2 = plt.subplot(gs1[3, :])
+    width_vals = np.copy(mt_data[:,0])
+    width_vals[:-1] = mt_data[1:,0]-mt_data[:-1,0]
+    width_vals[-1] = width_vals[-2]
+    rects = ax2.bar(mt_data[:,0] - width_vals/2, components, width=width_vals, color=colors(0))
+    for rect in rects:
+        height = rect.get_height()
+        label = int(round(height))
+        if label > 1:
+            ax2.text(rect.get_x()+rect.get_width()/2., 1.05*height,
+                     str(label), ha='center', va='bottom')
+    ax2.set_xscale('log')
+    gp.zoomout(ax2, 0.7)
+    ylim = ax2.get_ylim()
+    ax2.set_ylim([0, ylim[1]])
+    ax2.set_xlim(xlim)
+    ax2.set_xlabel(r'$Q (\AA^{-1})$', fontsize=default_fontsize)
+    ax2.set_ylabel(r'% of X$^2$', fontsize=default_fontsize)
+    ax2.get_yaxis().set_ticks([])
+    ax2.xaxis.labelpad = -10
+    ax2.yaxis.labelpad = -.5
+    if show:
+        plt.show()
+    else:
+        out_file = 'x2_comp.eps'
+        if prefix:
+            out_file = '%s_%s' % (prefix, out_file)
+        fig_file_name = op.join(os.getcwd(), out_file)
+        print 'storing X2 component plot as: %s' % fig_file_name
+        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+        plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
 def auto_crop(img):
     if img.max() == 255:
@@ -1614,7 +1682,6 @@ def auto_crop_group(images):
 
 def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
              inset_loc=[], prefix='', i0=False, cutoff=None, show = False):
-    from matplotlib.gridspec import GridSpec
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
     x2rg_best = x2rg_df.sort('X2')[:n_best]
@@ -1630,7 +1697,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
     # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
                         # wspace = 0.2, hspace = 0.2)
 
-    gs1 =  GridSpec(1, 2, left=0.075, right=0.75, wspace=0.1, hspace=0,
+    gs1 = GridSpec(1, 2, left=0.075, right=0.75, wspace=0.1, hspace=0,
                     top=0.95)
     ax1 = plt.subplot(gs1[:, 0])
     best_wrst_titles = [r'best $\chi^2$ model', r'worst $\chi^2$ model']
@@ -1673,10 +1740,10 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:,0], goal_iq[:,1], 'o', ms=8, mfc='none',
-            mec=colors(0), label='exp')
+             mec=colors(0), label='exp')
                 # label='exp', ms=8, mfc='none', color='b')
     ax2.errorbar(goal_iq[:,0], goal_iq[:,1], goal_iq[:,2], fmt = None,
-                ecolor=colors(0))
+                 ecolor=colors(0))
 
     best_X2 = x2rg_df.X2.min()
     if 3 == all_data_iq.shape[1]:
@@ -1752,6 +1819,50 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
+def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
+                sassie_run_dir):
+    for (i, data_file) in enumerate(all_data_files):
+        best_X2 = all_x2rg_dfs[i].X2.min()
+        best_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == best_X2]
+        i_best = best_series.index[0] + 1 # first column is the Q values
+        wrst_X2 = all_x2rg_dfs[i].X2.max()
+        wrst_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == wrst_X2]
+        i_worst = wrst_series.index[0] + 1 # first column is the Q values
+
+        all_x2rg_dfs[i].index.name = 'index'
+        all_x2rg_dfs[i].to_csv(data_file + '_x2rg.csv', sep=',')
+        np.savetxt(data_file + '_bst_wrst.iq',
+                   all_data_iqs[i][:, [0, i_best, i_worst]],
+                   header='Q, best I(Q), worst I(Q)')
+        np.savetxt(data_file + '_exp.iq', all_goal_iqs[i],
+                   header='Q, I(Q), Error I(Q)')
+
+        # save the best and worst dcd frame as a pdb
+        mol = sasmol.SasMol(0)
+        random_pdb = glob.glob(op.join(sassie_run_dir, op.split(
+            best_series.iloc[0]['run'])[0], '*.pdb'))[0]
+        mol.read_pdb(random_pdb)
+
+        best_mc_dir = op.join(sassie_run_dir, best_series.iloc[0]['run'],
+                              'monte_carlo')
+        best_dcd = glob.glob(op.join(best_mc_dir, '*.dcd'))
+        assert len(best_dcd) == 1, 'ERROR: multiple dcd in %s' % best_mc_dir
+        best_dcd = best_dcd[0]
+        mol.read_single_dcd_step(best_dcd, best_series.iloc[0]['id'])
+        mol.write_pdb(data_file + '_best.pdb', 0, 'w')
+
+        wrst_mc_dir = op.join(sassie_run_dir, wrst_series.iloc[0]['run'],
+                              'monte_carlo')
+        wrst_dcd = glob.glob(op.join(wrst_mc_dir, '*.dcd'))
+        assert len(wrst_dcd) == 1, 'ERROR: multiple dcd in %s' % wrst_mc_dir
+        wrst_dcd = wrst_dcd[0]
+        mol.read_single_dcd_step(wrst_dcd, wrst_series.iloc[0]['id'])
+        mol.write_pdb(data_file + '_wrst.pdb', 0, 'w')
+
+        # cp the psf-file to local directory
+        random_psf = glob.glob(op.join(sassie_run_dir, op.split(
+            best_series.iloc[0]['run'])[0], '*.psf'))[0]
+        shutil.copy(random_psf, './')
 
 if __name__ == '__main__':
     test = False
@@ -1845,48 +1956,8 @@ if __name__ == '__main__':
                         ns, cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
                         q_base=2, i0=i0, fresh=False))
 
-        for (i, data_file) in enumerate(all_data_files):
-            best_X2 = all_x2rg_dfs[i].X2.min()
-            best_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == best_X2]
-            i_best = best_series.index[0] + 1 # first column is the Q values
-            wrst_X2 = all_x2rg_dfs[i].X2.max()
-            wrst_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == wrst_X2]
-            i_worst = wrst_series.index[0] + 1 # first column is the Q values
-
-            all_x2rg_dfs[i].index.name = 'index'
-            all_x2rg_dfs[i].to_csv(data_file + '_x2rg.csv', sep=',')
-            np.savetxt(data_file + '_bst_wrst.iq',
-                       all_data_iqs[i][:, [0, i_best, i_worst]],
-                       header='Q, best I(Q), worst I(Q)')
-            np.savetxt(data_file + '_exp.iq', all_goal_iqs[i],
-                       header='Q, I(Q), Error I(Q)')
-
-            # save the best and worst dcd frame as a pdb
-            mol = sasmol.SasMol(0)
-            random_pdb = glob.glob(op.join(sassie_run_dir, op.split(
-                best_series.iloc[0]['run'])[0], '*.pdb'))[0]
-            mol.read_pdb(random_pdb)
-
-            best_mc_dir = op.join(sassie_run_dir, best_series.iloc[0]['run'],
-                                  'monte_carlo')
-            best_dcd = glob.glob(op.join(best_mc_dir, '*.dcd'))
-            assert len(best_dcd) == 1, 'ERROR: multiple dcd in %s' % best_mc_dir
-            best_dcd = best_dcd[0]
-            mol.read_single_dcd_step(best_dcd, best_series.iloc[0]['id'])
-            mol.write_pdb(data_file + '_best.pdb', 0, 'w')
-
-            wrst_mc_dir = op.join(sassie_run_dir, wrst_series.iloc[0]['run'],
-                                  'monte_carlo')
-            wrst_dcd = glob.glob(op.join(wrst_mc_dir, '*.dcd'))
-            assert len(wrst_dcd) == 1, 'ERROR: multiple dcd in %s' % wrst_mc_dir
-            wrst_dcd = wrst_dcd[0]
-            mol.read_single_dcd_step(wrst_dcd, wrst_series.iloc[0]['id'])
-            mol.write_pdb(data_file + '_wrst.pdb', 0, 'w')
-
-            # cp the psf-file to local directory
-            random_psf = glob.glob(op.join(sassie_run_dir, op.split(
-                best_series.iloc[0]['run'])[0], '*.psf'))[0]
-            shutil.copy(random_psf, './')
+        save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
+                    sassie_run_dir)
 
         density_plots = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167face_x2_lt_4p5_6A_voxels.png',
                           '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167side_x2_lt_4p5_6A_voxels.png']]
