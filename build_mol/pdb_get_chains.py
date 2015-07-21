@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # Author:  Steven C. Howell
 # Purpose: Prepare PDB for modeling
 # Created: 24 April 2014
@@ -20,29 +20,35 @@ import sassie.sasmol.sasmol as sasmol
 import numpy as np
 import pdb_get_sequence
 
+
 def main():
     ''' preprocessing for commandline executions'''
     import logging
     import argparse
     if '-v' in sys.argv:
-        logging.basicConfig(filename='_log-%s' %__name__, level=logging.DEBUG)
+        logging.basicConfig(filename='_log-%s' % __name__, level=logging.DEBUG)
     else:
         logging.basicConfig()
 
-    parser = argparse.ArgumentParser(#prog='', #usage='',
-        description = 'Separate the PDB into individual PDB and Sequence files by segname',
+    parser = argparse.ArgumentParser(  # prog='', #usage='',
+        description='Separate the PDB into individual PDB and Sequence files by segname',
     )
 
     parser.add_argument("-p", "--pdbfile", help="all atom pdb file")
-    parser.add_argument("-o", "--outfile", nargs='?', help="prefix of outfile to save")
-    parser.add_argument("-g", "--get_seq", default=True, action='store_true', help="whether get sequence")
+    parser.add_argument(
+        "-o", "--outfile", nargs='?', help="prefix of outfile to save")
+    parser.add_argument("-g", "--get_seq", default=True,
+                        action='store_true', help="whether get sequence")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-s", "--segnames", nargs='+', help="segnames to extract")
-    group.add_argument("-c", "--chainids", nargs='+', help="segnames to extract")
+    group.add_argument(
+        "-s", "--segnames", nargs='+', help="segnames to extract")
+    group.add_argument(
+        "-c", "--chainids", nargs='+', help="segnames to extract")
 
     args = parser.parse_args()
-    return pdb_get_chains(args.pdbfile, outfile=args.outfile, 
+    return pdb_get_chains(args.pdbfile, outfile=args.outfile,
                           segnames=args.segnames, chainids=args.chainids, get_seq=args.get_seq)
+
 
 def pdb_get_chains(pdbobj=None, outfile='seg_', segnames=None, chainids=None, get_seq=True):
     ''' get the sequence of a sasmol object '''
@@ -69,19 +75,21 @@ def pdb_get_chains(pdbobj=None, outfile='seg_', segnames=None, chainids=None, ge
     for eachfilter in filter_name:
         print "Filter pdb by: ", filter_tmpl.format(eachfilter)
         error, mask = pdbobj.get_subset_mask(filter_tmpl.format(eachfilter))
-        if error: print error
+        if error:
+            print error
 
         eachfilter_mol = sasmol.SasMol(0)
         error = pdbobj.copy_molecule_using_mask(eachfilter_mol, mask, 0)
-        if error: print error
+        if error:
+            print error
 
-        #eachfilter_mol.setSegname(eachfilter)
-        eachfilter_mol.write_pdb(outfile+'.pdb', 0, 'w')
+        # eachfilter_mol.setSegname(eachfilter)
+        eachfilter_mol.write_pdb(outfile + '.pdb', 0, 'w')
         seg_mols.append(eachfilter_mol)
-        
+
         if get_seq:
             pdb_get_sequence.pdb_get_sequence(eachfilter_mol)
-        
+
         print 'COMPLETE'
     return seg_mols
 

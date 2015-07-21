@@ -7,7 +7,6 @@ ncp = sasmol.SasMol(0)
 ncp.read_pdb('1KX5tailfold_167bp.pdb')
 
 
-
 # protein chains
 # H3: A, E # E will conflict with the gH5 protein, try aligning A instead
 # H4: B, F

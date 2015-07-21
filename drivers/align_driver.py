@@ -14,11 +14,11 @@ note: inputs.ref and inputs.move can often be the same pdb
 '''
 
 dimer_dcds = ['2x167_k010/run0/monte_carlo/2x167_k010_4d_1k.dcd',
-            '2x167_k010/run1/monte_carlo/2x167_k010_10d_1k.dcd',
-            '2x167_k010/run2/monte_carlo/2x167_k010_10d_5k.dcd',
-            '2x167_k010/run3/monte_carlo/2x167_k010_10d_5k.dcd',
-            '2x167_k010/run5/monte_carlo/2x167_k010_7d_5k.dcd',
-            '2x167_k010/run4/monte_carlo/2x167_k010_7d_5k.dcd']
+              '2x167_k010/run1/monte_carlo/2x167_k010_10d_1k.dcd',
+              '2x167_k010/run2/monte_carlo/2x167_k010_10d_5k.dcd',
+              '2x167_k010/run3/monte_carlo/2x167_k010_10d_5k.dcd',
+              '2x167_k010/run5/monte_carlo/2x167_k010_7d_5k.dcd',
+              '2x167_k010/run4/monte_carlo/2x167_k010_7d_5k.dcd']
 
 trimer_dcds = ['3x167_k010/run0/monte_carlo/3x167_k010_10d_1k.dcd',
                '3x167_k010/run1/monte_carlo/3x167_k010_4d_1k.dcd',

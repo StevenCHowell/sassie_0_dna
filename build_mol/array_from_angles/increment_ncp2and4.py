@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 """
   Author:  Steven C. Howell
   Purpose: construct gH5 nucleosome arrays incrementally twisting NCP 2 and 4
@@ -23,7 +23,7 @@ link_vars = build.inputs()
 link_vars.pdb = 'linker.pdb'
 link_vars.segnames = ['DNA1', 'DNA2']
 link_vars.resids = np.array([[1, 7], [2, 6], [7, 1]])
-link_vars.keep = [3,5]
+link_vars.keep = [3, 5]
 link_vars.ncp_resids = bps[ncp_link_match]
 
 pre_suf_vars = build.inputs()
@@ -47,28 +47,28 @@ phi = np.loadtxt(phi_file)
 dxyz = np.loadtxt(dxyz_file)
 
 adjust_ncp = build.inputs()
-adjust_ncp.mv_ncp = [1,3]
-adjust_ncp.origin = [1,3]
+adjust_ncp.mv_ncp = [1, 3]
+adjust_ncp.origin = [1, 3]
 adjust_ncp.method = 'twist'
 ncp_dna_resids = bps[[w601[0], w601[1]]]
-dyad_resids = bps[(w601[1] - w601[0])/2 + w601[0]]
+dyad_resids = bps[(w601[1] - w601[0]) / 2 + w601[0]]
 
-for i in xrange(-1,4):
+for i in xrange(-1, 4):
     adjust_ncp.angles = [i, i]
-    adjust_ncp.i_axes = [[1,0],[3,0]]
-    save_name = 'gH5x4_%s_n2n4_r24.pdb' % str(i).replace('-','m')
-    array = build.construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
-                                      ncp_dna_resids, dyad_resids, 
-                                      ref_atom_resid, link_vars, 
-                                      pre_suf_vars, save_name = save_name, 
-                                      adjust_ncp = adjust_ncp)
-    
+    adjust_ncp.i_axes = [[1, 0], [3, 0]]
+    save_name = 'gH5x4_%s_n2n4_r24.pdb' % str(i).replace('-', 'm')
+    array = build.construct_ncp_array(ncp, phi, dxyz, dna_segnames,
+                                      ncp_dna_resids, dyad_resids,
+                                      ref_atom_resid, link_vars,
+                                      pre_suf_vars, save_name=save_name,
+                                      adjust_ncp=adjust_ncp)
+
     # adjust_ncp.i_axes = [[1,0],[1,0]]
     # save_name = 'gH5x4_%s_n2n4_r22.pdb' % str(i).replace('-','m')
-    # array = build.construct_ncp_array(ncp, phi, dxyz, dna_segnames, 
-                                      # ncp_dna_resids, dyad_resids, 
-                                      # ref_atom_resid, link_vars, 
-                                      # pre_suf_vars, save_name = save_name, 
-                                      # adjust_ncp = adjust_ncp)
+    # array = build.construct_ncp_array(ncp, phi, dxyz, dna_segnames,
+    # ncp_dna_resids, dyad_resids,
+    # ref_atom_resid, link_vars,
+    # pre_suf_vars, save_name = save_name,
+    # adjust_ncp = adjust_ncp)
 
 print '\m/ >.< \m/'

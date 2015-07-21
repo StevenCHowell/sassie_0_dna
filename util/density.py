@@ -16,7 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 '''
-import os,sys,string,locale,bisect,time
+import os
+import sys
+import string
+import locale
+import bisect
+import time
 import numpy
 import sassie.sasmol.sasmol as sasmol
 import sassie.analyze.cube as cube
@@ -27,8 +32,8 @@ import sassie.analyze.renorm as renorm
 #       11/20/2005       --      initial coding                 :	jc
 #	03/15/2012	 --	 added segment based cube files :	jc
 #
-#LC      1         2         3         4         5         6         7
-#LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+# LC      1         2         3         4         5         6         7
+# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #                                                                      *      **
 '''
         DENSITY is the module that contains the functions
@@ -47,7 +52,8 @@ import sassie.analyze.renorm as renorm
 
 '''
 
-def print_failure(message,txtOutput):
+
+def print_failure(message, txtOutput):
 
     txtOutput.put("\n\n>>>> RUN FAILURE <<<<\n")
     txtOutput.put(">>>> RUN FAILURE <<<<\n")
@@ -56,30 +62,36 @@ def print_failure(message,txtOutput):
 
     return
 
+
 def unpack_variables(variables):
 
-    runname         = variables['runname'][0]
-    dcdfile         = variables['dcdfile'][0]
-    pdbfile         = variables['pdbfile'][0]
-    ofile           = variables['ofile'][0]
-    xlength         = variables['xlength'][0]
-    gridsp          = variables['gridsp'][0]
-    ylength         = variables['ylength'][0]
-    save_occupancy 	= variables['save_occupancy'][0]
-    zlength         = variables['zlength'][0]
-    nsegments       = variables['nsegments'][0]
-    equalweights    = variables['equalweights'][0]
-    weightsfile     = variables['weightsfile'][0]
+    runname = variables['runname'][0]
+    dcdfile = variables['dcdfile'][0]
+    pdbfile = variables['pdbfile'][0]
+    ofile = variables['ofile'][0]
+    xlength = variables['xlength'][0]
+    gridsp = variables['gridsp'][0]
+    ylength = variables['ylength'][0]
+    save_occupancy = variables['save_occupancy'][0]
+    zlength = variables['zlength'][0]
+    nsegments = variables['nsegments'][0]
+    equalweights = variables['equalweights'][0]
+    weightsfile = variables['weightsfile'][0]
 
-    return runname,dcdfile,pdbfile,ofile,xlength,gridsp,ylength,save_occupancy,zlength,nsegments,equalweights,weightsfile
+    return runname, dcdfile, pdbfile, ofile, xlength, gridsp, ylength, save_occupancy, zlength, nsegments, equalweights, weightsfile
 
-def process_input_variables(segvariables,nsegments):
+
+def process_input_variables(segvariables, nsegments):
 
     #nregions        = variables['nregions'][0]
     #lowregions      = variables['lowregions'][0]
     #highregions     = variables['highregions'][0]
 
-    allsnumregions = [] ; allslow = [] ; allshigh = [] ; allsbasis = [] ; allsname = []
+    allsnumregions = []
+    allslow = []
+    allshigh = []
+    allsbasis = []
+    allsname = []
 
     for i in range(len(segvariables)):
         allsnumregions.append(segvariables[i][0])
@@ -91,24 +103,27 @@ def process_input_variables(segvariables,nsegments):
     anregions = []
 
     for i in range(len(allsnumregions)):
-        nr=locale.atoi(allsnumregions[i])
+        nr = locale.atoi(allsnumregions[i])
         anregions.append(nr)
 
-    alow = [] ; ahigh = []
+    alow = []
+    ahigh = []
 
     for i in range(len(allslow)):
-        linlow=string.split(allslow[i],',')
-        linhigh=string.split(allshigh[i],',')
-        rlow=[] ; rhigh=[]
+        linlow = string.split(allslow[i], ',')
+        linhigh = string.split(allshigh[i], ',')
+        rlow = []
+        rhigh = []
         for k in range(len(linlow)):
-            tlow=locale.atoi(linlow[k])
-            thigh=locale.atoi(linhigh[k])
+            tlow = locale.atoi(linlow[k])
+            thigh = locale.atoi(linhigh[k])
             rlow.append(tlow)
             rhigh.append(thigh)
         alow.append(rlow)
         ahigh.append(rhigh)
 
-    return anregions,alow,ahigh,allsbasis,allsname
+    return anregions, alow, ahigh, allsbasis, allsname
+
 
 def stopme():
 
@@ -117,102 +132,125 @@ def stopme():
     print 'DEBUGGING CODE: STOPPING HERE\n\n'
     sys.exit()
 
-def write_cube_header(number_atoms,nxgp,nygp,nzgp,xmin,ymin,zmin,ang2au,gridsp,outfile,remark=''):
-    st1=remark+'SASSIE/GAUSSIAN CUBE FILE\n'
-    st2=remark+'OUTER LOOP: X, MIDDLE LOOP: Y, INNER LOOP: Z\n'
-    outfile.write(remark+'calpha_'+st1+st2)
-    outfile.write(remark+'%d\t%f\t%f\t%f\n' % (number_atoms,xmin*ang2au,ymin*ang2au,zmin*ang2au))
-    outfile.write(remark+'%d\t%f\t%f\t%f\n' % (nxgp,gridsp*ang2au,0.00,0.00))
-    outfile.write(remark+'%d\t%f\t%f\t%f\n' % (nygp,0.00,gridsp*ang2au,0.00))
-    outfile.write(remark+'%d\t%f\t%f\t%f\n' % (nzgp,0.00,0.00,gridsp*ang2au))
 
-def write_cube(m,fltr,nxgp,nygp,nzgp,abin,normbin,number_atoms,xmin,ymin,zmin,ang2au,gridsp,outfile,txtOutput):
+def write_cube_header(number_atoms, nxgp, nygp, nzgp, xmin, ymin, zmin, ang2au, gridsp, outfile, remark=''):
+    st1 = remark + 'SASSIE/GAUSSIAN CUBE FILE\n'
+    st2 = remark + 'OUTER LOOP: X, MIDDLE LOOP: Y, INNER LOOP: Z\n'
+    outfile.write(remark + 'calpha_' + st1 + st2)
+    outfile.write(remark + '%d\t%f\t%f\t%f\n' %
+                  (number_atoms, xmin * ang2au, ymin * ang2au, zmin * ang2au))
+    outfile.write(remark + '%d\t%f\t%f\t%f\n' %
+                  (nxgp, gridsp * ang2au, 0.00, 0.00))
+    outfile.write(remark + '%d\t%f\t%f\t%f\n' %
+                  (nygp, 0.00, gridsp * ang2au, 0.00))
+    outfile.write(remark + '%d\t%f\t%f\t%f\n' %
+                  (nzgp, 0.00, 0.00, gridsp * ang2au))
 
-    coor=m.coor()
-    name=m.name()
-    resid=m.resid()
-    segname=m.segname()
 
-    write_cube_header(number_atoms,nxgp,nygp,nzgp,xmin,ymin,zmin,ang2au,gridsp,outfile)
+def write_cube(m, fltr, nxgp, nygp, nzgp, abin, normbin, number_atoms, xmin, ymin, zmin, ang2au, gridsp, outfile, txtOutput):
+
+    coor = m.coor()
+    name = m.name()
+    resid = m.resid()
+    segname = m.segname()
+
+    write_cube_header(
+        number_atoms, nxgp, nygp, nzgp, xmin, ymin, zmin, ang2au, gridsp, outfile)
 
     for natom in range(len(name)):
         if eval(fltr):
-            outfile.write('%-7s %f\t%f\t%f\t%f\n' % ('12',0.00,coor[0,natom,0]*ang2au,coor[0,natom,1]*ang2au,coor[0,natom,2]*ang2au))
+            outfile.write('%-7s %f\t%f\t%f\t%f\n' % ('12', 0.00, coor[
+                          0, natom, 0] * ang2au, coor[0, natom, 1] * ang2au, coor[0, natom, 2] * ang2au))
 
     for i in range(nxgp):
 
-        if((((i+1)%nxgp)/10.0)==0 or (nxgp<10)):
-            fraction_done = (float(i+1)/float(nxgp))
-            progress_string='\nWROTE '+str(i+1)+' of '+str(nxgp)+' grid points : '+str(fraction_done*100.0)+' % done'
+        if((((i + 1) % nxgp) / 10.0) == 0 or (nxgp < 10)):
+            fraction_done = (float(i + 1) / float(nxgp))
+            progress_string = '\nWROTE ' + \
+                str(i + 1) + ' of ' + str(nxgp) + ' grid points : ' + \
+                str(fraction_done * 100.0) + ' % done'
             print('%s\n' % progress_string)
-            report_string='STATUS\t'+str(fraction_done)
+            report_string = 'STATUS\t' + str(fraction_done)
             txtOutput.put(report_string)
 
         for j in range(nygp):
             for k in range(nzgp):
-                outfile.write('%lf ' % (abin[i][j][k]*normbin))
-                if((k%6)==5) :
+                outfile.write('%lf ' % (abin[i][j][k] * normbin))
+                if((k % 6) == 5):
                     outfile.write('\n')
             outfile.write('\n')
 
-    filename=str(outfile).split("'")[1]
+    filename = str(outfile).split("'")[1]
     txtOutput.put("Wrote the density data to : %s\n\n" % filename)
 
 
-def write_occupancy(m,nxgp,nygp,nzgp,nsegments,anregions,cbin,sbin,arbin,number_atoms_full,number_atoms_segments,number_atoms_regions,allsbasis,allsname,alow,ahigh,xmin,ymin,zmin,ang2au,gridsp,outfile,txtOutput):
+def write_occupancy(m, nxgp, nygp, nzgp, nsegments, anregions, cbin, sbin, arbin, number_atoms_full, number_atoms_segments, number_atoms_regions, allsbasis, allsname, alow, ahigh, xmin, ymin, zmin, ang2au, gridsp, outfile, txtOutput):
 
-    coor=m.coor()
-    name=m.name()
-    resid=m.resid()
-    segname=m.segname()
+    coor = m.coor()
+    name = m.name()
+    resid = m.resid()
+    segname = m.segname()
 
-    fltr=''
+    fltr = ''
     for i in xrange(nsegments):
-        fltr += 'segname[natom] == "'+allsname[i]+'" and name[natom] == "'+allsbasis[i]+'"'
-        if i<(nsegments-1):
-            fltr+=' or '
+        fltr += 'segname[natom] == "' + allsname[i] + \
+            '" and name[natom] == "' + allsbasis[i] + '"'
+        if i < (nsegments - 1):
+            fltr += ' or '
     outfile.write('\n############################\n#Complete\n')
-    write_cube_header(number_atoms_full,nxgp,nygp,nzgp,xmin,ymin,zmin,ang2au,gridsp,outfile,remark='#')
+    write_cube_header(number_atoms_full, nxgp, nygp, nzgp,
+                      xmin, ymin, zmin, ang2au, gridsp, outfile, remark='#')
     for natom in range(len(name)):
         if eval(fltr):
-            outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12',0.00,coor[0,natom,0]*ang2au,coor[0,natom,1]*ang2au,coor[0,natom,2]*ang2au))
+            outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12', 0.00, coor[
+                          0, natom, 0] * ang2au, coor[0, natom, 1] * ang2au, coor[0, natom, 2] * ang2au))
 
     for ii in xrange(nsegments):
-        outfile.write('\n############################\n#Seg_%d  \n'%ii)
-        fltr="name[natom]=='"+allsbasis[ii]+"' and segname[natom]=='"+allsname[ii]+"'"
-        write_cube_header(number_atoms_segments[ii],nxgp,nygp,nzgp,xmin,ymin,zmin,ang2au,gridsp,outfile,remark='#')
+        outfile.write('\n############################\n#Seg_%d  \n' % ii)
+        fltr = "name[natom]=='" + allsbasis[ii] + \
+            "' and segname[natom]=='" + allsname[ii] + "'"
+        write_cube_header(number_atoms_segments[
+                          ii], nxgp, nygp, nzgp, xmin, ymin, zmin, ang2au, gridsp, outfile, remark='#')
         for natom in range(len(name)):
             if eval(fltr):
-                outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12',0.00,coor[0,natom,0]*ang2au,coor[0,natom,1]*ang2au,coor[0,natom,2]*ang2au))
+                outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12', 0.00, coor[
+                              0, natom, 0] * ang2au, coor[0, natom, 1] * ang2au, coor[0, natom, 2] * ang2au))
         for jj in range(anregions[ii]):
-            outfile.write('\n############################\n#Seg_%d_Reg_%d  \n'%(ii,jj))
-            write_cube_header(number_atoms_regions[ii][jj],nxgp,nygp,nzgp,xmin,ymin,zmin,ang2au,gridsp,outfile,remark='#')
-            fltr="name[natom]=='"+allsbasis[ii]+"' and segname[natom]=='"+allsname[ii]+"' and (resid[natom]>="+str(alow[ii][jj])+" and resid[natom]<="+str(ahigh[ii][jj])+")"
+            outfile.write(
+                '\n############################\n#Seg_%d_Reg_%d  \n' % (ii, jj))
+            write_cube_header(number_atoms_regions[ii][
+                              jj], nxgp, nygp, nzgp, xmin, ymin, zmin, ang2au, gridsp, outfile, remark='#')
+            fltr = "name[natom]=='" + allsbasis[ii] + "' and segname[natom]=='" + allsname[ii] + \
+                "' and (resid[natom]>=" + str(alow[ii][jj]) + \
+                " and resid[natom]<=" + str(ahigh[ii][jj]) + ")"
             for natom in range(len(name)):
                 if eval(fltr):
-                    outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12',0.00,coor[0,natom,0]*ang2au,coor[0,natom,1]*ang2au,coor[0,natom,2]*ang2au))
-
+                    outfile.write('#%-7s %f\t%f\t%f\t%f\n' % ('12', 0.00, coor[
+                                  0, natom, 0] * ang2au, coor[0, natom, 1] * ang2au, coor[0, natom, 2] * ang2au))
 
     outfile.write('\n############################\n')
     outfile.write('# X       Y        Z        Complete  ')
     for ii in xrange(nsegments):
         outfile.write('Seg_%d  ' % ii)
         for jj in range(anregions[ii]):
-            outfile.write('Seg_%d_Reg_%d ' % (ii,jj))
+            outfile.write('Seg_%d_Reg_%d ' % (ii, jj))
     outfile.write('\n')
 
     for i in range(nxgp):
 
-        if((((i+1)%nxgp)/10.0)==0 or (nxgp<10)):
-            fraction_done = (float(i+1)/float(nxgp))
-            progress_string='WROTE '+str(i+1)+' of '+str(nxgp)+' : '+str(fraction_done*100.0)+' % done'
+        if((((i + 1) % nxgp) / 10.0) == 0 or (nxgp < 10)):
+            fraction_done = (float(i + 1) / float(nxgp))
+            progress_string = 'WROTE ' + \
+                str(i + 1) + ' of ' + str(nxgp) + ' : ' + \
+                str(fraction_done * 100.0) + ' % done'
             print('%s\n' % progress_string)
-            report_string='STATUS\t'+str(fraction_done)
+            report_string = 'STATUS\t' + str(fraction_done)
             txtOutput.put(report_string)
 
         for j in range(nygp):
             for k in range(nzgp):
-                outfile.write('%8.3f %8.3f %8.3f ' % (xmin+i*gridsp,ymin+j*gridsp,zmin+k*gridsp))
+                outfile.write('%8.3f %8.3f %8.3f ' % (
+                    xmin + i * gridsp, ymin + j * gridsp, zmin + k * gridsp))
                 outfile.write('%.3e ' % (cbin[i][j][k]))
                 for ii in xrange(nsegments):
                     outfile.write('%.3e ' % sbin[ii][i][j][k])
@@ -220,17 +258,15 @@ def write_occupancy(m,nxgp,nygp,nzgp,nsegments,anregions,cbin,sbin,arbin,number_
                         outfile.write('%.3e ' % arbin[ii][jj][i][j][k])
                 outfile.write('\n')
 
-    filename=str(outfile).split("'")[1]
+    filename = str(outfile).split("'")[1]
     txtOutput.put("Wrote occupancy data to : %s\n\n" % filename)
 
 
-
-def density(variables,segvariables,txtOutput):
-
+def density(variables, segvariables, txtOutput):
     '''
         DENSITY is the function to read in variables from GUI input and compare
-       	generate three-dimensional volumetric data files using the GAUSSIAN file
-	format.
+        generate three-dimensional volumetric data files using the GAUSSIAN file
+        format.
 
         INPUT:  variable descriptions:
 
@@ -242,7 +278,7 @@ def density(variables,segvariables,txtOutput):
                 ylength:        y boxlength
                 save_occupancy: whether save the unweighted raw cube data or not
                 zlength:        z boxlength
-		nsegments:	number of segments
+                nsegments:	number of segments
                 nregions:       number of regions per segment
                 lowregions:     low region array per segment
                 highregions:    high region array per segment
@@ -254,39 +290,41 @@ def density(variables,segvariables,txtOutput):
 
                 files stored in ~/runname/filter directory:
 
-		*_complete.cube:	Gaussian volumetric cube file of all basis atoms
-		*_region_X.cube:	Gaussian volumetric cube file of basis atoms in region X
+                *_complete.cube:	Gaussian volumetric cube file of all basis atoms
+                *_region_X.cube:	Gaussian volumetric cube file of basis atoms in region X
 
 
-	The output density will be normalized as follows against the maximum density value from the composite map including all atoms:
-	rho(norm)[i][j][k] = rho[i][j][k]*100.0/max(rho)
-	where i=1,2,...,Nsegments, j=1,2,...,Nregions, and k=1,2,...,Ngridpoints
+        The output density will be normalized as follows against the maximum density value from the composite map including all atoms:
+        rho(norm)[i][j][k] = rho[i][j][k]*100.0/max(rho)
+        where i=1,2,...,Nsegments, j=1,2,...,Nregions, and k=1,2,...,Ngridpoints
         '''
-    runname,dcdfile,pdbfile,ofile,xlength,gridsp,ylength,save_occupancy,zlength,nsegments,equalweights,weightsfile=unpack_variables(variables)
+    runname, dcdfile, pdbfile, ofile, xlength, gridsp, ylength, save_occupancy, zlength, nsegments, equalweights, weightsfile = unpack_variables(
+        variables)
 
-    anregions,alow,ahigh,allsbasis,allsname = process_input_variables(segvariables,nsegments)
+    anregions, alow, ahigh, allsbasis, allsname = process_input_variables(
+        segvariables, nsegments)
 
     if (runname[-1] == '/'):
-        print 'runname(1) = ',runname
-        densitypath=runname+'density/'
-        print 'densitypath = ',densitypath
+        print 'runname(1) = ', runname
+        densitypath = runname + 'density/'
+        print 'densitypath = ', densitypath
     else:
-        print 'runname(2) = ',runname
-        densitypath=runname+'/density/'
-        print 'densitypath = ',densitypath
+        print 'runname(2) = ', runname
+        densitypath = runname + '/density/'
+        print 'densitypath = ', densitypath
 
-    direxist=os.path.exists(densitypath)
-    if(direxist==0):
-        os.system('mkdir -p '+densitypath)
+    direxist = os.path.exists(densitypath)
+    if(direxist == 0):
+        os.system('mkdir -p ' + densitypath)
 
-    if(equalweights==0):
-        wst='_unequalweights'
+    if(equalweights == 0):
+        wst = '_unequalweights'
     else:
-        wst='_equalweights'
+        wst = '_equalweights'
 
-    ang2au=1.0/0.5291772108
+    ang2au = 1.0 / 0.5291772108
 
-    m1=sasmol.SasMol(0)
+    m1 = sasmol.SasMol(0)
     m1.read_pdb(pdbfile)
 
     try:
@@ -299,113 +337,129 @@ def density(variables,segvariables,txtOutput):
         elif(dcdfile[-3:] == 'pdb'):
             m1.read_pdb(dcdfile)
             nf = m1.number_of_frames()
-            minmax_array = m1.calc_minmax_all_steps(dcdfile,pdb='pdb')
+            minmax_array = m1.calc_minmax_all_steps(dcdfile, pdb='pdb')
             intype = 'pdb'
     except:
-        message='input filename is a PDB or DCD file but it must end with ".pdb" or ".dcd" '
-        message+=' :  stopping here'
-        print_failure(message,txtOutput)
+        message = 'input filename is a PDB or DCD file but it must end with ".pdb" or ".dcd" '
+        message += ' :  stopping here'
+        print_failure(message, txtOutput)
 #
-    print 'number of frames = ',nf
-    print 'intype = ',intype
+    print 'number of frames = ', nf
+    print 'intype = ', intype
 
-    outfile=(open(densitypath+ofile+'_'+str(gridsp)+wst+'_complete.cube','w'))
+    outfile = (
+        open(densitypath + ofile + '_' + str(gridsp) + wst + '_complete.cube', 'w'))
 
     for i in xrange(nsegments):
-        print '\nsegment = ',str(i+1),':\n\tnum regions = ',anregions[i]
-        print '\tlow = ',alow[i]
-        print '\thigh = ',ahigh[i],'\n'
+        print '\nsegment = ', str(i + 1), ':\n\tnum regions = ', anregions[i]
+        print '\tlow = ', alow[i]
+        print '\thigh = ', ahigh[i], '\n'
 
-    soutfile=[] ; sstring=[]
+    soutfile = []
+    sstring = []
     for i in xrange(nsegments):
-        filest=densitypath+ofile+'_'+str(gridsp)+wst+'_segment_'+str(i+1)+'_complete.cube'
+        filest = densitypath + ofile + '_' + \
+            str(gridsp) + wst + '_segment_' + str(i + 1) + '_complete.cube'
         sstring.append(filest)
-        soutfile.append(open(filest,'w'))
+        soutfile.append(open(filest, 'w'))
 
-    aroutfile=[] ; arstring=[]
+    aroutfile = []
+    arstring = []
     for i in xrange(nsegments):
-        routfile=[] ; rstring=[]
+        routfile = []
+        rstring = []
         for j in range(anregions[i]):
-            filest=densitypath+ofile+'_'+str(gridsp)+wst+'_segment_'+str(i+1)+'_region_'+str(j+1)+'.cube'
+            filest = densitypath + ofile + '_' + \
+                str(gridsp) + wst + '_segment_' + str(i + 1) + \
+                '_region_' + str(j + 1) + '.cube'
             rstring.append(filest)
-            routfile.append(open(filest,'w'))
+            routfile.append(open(filest, 'w'))
         aroutfile.append(routfile)
         arstring.append(rstring)
 
-    if(equalweights==1):
-        weights=numpy.ones(nf,numpy.float32)
-        sumweights=float(nf)
+    if(equalweights == 1):
+        weights = numpy.ones(nf, numpy.float32)
+        sumweights = float(nf)
     else:
-        winfile=open(weightsfile,'r').readlines()
-        pweights=[]
-        if((len(winfile)-2)!=nf):
-            print 'nf = ',nf
-            print 'len(winfile) = ',len(winfile)
-            message = 'length of weightsfile, '+weightsfile+' indicates there are not enought data to match the number of frames in input file'+dcdfile+' nf = '+str(nf)
-            message+=' :  stopping here'
-            print_failure(message,txtOutput)
+        winfile = open(weightsfile, 'r').readlines()
+        pweights = []
+        if((len(winfile) - 2) != nf):
+            print 'nf = ', nf
+            print 'len(winfile) = ', len(winfile)
+            message = 'length of weightsfile, ' + weightsfile + \
+                ' indicates there are not enought data to match the number of frames in input file' + \
+                dcdfile + ' nf = ' + str(nf)
+            message += ' :  stopping here'
+            print_failure(message, txtOutput)
             return
 
         for i in range(len(winfile)):
-            if(i>1):
-                lin=string.split(winfile[i])
-                lw=locale.atof(lin[2])
+            if(i > 1):
+                lin = string.split(winfile[i])
+                lw = locale.atof(lin[2])
                 pweights.append(lw)
-        if(len(pweights)!=nf):
-            print 'nf = ',nf
-            print 'len(pweights) = ',len(pweights)
-            message = 'number of frames '+str(len(pweights))+' in weightsfile, '+weightsfile+' does not match the number of frames in input file'+dcdfile+' nf = '+str(nf)
-            message+=' :  stopping here'
-            print_failure(message,txtOutput)
+        if(len(pweights) != nf):
+            print 'nf = ', nf
+            print 'len(pweights) = ', len(pweights)
+            message = 'number of frames ' + str(len(pweights)) + ' in weightsfile, ' + weightsfile + \
+                ' does not match the number of frames in input file' + \
+                dcdfile + ' nf = ' + str(nf)
+            message += ' :  stopping here'
+            print_failure(message, txtOutput)
             return
 
-        weights=numpy.array(pweights)
-        sumweights=numpy.sum(weights)
+        weights = numpy.array(pweights)
+        sumweights = numpy.sum(weights)
 
-    #print 'calculating min and max over all frames'
+    # print 'calculating min and max over all frames'
 
     total_min_array = minmax_array[0]
     total_max_array = minmax_array[1]
 
-    print 'total_min_array = ',total_min_array
-    print 'total_max_array = ',total_max_array
+    print 'total_min_array = ', total_min_array
+    print 'total_max_array = ', total_max_array
 
     actual_xlength = total_max_array[0] - total_min_array[0]
     actual_ylength = total_max_array[1] - total_min_array[1]
     actual_zlength = total_max_array[2] - total_min_array[2]
 
-    print 'actual xlength = ',actual_xlength
-    print 'actual ylength = ',actual_ylength
-    print 'actual zlength = ',actual_zlength
+    print 'actual xlength = ', actual_xlength
+    print 'actual ylength = ', actual_ylength
+    print 'actual zlength = ', actual_zlength
 
-    xmin=numpy.floor(-xlength/2.0) ; xmax=numpy.ceil(xlength/2.0)
-    ymin=numpy.floor(-ylength/2.0) ; ymax=numpy.ceil(ylength/2.0)
-    zmin=numpy.floor(-zlength/2.0) ; zmax=numpy.ceil(zlength/2.0)
+    xmin = numpy.floor(-xlength / 2.0)
+    xmax = numpy.ceil(xlength / 2.0)
+    ymin = numpy.floor(-ylength / 2.0)
+    ymax = numpy.ceil(ylength / 2.0)
+    zmin = numpy.floor(-zlength / 2.0)
+    zmax = numpy.ceil(zlength / 2.0)
 
     if(xmin > total_min_array[0]):
-        xmin = total_min_array[0]-gridsp # make it slightly smaller
-        print 'reset xmin to fit molecule: '+str(xmin)
+        xmin = total_min_array[0] - gridsp  # make it slightly smaller
+        print 'reset xmin to fit molecule: ' + str(xmin)
     if(ymin > total_min_array[1]):
-        ymin = total_min_array[1]-gridsp # make it slightly smaller
-        print 'reset ymin to fit molecule: '+str(ymin)
+        ymin = total_min_array[1] - gridsp  # make it slightly smaller
+        print 'reset ymin to fit molecule: ' + str(ymin)
     if(zmin > total_min_array[2]):
-        zmin = total_min_array[2]-gridsp # make it slightly smaller
-        print 'reset zmin to fit molecule: '+str(zmin)
+        zmin = total_min_array[2] - gridsp  # make it slightly smaller
+        print 'reset zmin to fit molecule: ' + str(zmin)
     if(xmax < total_max_array[0]):
-        xmax = total_max_array[0]+gridsp # make it slightly larger
-        print 'reset xmax to fit molecule: '+str(xmax)
+        xmax = total_max_array[0] + gridsp  # make it slightly larger
+        print 'reset xmax to fit molecule: ' + str(xmax)
     if(ymax < total_max_array[1]):
-        ymax = total_max_array[1]+gridsp # make it slightly larger
-        print 'reset ymax to fit molecule: '+str(ymax)
+        ymax = total_max_array[1] + gridsp  # make it slightly larger
+        print 'reset ymax to fit molecule: ' + str(ymax)
     if(zmax < total_max_array[2]):
-        zmax = total_max_array[2]+gridsp # make it slightly larger
-        print 'reset zmax to fit molecule: '+str(zmax)
+        zmax = total_max_array[2] + gridsp  # make it slightly larger
+        print 'reset zmax to fit molecule: ' + str(zmax)
 
-    nxgp=1*int((xmax-xmin)/gridsp) ; nygp=1*int((ymax-ymin)/gridsp) ; nzgp=1*int((zmax-zmin)/gridsp)
+    nxgp = 1 * int((xmax - xmin) / gridsp)
+    nygp = 1 * int((ymax - ymin) / gridsp)
+    nzgp = 1 * int((zmax - zmin) / gridsp)
 
-    name=m1.name()
-    resid=m1.resid()
-    segname=m1.segname()
+    name = m1.name()
+    resid = m1.resid()
+    segname = m1.segname()
 
     basis_filter_1 = ''
     for i in xrange(nsegments):
@@ -417,16 +471,16 @@ def density(variables,segvariables,txtOutput):
             name_filter += 'name[i] == "%s"' % allsbasis[i][j]
         name_filter = '( %s )' % name_filter
         basis_filter_1 += '( %s and %s )' % (seg_filter, name_filter)
-        if i<(nsegments-1):
-            basis_filter_1+=' or '
+        if i < (nsegments - 1):
+            basis_filter_1 += ' or '
 
-    error,full_mask = m1.get_subset_mask(basis_filter_1)
-    print 'full_mask = ',full_mask[4],full_mask[21],full_mask[22]
+    error, full_mask = m1.get_subset_mask(basis_filter_1)
+    print 'full_mask = ', full_mask[4], full_mask[21], full_mask[22]
     number_atoms_full = numpy.sum(full_mask)
-    print 'number of atoms full = ',number_atoms_full
+    print 'number of atoms full = ', number_atoms_full
 
-
-    segments_mask=[] ; number_atoms_segments=[]
+    segments_mask = []
+    number_atoms_segments = []
 
     for i in xrange(nsegments):
         # basis_filter_1s = 'segname[i] == "'+allsname[i]+'" and name[i] == "'+allsbasis[i]+'"'
@@ -439,16 +493,17 @@ def density(variables,segvariables,txtOutput):
         name_filter = '( %s )' % name_filter
         basis_filter_1s = '( %s and %s )' % (seg_filter, name_filter)
         # print basis_filter_1s
-        error,segment_mask = m1.get_subset_mask(basis_filter_1s)
+        error, segment_mask = m1.get_subset_mask(basis_filter_1s)
         segments_mask.append(segment_mask)
         number_atoms_segments.append(numpy.sum(segment_mask))
-        print 'number of atoms segment '+str(i)+' = ',numpy.sum(segment_mask)
+        print 'number of atoms segment ' + str(i) + ' = ', numpy.sum(segment_mask)
 
-
-    aregions_mask=[] ; anumber_atoms_regions=[]
+    aregions_mask = []
+    anumber_atoms_regions = []
 
     for i in xrange(nsegments):
-        regions_mask=[] ; number_atoms_regions=[]
+        regions_mask = []
+        number_atoms_regions = []
         for j in range(anregions[i]):
             seg_filter = ' segname[i] == "%s" ' % allsname[i]
             name_filter = ''
@@ -463,78 +518,85 @@ def density(variables,segvariables,txtOutput):
                                                        resid_filter)
             # print basis_filter_2
             # basis_filter_2 = 'name[i] == "'+allsbasis[i]+'" and segname[i] == "'+allsname[i]+'" and (resid[i] >= '+str(alow[i][j])+' and resid[i] <= '+str(ahigh[i][j])+')'
-            error,region_mask = m1.get_subset_mask(basis_filter_2)
+            error, region_mask = m1.get_subset_mask(basis_filter_2)
             regions_mask.append(region_mask)
             number_atoms_regions.append(numpy.sum(region_mask))
-            print 'number of atoms segment '+str(i)+' region '+str(j)+' = ',numpy.sum(region_mask)
+            print 'number of atoms segment ' + str(i) + ' region ' + str(j) + ' = ', numpy.sum(region_mask)
 
         aregions_mask.append(regions_mask)
         anumber_atoms_regions.append(number_atoms_regions)
 
-    cbin=numpy.zeros((nxgp,nygp,nzgp),numpy.float32)
+    cbin = numpy.zeros((nxgp, nygp, nzgp), numpy.float32)
 
-
-    sbin=[]
+    sbin = []
     for i in xrange(nsegments):
-        sbin.append(numpy.zeros((nxgp,nygp,nzgp),numpy.float32))
+        sbin.append(numpy.zeros((nxgp, nygp, nzgp), numpy.float32))
 
-
-    arbin=[]
+    arbin = []
     for i in xrange(nsegments):
-        rbin=[]
+        rbin = []
         for j in range(anregions[i]):
-            rbin.append(numpy.zeros((nxgp,nygp,nzgp),numpy.float32))
+            rbin.append(numpy.zeros((nxgp, nygp, nzgp), numpy.float32))
         arbin.append(rbin)
 
-    ttxt=time.ctime()
-    st=''.join(['=' for x in xrange(60)])
+    ttxt = time.ctime()
+    st = ''.join(['=' for x in xrange(60)])
 
-    txtOutput.put("\n%s \n" %(st))
-    txtOutput.put("DATA FROM RUN: %s \n\n" %(ttxt))
+    txtOutput.put("\n%s \n" % (st))
+    txtOutput.put("DATA FROM RUN: %s \n\n" % (ttxt))
 
     for i in range(nf):
 
         if(intype == 'dcd'):
-            m1.read_dcd_step(ldcdfile,i)
-            error,cz=m1.get_coor_using_mask(0,full_mask)
+            m1.read_dcd_step(ldcdfile, i)
+            error, cz = m1.get_coor_using_mask(0, full_mask)
         elif(intype == 'pdb'):
-            error,cz=m1.get_coor_using_mask(i,full_mask)
+            error, cz = m1.get_coor_using_mask(i, full_mask)
 
-        weight=weights[i]
+        weight = weights[i]
         try:
-            cube.cube(cz[0],cbin,weight,xmin,ymin,zmin,gridsp,nxgp,nygp,nzgp)
+            cube.cube(
+                cz[0], cbin, weight, xmin, ymin, zmin, gridsp, nxgp, nygp, nzgp)
 
             for j in range(nsegments):
                 if(intype == 'dcd'):
-                    error,lcz=m1.get_coor_using_mask(0,segments_mask[j])
+                    error, lcz = m1.get_coor_using_mask(0, segments_mask[j])
                 elif(intype == 'pdb'):
-                    error,lcz=m1.get_coor_using_mask(i,segments_mask[j])
-                cube.cube(lcz[0],sbin[j],weight,xmin,ymin,zmin,gridsp,nxgp,nygp,nzgp)
+                    error, lcz = m1.get_coor_using_mask(i, segments_mask[j])
+                cube.cube(
+                    lcz[0], sbin[j], weight, xmin, ymin, zmin, gridsp, nxgp, nygp, nzgp)
 
             for j in range(nsegments):
                 for k in xrange(anregions[j]):
                     if(intype == 'dcd'):
-                        error,lcz=m1.get_coor_using_mask(0,aregions_mask[j][k])
+                        error, lcz = m1.get_coor_using_mask(
+                            0, aregions_mask[j][k])
                     elif(intype == 'pdb'):
-                        error,lcz=m1.get_coor_using_mask(i,aregions_mask[j][k])
-                    cube.cube(lcz[0],arbin[j][k],weight,xmin,ymin,zmin,gridsp,nxgp,nygp,nzgp)
+                        error, lcz = m1.get_coor_using_mask(
+                            i, aregions_mask[j][k])
+                    cube.cube(
+                        lcz[0], arbin[j][k], weight, xmin, ymin, zmin, gridsp, nxgp, nygp, nzgp)
         except:
-            message='try increasing boxsize via xlength, ylength, and zlength'
-            message+=' : stopping here'
-            print_failure(message,txtOutput)
+            message = 'try increasing boxsize via xlength, ylength, and zlength'
+            message += ' : stopping here'
+            print_failure(message, txtOutput)
             return
 
-        if(((i+1)%(float(nf)/10.0)==0 or (nf<10))):
-            print 'i = ',i+1, 'of ',nf,' steps: ',(float(i+1)/float(nf))*100.0,' percent done'
-            fraction_done = (float(i+1)/float(nf))
-            progress_string='COMPLETED '+str(i+1)+' of '+str(nf)+' : '+str(fraction_done*100.0)+' % done'
+        if(((i + 1) % (float(nf) / 10.0) == 0 or (nf < 10))):
+            print 'i = ', i + 1, 'of ', nf, ' steps: ', (float(i + 1) / float(nf)) * 100.0, ' percent done'
+            fraction_done = (float(i + 1) / float(nf))
+            progress_string = 'COMPLETED ' + \
+                str(i + 1) + ' of ' + str(nf) + ' : ' + \
+                str(fraction_done * 100.0) + ' % done'
             print('%s\n' % progress_string)
-            report_string='STATUS\t'+str(fraction_done)
+            report_string = 'STATUS\t' + str(fraction_done)
             txtOutput.put(report_string)
 
     if(save_occupancy == "Y"):
-        outfile_ro=(open(densitypath+ofile+'_'+str(gridsp)+wst+'_occupancy.txt','w'))
-        write_occupancy(m1,nxgp,nygp,nzgp,nsegments,anregions,cbin,sbin,arbin,number_atoms_full,number_atoms_segments,anumber_atoms_regions,allsbasis,allsname,alow,ahigh,xmin,ymin,zmin,ang2au,gridsp,outfile_ro,txtOutput)
+        outfile_ro = (
+            open(densitypath + ofile + '_' + str(gridsp) + wst + '_occupancy.txt', 'w'))
+        write_occupancy(m1, nxgp, nygp, nzgp, nsegments, anregions, cbin, sbin, arbin, number_atoms_full, number_atoms_segments,
+                        anumber_atoms_regions, allsbasis, allsname, alow, ahigh, xmin, ymin, zmin, ang2au, gridsp, outfile_ro, txtOutput)
         outfile_ro.close()
 
     '''
@@ -561,65 +623,67 @@ def density(variables,segvariables,txtOutput):
 
     # now renormalize the bins so that density 0 to 100%
 
-    maxcbin=renorm.renorm(cbin,nxgp,nygp,nzgp)
-    maxsbin=[]
+    maxcbin = renorm.renorm(cbin, nxgp, nygp, nzgp)
+    maxsbin = []
     for i in xrange(nsegments):
-        maxsbin.append(renorm.renorm(sbin[i],nxgp,nygp,nzgp))
-    amaxreg=[]
+        maxsbin.append(renorm.renorm(sbin[i], nxgp, nygp, nzgp))
+    amaxreg = []
     for i in xrange(nsegments):
-        maxreg=[]
+        maxreg = []
         for j in range(anregions[i]):
-            maxreg.append(renorm.renorm(arbin[i][j],nxgp,nygp,nzgp))
+            maxreg.append(renorm.renorm(arbin[i][j], nxgp, nygp, nzgp))
         amaxreg.append(maxreg)
 
-    if(maxcbin==0.0):
-        print 'maxcbin = ',maxcbin
-        message='divide by zero error in renormalization step (1)'
-        message+=' maxbin = '+str(maxcbin)
-        message+=' :  stopping here'
-        print_failure(message,txtOutput)
+    if(maxcbin == 0.0):
+        print 'maxcbin = ', maxcbin
+        message = 'divide by zero error in renormalization step (1)'
+        message += ' maxbin = ' + str(maxcbin)
+        message += ' :  stopping here'
+        print_failure(message, txtOutput)
         return
 
     else:
-        normcbin=100.0/maxcbin
+        normcbin = 100.0 / maxcbin
 
-    normsbin=[]
+    normsbin = []
     for i in xrange(nsegments):
-        if(maxsbin[i]==0.0):
-            print ("maxsbin[%i] = %f\n" % (i,maxsbin[i]))
-            message='divide by zero error in renormalization step (2)'
-            message+='i = '+str(i)+' maxsbin = '+str(maxsbin[i])
-            message+=' :  stopping here'
-            print_failure(message,txtOutput)
+        if(maxsbin[i] == 0.0):
+            print ("maxsbin[%i] = %f\n" % (i, maxsbin[i]))
+            message = 'divide by zero error in renormalization step (2)'
+            message += 'i = ' + str(i) + ' maxsbin = ' + str(maxsbin[i])
+            message += ' :  stopping here'
+            print_failure(message, txtOutput)
             return
         else:
-            normsbin.append(100.0/maxsbin[i])
+            normsbin.append(100.0 / maxsbin[i])
 
-    anormreg=[]
+    anormreg = []
     for i in xrange(nsegments):
-        normreg=[]
+        normreg = []
         for j in range(anregions[i]):
-            if(amaxreg[i][j]==0.0):
-                print ("amaxreg[%i][%i] = %f\n" % (i,j,amaxreg[i][j]))
-                message='divide by zero error in renormalization step (2)'
-                message+='i = '+str(i)+' j = '+str(j)+' amaxreg = '+str(amaxreg[i][j])
-                message+=' :  stopping here'
-                print_failure(message,txtOutput)
+            if(amaxreg[i][j] == 0.0):
+                print ("amaxreg[%i][%i] = %f\n" % (i, j, amaxreg[i][j]))
+                message = 'divide by zero error in renormalization step (2)'
+                message += 'i = ' + \
+                    str(i) + ' j = ' + str(j) + \
+                    ' amaxreg = ' + str(amaxreg[i][j])
+                message += ' :  stopping here'
+                print_failure(message, txtOutput)
                 return
 
             else:
-                normreg.append(100.0/amaxreg[i][j])
+                normreg.append(100.0 / amaxreg[i][j])
 
         anormreg.append(normreg)
-    z=0.0
+    z = 0.0
 
     fraction_done = 0.0
-    report_string='STATUS\t'+str(fraction_done)
+    report_string = 'STATUS\t' + str(fraction_done)
     txtOutput.put(report_string)
 
     print 'writing cube files to disk'
 
-    fltr=''
+    fltr = ''
     for i in xrange(nsegments):
         # fltr += 'segname[natom] == "'+allsname[i]+'" and name[natom] == "'+allsbasis[i]+'"'
         seg_fltr = 'segname[natom] == "%s" ' % allsname[i]
@@ -629,15 +693,16 @@ def density(variables,segvariables,txtOutput):
                 name_fltr += ' or '
             name_fltr += 'name[natom] == "%s"' % allsbasis[i][j]
         fltr += '( %s and ( %s ) )' % (seg_fltr, name_fltr)
-        if i<(nsegments-1):
-            fltr+=' or '
-    write_cube(m1,fltr,nxgp,nygp,nzgp,cbin,normcbin,number_atoms_full,xmin,ymin,zmin,ang2au,gridsp,outfile,txtOutput)
+        if i < (nsegments - 1):
+            fltr += ' or '
+    write_cube(m1, fltr, nxgp, nygp, nzgp, cbin, normcbin,
+               number_atoms_full, xmin, ymin, zmin, ang2au, gridsp, outfile, txtOutput)
     outfile.close()
 
     for i in xrange(nsegments):
 
         fraction_done = 0.0
-        report_string='STATUS\t'+str(fraction_done)
+        report_string = 'STATUS\t' + str(fraction_done)
         txtOutput.put(report_string)
 
         # fltr='name[natom]=="'+allsbasis[i]+'" and segname[natom]=="'+allsname[i]+'"'
@@ -648,17 +713,17 @@ def density(variables,segvariables,txtOutput):
                 name_fltr += ' or '
             name_fltr += 'name[natom] == "%s"' % allsbasis[i][j]
         fltr = '( %s and ( %s ) )' % (seg_fltr, name_fltr)
-        write_cube(m1,fltr,nxgp,nygp,nzgp,sbin[i],normcbin,number_atoms_segments[i],xmin,ymin,zmin,ang2au,gridsp,soutfile[i],txtOutput)
-        #write_cube(m1,fltr,nxgp,nygp,nzgp,sbin[i],normsbin[i],number_atoms_segments[i],xmin,ymin,zmin,ang2au,gridsp,soutfile[i],txtOutput)
+        write_cube(m1, fltr, nxgp, nygp, nzgp, sbin[i], normcbin, number_atoms_segments[
+                   i], xmin, ymin, zmin, ang2au, gridsp, soutfile[i], txtOutput)
+        # write_cube(m1,fltr,nxgp,nygp,nzgp,sbin[i],normsbin[i],number_atoms_segments[i],xmin,ymin,zmin,ang2au,gridsp,soutfile[i],txtOutput)
         soutfile[i].close()
-
 
     for i in xrange(nsegments):
 
         for j in range(anregions[i]):
 
             fraction_done = 0.0
-            report_string='STATUS\t'+str(fraction_done)
+            report_string = 'STATUS\t' + str(fraction_done)
             txtOutput.put(report_string)
 
             # fltr='name[natom]=="'+allsbasis[i]+'" and segname[natom]=="'+allsname[i]+'" and (resid[natom]>='+str(alow[i][j])+' and resid[natom]<='+str(ahigh[i][j])+')'
@@ -670,17 +735,18 @@ def density(variables,segvariables,txtOutput):
                 name_fltr += 'name[natom] == "%s"' % allsbasis[i][k]
             name_fltr = '( %s )' % name_fltr
             resid_fltr = ('( resid[natom] >= %d and resid[natom] <= %d )' %
-                            (alow[i][j], ahigh[i][j]))
+                          (alow[i][j], ahigh[i][j]))
             fltr = '( %s and %s and %s )' % (seg_fltr, name_fltr, resid_fltr)
 
-            write_cube(m1,fltr,nxgp,nygp,nzgp,arbin[i][j],normcbin,anumber_atoms_regions[i][j],xmin,ymin,zmin,ang2au,gridsp,aroutfile[i][j],txtOutput)
-            #write_cube(m1,fltr,nxgp,nygp,nzgp,arbin[i][j],anormreg[i][j],anumber_atoms_regions[i][j],xmin,ymin,zmin,ang2au,gridsp,aroutfile[i][j],txtOutput)
+            write_cube(m1, fltr, nxgp, nygp, nzgp, arbin[i][j], normcbin, anumber_atoms_regions[
+                       i][j], xmin, ymin, zmin, ang2au, gridsp, aroutfile[i][j], txtOutput)
+            # write_cube(m1,fltr,nxgp,nygp,nzgp,arbin[i][j],anormreg[i][j],anumber_atoms_regions[i][j],xmin,ymin,zmin,ang2au,gridsp,aroutfile[i][j],txtOutput)
             aroutfile[i][j].close()
 
     if(intype == 'dcd'):
         m1.close_dcd_read(ldcdfile[0])
 
-    txtOutput.put("\n%s \n\n" %(st))
+    txtOutput.put("\n%s \n\n" % (st))
     time.sleep(2.0)
     print 'DENSITY IS DONE'
 

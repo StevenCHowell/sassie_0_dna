@@ -6,8 +6,8 @@
 #
 # $Id$
 #
-#0000000011111111112222222222333333333344444444445555555555666666666677777777778
-#2345678901234567890123456789012345678901234567890123456789012345678901234567890
+# 0000000011111111112222222222333333333344444444445555555555666666666677777777778
+# 2345678901234567890123456789012345678901234567890123456789012345678901234567890
 
 import x_dna.drivers.my_crysol_driver as crysol
 
@@ -18,10 +18,10 @@ in_vars.dcdpath = 'run1/dna_mc/'
 in_vars.pdbfile = 'dimer_mod.pdb'
 in_vars.pdbpath = './'
 # maxh ~= (Q_max x D_max)/pi
-in_vars.maxh = '18' # Dimer_maxh ~= (0.2 x 280)/pi
-# in_vars.maxh = '21' # Trimer_maxh ~= (0.2 x 325)/pi     
-# in_vars.maxh = '21' # Tetramer_maxh ~= (0.2 x 325)/pi     
-in_vars.fib  = '18' # more does not slow crysol down noticeably
+in_vars.maxh = '18'  # Dimer_maxh ~= (0.2 x 280)/pi
+# in_vars.maxh = '21' # Trimer_maxh ~= (0.2 x 325)/pi
+# in_vars.maxh = '21' # Tetramer_maxh ~= (0.2 x 325)/pi
+in_vars.fib = '18'  # more does not slow crysol down noticeably
 in_vars.maxs = '0.2'
 in_vars.numpoints = '100'
 
