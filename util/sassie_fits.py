@@ -273,8 +273,8 @@ def mkdir_p(path):
             raise
 
 
-def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
-                      q_base=1, i0=True, s=True, o=True, run_label=''):
+def compare_run_to_iq(run_dir, goal_iq, filter_dir, out_file=None, i0=True,
+                      s=True, o=True, run_label=''):
 
     assert op.exists(run_dir), 'No such run directory: %s' % run_dir
     if op.exists(op.join(run_dir, 'crysol')) and False:
@@ -291,21 +291,14 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
 
     # get the Rg and I(Q) for each structure from the calculation rusults
     if ext[-3:] == 'int':
-        Rg, data_iq, labels = load_crysol(syn_data_dir, goal[0, 1])
+        Rg, data_iq, labels = load_crysol(syn_data_dir, goal_iq[0, 1])
     elif ext[-3:] == 'dat':
-        Rg, data_iq, labels = load_foxs(syn_data_dir, goal[0, 1])
+        Rg, data_iq, labels = load_foxs(syn_data_dir, goal_iq[0, 1])
 
-    data_iq, goal_iq = new_q_grid(ns, data_iq, goal, q_base=q_base,
-                                  q_max=0.2, i0=i0)
+    data_iq = interp_iq(data_iq, goal_iq)
 
-    # # get the Kratky from the I(Q)
-    # data_kratky = kratky(data_iq)
-    # goal_kratky = kratky(goal_iq)
-    # print data_kratky
 
-    # create the data frame
-
-    # compare I(Q) and/or Kratky of the experimental vs synthetic structures
+    # compare I(Q) of the experimental and synthetic structures
     nf = data_iq.shape[1]
     match_iq = np.zeros(data_iq.shape)
     iq_scale = np.zeros(nf - 1)
@@ -347,45 +340,28 @@ def compare_run_to_iq(run_dir, goal, ns, filter_dir, out_file=None,
     return result_df, match_iq, iq_df, goal_iq
 
 
-def new_q_grid(ns, data_iq, goal, q_max=0.2, q_base=1, i0=True):
+def interp_iq(data_iq, goal, q_max=0.2):
 
-    if i0:
-        ns -= 1
-    q_min = goal[goal[:, 0] > 0, 0].min()
-    new_q = polyspace(q_min, q_max, q_base, ns)
-    if i0:
-        new_q = np.concatenate(([0], new_q))
+    q_grid = goal[:,0]
+    data_int = np.zeros((len(q_grid), data_iq.shape[1]))
+    data_int[:, 0] = q_grid
 
     # interpolate calculated data to be on the intended grid
-    if new_q[0] < data_iq[0, 0]:
-        new_q[0] = data_iq[0, 0]
-        print 'changing q_min from %f to %f' % (new_q[0], data_iq[0, 0])
-    if new_q[-1] > data_iq[-1, 0]:
-        print 'changing q_max from %f to %f' % (new_q[-1], data_iq[-1, 0])
-        new_q[-1] = data_iq[-1, 0]
-    interp_c = interpolate.interp1d(data_iq[:, 0], data_iq[:, 1:], axis=0,
-                                    kind='cubic')
-    data_int = np.zeros((len(new_q), len(data_iq[0, :])))
-    data_int[:, 0] = new_q
-    data_int[:, 1:] = interp_c(new_q)
+    if data_iq.shape[1] == 3:
+        print ('BE AWARE: using 3rd column in calculated I(Q) as error')
+        interp_data = interpolate.splrep(data_iq[:, 0], data_iq[:, 1],
+                                         w=1.0/data_iq[:,2])
+        data_int[:, 1] = interpolate.splev(q_grid, interp_data)
+    else:
+        print ('Interpolating %d calculated I(Q) curves' %
+               (data_iq.shape[1]-1))
+        for i in xrange(1, data_iq.shape[1]):
+            interp_data = interpolate.splrep(data_iq[:, 0], data_iq[:, i])
+            data_int[:, i] = interpolate.splev(q_grid, interp_data)
+
     data_iq = data_int
 
-    # interpolate reference data to be on the same grid as the calculated I(Q)
-    interp_iq = interpolate.interp1d(goal[:, 0], goal[:, 1:], kind='cubic',
-                                     axis=0)
-    goal_iq = np.zeros((len(new_q), 3))
-    goal_iq[:, 0] = new_q
-    interp_res = interp_iq(new_q)
-    try:
-        goal_iq[:, 1:] = interp_res
-    except:
-        if np.allclose(interp_res[:, 1], interp_res[:, 2]):
-            interp_res = interp_res[:, :2]
-            goal_iq[:, 1:] = interp_res
-        else:
-            assert False, 'ERROR: problem interpolating data'
-
-    return data_iq, goal_iq
+    return data_iq
 
 
 def polyspace(x1, x2, p, n):
@@ -1334,9 +1310,9 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
             plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
 
 
-def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
+def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 prefix='', do_plot='True', cutoff=None, best_dcd=False,
-                q_base=1, fresh=False, i0=True, s=True, o=True):
+                fresh=False, s=True, o=True):
     all_x2rg_dfs = []
     all_data_iqs = []
     all_goal_iqs = []
@@ -1352,8 +1328,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
             data_iq_list = []
             for run_dir in run_dirs[array_type]:
                 filter_dir = op.join(run_dir, data_file + '_filter')
-                run_label = '_base%d_ns%d_s%do%d' % (q_base, ns[array_type],
-                                                     s, o)
+                run_label = '_s%do%d' % (s, o)
                 out_file = op.join(filter_dir, 'rg_x2%s.out' % run_label)
                 if op.exists(out_file) and not fresh:
                     print 'loading rg and X^2 values from %s' % out_file
@@ -1366,8 +1341,8 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
                     print 'loading rg then calculating X^2 values'
                     data = np.loadtxt(rg_file)
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
-                        run_dir, data, ns[array_type], filter_dir, out_file,
-                        q_base, run_label=run_label, i0=i0, s=s, o=o)
+                        run_dir, data, filter_dir, out_file, i0=i0, s=s, o=o,
+                        run_label=run_label)
                 run_name = run_dir.split(
                     '/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
@@ -1974,8 +1949,8 @@ if __name__ == '__main__':
                 'c500_4x167_k100']
         # full
         tri0 = ['c000_3x167_k010',
-                # 'c000_3x167_k050',
-                # 'c000_3x167_k100',
+                'c000_3x167_k050',
+                'c000_3x167_k100',
                 'c000_3x167_k200']
         tet0 = ['c000_4x167_k010',
                 'c000_4x167_k050',
@@ -1988,7 +1963,7 @@ if __name__ == '__main__':
         # quicker to run
         # tet0 = [tet0[-1]]
         # tet0 = ['c000_4x167_mg1']
-        tri0 = [tri0[-1]]
+        # tri0 = [tri0[-1]]
 
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
@@ -2010,8 +1985,8 @@ if __name__ == '__main__':
                     'h5': tetramer_runs}
 
         data_dir = ('/home/schowell/data/'
-                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/iqdata/')
-        data_ext = '.i0q'
+                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/interp_data/')
+        data_ext = '.int'
 
         array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']
@@ -2022,15 +1997,28 @@ if __name__ == '__main__':
         # i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid
         # points
         i0 = False
-        ns = {'di': 50, 'tri': 50, 'tet': 50, 'h5': 50}  # Q grid points
 
         best_dcd = False
         maxX2 = 4.5
+        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        # fresh=True))
+
+        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        # fresh=False))
+
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        ns, cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        q_base=2, i0=i0, fresh=False))
+                        cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
+                        fresh=True))
 
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
+                        fresh=False))
         save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
                     sassie_run_dir)
 
