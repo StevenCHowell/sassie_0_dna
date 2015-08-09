@@ -15,9 +15,9 @@ import os.path as op
 import multiprocessing as mp
 import x_dna.util.basis_to_python as b2p
 import pandas as pd
+import errno
 
 # import sys
-# import errno
 # import logging
 # import cmd
 
