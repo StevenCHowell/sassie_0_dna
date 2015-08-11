@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Auther: Steven C. Howell
-# Purpose: Check that there is no overlap then run crysol (parrallel)
-# Created: 10/09/2014
+# Purpose: Check that there is no overlap then run foxs (parrallel)
+# Created: 05/2015
 # $Id$
 
 import glob

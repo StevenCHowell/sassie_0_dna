@@ -2012,8 +2012,18 @@ if __name__ == '__main__':
 
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        fresh=False))
+
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        fresh=False))
+
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
-                        fresh=True))
+                        fresh=False))
 
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
