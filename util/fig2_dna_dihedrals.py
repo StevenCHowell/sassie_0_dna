@@ -61,7 +61,7 @@ def main():
 
     #~~~ 60 bps dsDNA ~~~#
     first_last_resids = [[1, 60], [61, 120]]
-    run_dir = 'dsDNA_60bps/'
+    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
     pdb_file_name = run_dir + 'new_dsDNA60.pdb'
     flex_file = run_dir + 'new_dsDNA60.flex'
     drude = False
