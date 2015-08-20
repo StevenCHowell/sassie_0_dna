@@ -127,7 +127,7 @@ def main():
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
     calc_dihedrals = True
     good_dihedral = True
-    # scatter_dihedrals = True
+    scatter_dihedrals = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
     for dcd_file_name in dcd_files:
@@ -149,9 +149,11 @@ def main():
 
         if good_dihedral:
             plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=(703.0/58.0))
+            plot_good_dihedrals(dcd_file_name, max_frame=None, MD=False, scale_spb=(703.0/58.0))
 
         if scatter_dihedrals:
             scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb=(703.0/58.0))
+            scatter_plot_dihedrals(dcd_file_name, frequency, MD=False, scale_spb=(703.0/58.0))
 
 def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                         used_goback=False, show=False, MD=True):
@@ -296,6 +298,8 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
         plt.show()
     else:
         save_name = '%s_per_accept' % dcd_file_name[:-4]
+        if MD:
+            save_name += '_MD'
         if max_frame:
             save_name += '_' + str(max_frame)
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
@@ -321,7 +325,7 @@ def limit_patch(x_key, y_key, limits, ax):
     ax.add_patch(limit_patch)
 
 
-def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1):
+def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
     prefix = dcd_file_name[:-4] + '_'
     angles = pd.read_hdf(dcd_file_name[:-3] + 'hdf', 'angles')
 
@@ -335,8 +339,13 @@ def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1):
     spb, indices = np.unique(all_spb[:, 1], return_inverse=True)
     n_steps = len(spb)
 
-    limits = pd.DataFrame.from_csv('/home/schowell/data/myData/dihedrals/'
-                                   'dsDNA_60bps/dna_angles.txt')
+    if MD:
+        limit_file = ('/home/schowell/data/myData/dihedrals/'
+                      'dsDNA_60bps/md_angles.txt')
+    else:
+        limit_file = ('/home/schowell/data/myData/dihedrals/'
+                      'dsDNA_60bps/dna_angles.txt')
+    limits = pd.read_csv(limit_file, index_col=0)
     limits['low'] = limits['mean'] - 2 * limits['sd']
     limits['high'] = limits['mean'] + 2 * limits['sd']
 
@@ -376,10 +385,11 @@ def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1):
 
             plt.suptitle('%d Steps (%d frame/s): scatter plots of selected'
                          'torsional angles' % (step + 1, nf))
-            plt.savefig(prefix + 'dihedrals_%dsteps.eps' %
-                        (step + 1), dpi=400, bbox_inches='tight')
-            plt.savefig(prefix + 'dihedrals_%dsteps.png' %
-                        (step + 1), dpi=400, bbox_inches='tight')
+            save_name = prefix + 'dihedrals_%dsteps' % (step + 1)
+            if MD:
+                save_name += '_MD'
+            plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+            plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
 
     # plt.show()
     print 'pause'
