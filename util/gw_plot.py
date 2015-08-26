@@ -79,7 +79,7 @@ def color_order(i):
 def qual_color(i, style='set4'):
     '''
     http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer.html
-    9-class qualitative Set1, 
+    9-class qualitative Set1,
     '''
     # 12-class paired
     pair = [[166, 206, 227],
@@ -214,7 +214,7 @@ def make_colormap(seq):
     seq: a sequence of floats and RGB-tuples. The floats should be increasing
     and in the interval (0,1).
     Example:
-        rvb = make_colormap([c('red'), c('violet'), 0.33, c('violet'), 
+        rvb = make_colormap([c('red'), c('violet'), 0.33, c('violet'),
             c('blue'), 0.66, c('blue')])
     """
     seq = [(None,) * 3, 0.0] + list(seq) + [1.0, (None,) * 3]

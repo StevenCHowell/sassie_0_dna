@@ -16,6 +16,8 @@ import matplotlib.patches as patches
 import matplotlib.gridspec as gridspec
 import sassie.calculate.dna_dihedral as dd
 import x_dna.util.gw_plot as gwp
+import multiprocessing as mp
+
 
 LOGGER = logging.getLogger(__name__)  # add module name manually
 
@@ -59,13 +61,25 @@ def main():
     # dcd_files = []
     # dcd_files.append(run_dir + 'min_run_0.dcd')
 
-    #~~~ 60 bps dsDNA ~~~#
+    #~~~ new 60 bps dsDNA ~~~#
     first_last_resids = [[1, 60], [61, 120]]
-    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    pdb_file_name = run_dir + 'new_dsDNA60.pdb'
-    flex_file = run_dir + 'new_dsDNA60.flex'
+    run_dir = '/home/schowell/data/code/pylib/sassie_2_na/build_mol/dsDNA60/'
+    flex_file = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/new_dsDNA60.flex'
     drude = False
     dcd_files = []
+    # pdb_file_name = run_dir + 'c36_dna_raw.pdb'
+    # dcd_files.append(run_dir + 'c36_dna_raw_x2.dcd')
+    pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
+    dcd_files.append(run_dir + 'output_building/c36_dna60_raw_min.dcd')
+
+
+    #~~~ 60 bps dsDNA ~~~#
+    # first_last_resids = [[1, 60], [61, 120]]
+    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    # pdb_file_name = run_dir + 'new_dsDNA60.pdb'
+    # flex_file = run_dir + 'new_dsDNA60.flex'
+    # drude = False
+    # dcd_files = []
     # dcd_files.append('raw_min.dcd')
     # dcd_files.append('raw_min.dcd')
     # dcd_files.append(run_dir + 'run0_1k_steps/monte_carlo/min_dsDNA60.dcd')
@@ -82,16 +96,65 @@ def main():
     # dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60.dcd')
     # dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparser.dcd')
 
-    dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run9_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run12_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run11_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run4_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run5_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run6_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run7_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run9_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    # dcd_files.append(run_dir + 'run10_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+
+    # dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir +  [61, 120]]
+    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    # pdb_file_name = run_dir + 'new_dsDNA60.pdb'
+    # flex_file = run_dir + 'new_dsDNA60.flex'
+    # drude = False
+    # dcd_files = []'run9_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+    # dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+
+    # dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run9_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+
+    # dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+
+    # dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    # dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
 
     # run_dir = 'charmm36/'
     # first_last_resids = [[1,12],[13,24]]
@@ -128,10 +191,16 @@ def main():
     calc_dihedrals = True
     good_dihedral = True
     scatter_dihedrals = True
+    parallel = False
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
-    for dcd_file_name in dcd_files:
+    processes = []
+    used_goback = False
+    max_frame = None
+    scale_spb = 127.0 / 58.0
+    show = False
 
+    for dcd_file_name in dcd_files:
         # calculate and save the DNA dihedral angels
         if calc_dihedrals:
             hdf_file = dcd_file_name[:-3] + 'hdf'
@@ -140,20 +209,54 @@ def main():
                 print "skipping calculations (remove file to recalculate)"
             else:
                 print "calculating dihedral angles for %s" % hdf_file
-                angles_df = dd.get_angles_df(dcd_file_name, pdb_file_name,
-                                             first_last_resids, flex_file,
-                                             drude=drude)
-                # angles_df = dd.get_angles_df_from_mask(
-                    # dcd_file_name, pdb_file_name,first_last_resids, flex_file)
-                print "finished angle calculations for %s" % hdf_file
+                if parallel:
+                    get_angles_inputs = (dcd_file_name, pdb_file_name,
+                                         first_last_resids, flex_file)
+
+                    processes.append(mp.Process(target=dd.get_angles_df,
+                                                args=get_angles_inputs))
+                else:
+                    angles_df = dd.get_angles_df(dcd_file_name, pdb_file_name,
+                                                 first_last_resids, flex_file,
+                                                 drude=drude)
+                    print "finished angle calculations for %s" % hdf_file
 
         if good_dihedral:
-            plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=(703.0/58.0))
-            plot_good_dihedrals(dcd_file_name, max_frame=None, MD=False, scale_spb=(703.0/58.0))
+            if parallel:
+                plot_inputs = (dcd_file_name, max_frame, scale_spb,
+                               used_goback, show, True)
+                processes.append(mp.Process(target=plot_good_dihedrals,
+                                            args=plot_inputs))
+                plot_inputs = (dcd_file_name, max_frame, scale_spb,
+                               used_goback, show, False)
+                processes.append(mp.Process(target=plot_good_dihedrals,
+                                            args=plot_inputs))
+            else:
+                plot_good_dihedrals(dcd_file_name, max_frame, scale_spb,
+                                    used_goback, show, True)
+                plot_good_dihedrals(dcd_file_name, max_frame, scale_spb,
+                                    used_goback, show, False)
 
         if scatter_dihedrals:
-            scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb=(703.0/58.0))
-            scatter_plot_dihedrals(dcd_file_name, frequency, MD=False, scale_spb=(703.0/58.0))
+            if parallel:
+                scatter_inputs = (dcd_file_name, frequency, scale_spb, True)
+                process.append(mp.Process(target=scatter_plot_dihedrals,
+                                          args=scatter_inputs))
+                scatter_inputs = (dcd_file_name, frequency, scale_spb, False)
+                process.append(mp.Process(target=scatter_plot_dihedrals,
+                                          args=scatter_inputs))
+            else:
+                scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb,
+                                       True)
+                scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb,
+                                       False)
+    if parallel:
+        for p in processes:
+            p.start()
+
+        for p in processes:
+            p.join()
+
 
 def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                         used_goback=False, show=False, MD=True):
@@ -279,16 +382,26 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
     gs1 = gridspec.GridSpec(1, 1, left=0.075, right=0.75, wspace=0.1,
                             hspace=0, top=0.95)
     ax1 = plt.subplot(gs1[:, 0])
-    angle_labels = ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'chi']
+    angle_labels = [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$',
+                    r'$\epsilon$', r'$\zeta$', r'$\chi$']
     plot_order = [2, 3, 4, 7, 1, 5, 6]
     # plot_order = [1, 5, 6]
     # plot_order = [2, 3, 4, 7]
-    for (c, i_angle) in enumerate(plot_order):
-        ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle], '-',
-                 c=gwp.qual_color(c), label=angle_labels[i_angle - 1])
-    ax1.set_ylim([-0.1, 1.1])
+    if len(angle_vs_steps)>2:
+        for (c, i_angle) in enumerate(plot_order):
+            ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
+                     c=gwp.qual_color(c), label=angle_labels[i_angle - 1])
+        ax1.set_ylim([0, 110])
+        ax1.set_xscale('log')
+        ax1.set_xlim([0, 1800])
+    else:
+        for (c, i_angle) in enumerate(plot_order):
+            ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
+                     color=gwp.qual_color(c), marker=gwp.symbol_order(c),
+                     mec=gwp.qual_color(c), label=angle_labels[i_angle - 1],
+                     markersize=15, mfc='none')
+        ax1.set_ylim([-1, 110])
     ax1.set_ylabel(r'% in range')
-    ax1.set_xscale('log')
     ax1.set_xlabel(r'steps per bp')
     default_fontsize = 12
     lg = plt.legend(loc='upper left', bbox_to_anchor=(1, 1),
@@ -297,11 +410,12 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
     if show:
         plt.show()
     else:
-        save_name = '%s_per_accept' % dcd_file_name[:-4]
+        save_name = '%s_in_range' % dcd_file_name[:-4]
         if MD:
             save_name += '_MD'
         if max_frame:
             save_name += '_' + str(max_frame)
+        print 'saving figure to %s' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
     print 'done plotting'
@@ -359,11 +473,11 @@ def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
     matplotlib.rcParams['ytick.direction'] = 'in'
 
     if n_steps == 2:
-        df_0, _ = get_step_i_dihedrals(1, indices, angles)
+        df_0, _ = get_step_i_dihedrals(0, indices, angles)
         ax_array = make_selected_scatter_plots(limits, df_0, angle_label,
                                                symbol='+')
 
-        df_1, _ = get_step_i_dihedrals(0, indices, angles)
+        df_1, _ = get_step_i_dihedrals(1, indices, angles)
         make_selected_scatter_plots(limits, df_1, angle_label, i_color=2,
                                     ax_array=ax_array)
 
@@ -371,10 +485,11 @@ def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
                    bbox_to_anchor=[1.1475, 1.07], numpoints=1)
 
         plt.suptitle('Comparative scatter plot of selected torsional angles')
-        plt.savefig(prefix + 'dihedrals_comparison.eps', dpi=400,
-                    bbox_inches='tight')
-        plt.savefig(prefix + 'dihedrals_comparison.png', dpi=400,
-                    bbox_inches='tight')
+        save_name = prefix + 'dihedrals_comparison'
+        if MD:
+            save_name += '_MD'
+        plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+        plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
         # plt.show()
     else:
         if frequency == -1:

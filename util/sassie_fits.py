@@ -1312,7 +1312,7 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 prefix='', do_plot='True', cutoff=None, best_dcd=False,
-                fresh=False, s=True, o=True):
+                fresh=False, s=True, o=True, i0=False):
     all_x2rg_dfs = []
     all_data_iqs = []
     all_goal_iqs = []
@@ -2013,22 +2013,23 @@ if __name__ == '__main__':
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        fresh=False))
+                        fresh=False, i0=i0))
 
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        fresh=False))
+                        fresh=False, i0=i0))
 
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
-                        fresh=False))
+                        fresh=False, i0=i0))
 
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
-                        fresh=False))
+                        fresh=False, i0=i0))
+
         save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
                     sassie_run_dir)
 

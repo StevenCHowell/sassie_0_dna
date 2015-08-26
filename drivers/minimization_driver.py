@@ -52,7 +52,7 @@ def parse():
     parser.add_argument(
         "--md", type=str, default='2', help=("0: min, 1: min-md, 2: min-md-min"))
     parser.add_argument(
-        "--mdsteps", type=str, default='100', help=("# of md steps"))
+        "--mdsteps", type=str, default='200', help=("# of md steps"))
     parser.add_argument(
         "--dielect", type=str, default='80.0', help=("solvent dielectric"))
     parser.add_argument(
@@ -133,6 +133,12 @@ class Drv():
         svariables['mdsteps'] = (mdsteps, 'int')
         svariables['dielect'] = (dielect, 'float')
         svariables['temperature'] = (temperature, 'float')
+
+        svariables['use_external_input_file'] = ('False','boolean')
+        svariables['external_input_file'] = ('','string')
+
+        svariables['velocity_restart_file'] = ('','string')
+        svariables['extended_system_restart_file'] = ('','string')
 
         error, variables = input_filter.type_check_and_convert(svariables)
 
