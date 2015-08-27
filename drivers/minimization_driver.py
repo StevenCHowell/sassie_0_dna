@@ -44,7 +44,7 @@ def parse():
     parser.add_argument("--ncpu", type=str, default='8',
                         help=("number of cpus to use for minimization"))
     parser.add_argument(
-        "--keepout", type=str, default='1', help=("keep run output"))
+        "--keepout", type=str, default='0', help=("keep run output"))
     parser.add_argument("--dcdfreq", type=str, default='20', help=(
         "frequency that frames are written during the individual minimization (should be an integer devisor of the total # of minimization steps)"))
 
