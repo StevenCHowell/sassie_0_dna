@@ -116,6 +116,7 @@ def qual_color(i, style='set4'):
             [166, 118,  29],
             [102, 102, 102]]
 
+
     #  http://tools.medialab.sciences-po.fr/iwanthue/
     set2 = [[206, 158, 154],
             [127, 206, 78],

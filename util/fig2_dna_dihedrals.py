@@ -18,14 +18,6 @@ import sassie.calculate.dna_dihedral as dd
 import x_dna.util.gw_plot as gwp
 import multiprocessing as mp
 
-
-LOGGER = logging.getLogger(__name__)  # add module name manually
-
-
-class MainError(Exception):
-    pass
-
-
 def main():
     if '-v' in sys.argv:
         logging.basicConfig(filename='%s.log' % __file__[:-3],
@@ -38,6 +30,7 @@ def main():
     good_dihedral = False
     scatter_dihedrals = False
     calc_dihedrals = False
+    parallel = False
     frequency = -1
 
     # ~~~~~~~~ FILE INPUT ~~~~~~~~~~ #
@@ -61,7 +54,7 @@ def main():
     # dcd_files = []
     # dcd_files.append(run_dir + 'min_run_0.dcd')
 
-    #~~~ new 60 bps dsDNA ~~~#
+    #~~~ new charmm36 60 bps dsDNA (compare before and after min) ~~~#
     first_last_resids = [[1, 60], [61, 120]]
     run_dir = '/home/schowell/data/code/pylib/sassie_2_na/build_mol/dsDNA60/'
     flex_file = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/new_dsDNA60.flex'
@@ -69,92 +62,35 @@ def main():
     dcd_files = []
     # pdb_file_name = run_dir + 'c36_dna_raw.pdb'
     # dcd_files.append(run_dir + 'c36_dna_raw_x2.dcd')
-    pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
-    dcd_files.append(run_dir + 'output_building/c36_dna60_raw_min.dcd')
+    # pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
+    # dcd_files.append(run_dir + 'output_building/c36_dna60_raw_min.dcd')
 
-
-    #~~~ 60 bps dsDNA ~~~#
+    #~~~ determine how many time DNA can be minimized ~~~#
     # first_last_resids = [[1, 60], [61, 120]]
     # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    # pdb_file_name = run_dir + 'new_dsDNA60.pdb'
+    # pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
     # flex_file = run_dir + 'new_dsDNA60.flex'
     # drude = False
     # dcd_files = []
-    # dcd_files.append('raw_min.dcd')
-    # dcd_files.append('raw_min.dcd')
-    # dcd_files.append(run_dir + 'run0_1k_steps/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run1_1k_steps/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run2_100k_steps/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run2_100k_steps/monte_carlo/5p5_spb.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run9_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparser.dcd')
+    # dcd_files.append(run_dir + 'ma0_spb1/no_mc/mmm_x100.dcd')
+    # dcd_files.append(run_dir + 'm_ma0_spb1/no_mc/m_x100.dcd')
 
-    # dcd_files.append(run_dir + 'run12_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run11_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run9_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+    #~~~ 60 bps dsDNA ~~~#
+    first_last_resids = [[1, 60], [61, 120]]
+    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
+    flex_file = run_dir + 'new_dsDNA60.flex'
+    drude = False
+    dcd_files = []
 
-    # dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir +  [61, 120]]
-    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    # pdb_file_name = run_dir + 'new_dsDNA60.pdb'
-    # flex_file = run_dir + 'new_dsDNA60.flex'
-    # drude = False
-    # dcd_files = []'run9_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
-
-    # dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run9_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
-
-    # dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
-
-    # dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
-    # dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+    dcd_files.append(run_dir + 'ma10_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma1_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma20_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma30_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma40_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma50_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma5_spb1000/mc1_spb1000_sparse.dcd')
+    dcd_files.append(run_dir + 'ma60_spb1000/mc1_spb1000_sparse.dcd')
 
     # run_dir = 'charmm36/'
     # first_last_resids = [[1,12],[13,24]]
@@ -190,14 +126,15 @@ def main():
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
     calc_dihedrals = True
     good_dihedral = True
-    scatter_dihedrals = True
-    parallel = False
+    # scatter_dihedrals = True
+    parallel = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
     processes = []
     used_goback = False
     max_frame = None
-    scale_spb = 127.0 / 58.0
+    scale_spb = 100.0 / 58.0
+    # scale_spb = 1.0
     show = False
 
     for dcd_file_name in dcd_files:
@@ -240,10 +177,10 @@ def main():
         if scatter_dihedrals:
             if parallel:
                 scatter_inputs = (dcd_file_name, frequency, scale_spb, True)
-                process.append(mp.Process(target=scatter_plot_dihedrals,
+                processes.append(mp.Process(target=scatter_plot_dihedrals,
                                           args=scatter_inputs))
                 scatter_inputs = (dcd_file_name, frequency, scale_spb, False)
-                process.append(mp.Process(target=scatter_plot_dihedrals,
+                processes.append(mp.Process(target=scatter_plot_dihedrals,
                                           args=scatter_inputs))
             else:
                 scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb,
@@ -279,6 +216,12 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
         print 'failed to load percent of good angles file: %s' % npy_file
 
         angles = pd.read_hdf(dcd_file_name[:-3] + 'hdf', 'angles')
+        angles['-90'] = np.abs(-90 - (angles['epsilon'] - angles['zeta']))
+        angles['+90'] = np.abs(90 - (angles['epsilon'] - angles['zeta']))
+        angles['min'] = angles.loc[:,['+90', '-90']].min(axis=1)
+        angles['B-type'] = 'B'
+        angles['B-type'][angles['min'] == angles['+90']] = 'BII'
+        angles['B-type'][angles['min'] == angles['-90']] = 'BI'
 
         try:
             scale_spb == 1  # enforce there is not a scale
@@ -320,11 +263,15 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             else:
                 df = angles[angles['frame'] == i+1]
 
+
+            df_BI = df[df['B-type'] == 'BI']
+            df_BII = df[df['B-type'] == 'BII']
+
             beta_good = sum(
-                ((df['beta'] > limits.loc['beta1']['low']) &
-                 (df['beta'] < limits.loc['beta1']['high'])) |
-                ((df['beta'] > limits.loc['beta2']['low']) &
-                 (df['beta'] < limits.loc['beta2']['high'])))
+                ((df_BI['beta'] > limits.loc['beta1']['low']) &
+                 (df_BI['beta'] < limits.loc['beta1']['high'])) |
+                ((df_BII['beta'] > limits.loc['beta2']['low']) &
+                 (df_BII['beta'] < limits.loc['beta2']['high'])))
             n_beta = df['beta'].notnull().sum() * 1.0
             angle_vs_steps[i, 2] = beta_good / n_beta
 
@@ -335,22 +282,22 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             angle_vs_steps[i, 3] = gamma_good / n_gamma
 
             delta_good = sum(
-                ((df['delta'] > limits.loc['delta1']['low']) &
-                 (df['delta'] < limits.loc['delta1']['high'])) |
-                ((df['delta'] > limits.loc['delta2']['low']) &
-                 (df['delta'] < limits.loc['delta2']['high'])))
+                ((df_BI['delta'] > limits.loc['delta1']['low']) &
+                 (df_BI['delta'] < limits.loc['delta1']['high'])) |
+                ((df_BII['delta'] > limits.loc['delta2']['low']) &
+                 (df_BII['delta'] < limits.loc['delta2']['high'])))
             n_delta = df['delta'].notnull().sum() * 1.0
             angle_vs_steps[i, 4] = delta_good / n_delta
 
             chi_good = sum(
-                (((df['resname'] == 'C') | (df['resname'] == 'T')) &
-                 (df['chi'] > limits.loc['chi1py']['low']) &
-                 (df['chi'] < limits.loc['chi1py']['high'])) |
-                (((df['resname'] == 'G') | (df['resname'] == 'A')) &
-                 (df['chi'] > limits.loc['chi1pu']['low']) &
-                 (df['chi'] < limits.loc['chi1pu']['high'])) |
-                ((df['chi'] > limits.loc['chi2']['low']) &
-                 (df['chi'] < limits.loc['chi2']['high'])))
+                (((df_BI['resname'] == 'C') | (df_BI['resname'] == 'T')) &
+                 (df_BI['chi'] > limits.loc['chi1py']['low']) &
+                 (df_BI['chi'] < limits.loc['chi1py']['high'])) |
+                (((df_BI['resname'] == 'G') | (df_BI['resname'] == 'A')) &
+                 (df_BI['chi'] > limits.loc['chi1pu']['low']) &
+                 (df_BI['chi'] < limits.loc['chi1pu']['high'])) |
+                ((df_BII['chi'] > limits.loc['chi2']['low']) &
+                 (df_BII['chi'] < limits.loc['chi2']['high'])))
             n_chi = df['chi'].notnull().sum() * 1.0
             angle_vs_steps[i, 7] = chi_good / n_chi
 
@@ -361,18 +308,19 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             angle_vs_steps[i, 1] = alpha_good / n_alpha
 
             epsilon_good = sum(
-                ((df['epsilon'] > limits.loc['epsilon1']['low']) &
-                 (df['epsilon'] < limits.loc['epsilon1']['high'])) |
-                ((df['epsilon'] > limits.loc['epsilon2']['low']) &
-                 (df['epsilon'] < limits.loc['epsilon2']['high'])))
+                ((df_BI['epsilon'] > limits.loc['epsilon1']['low']) &
+                 (df_BI['epsilon'] < limits.loc['epsilon1']['high'])) |
+                ((df_BII['epsilon'] > limits.loc['epsilon2']['low']) &
+                 (df_BII['epsilon'] < limits.loc['epsilon2']['high'])))
             n_epsilon = df['epsilon'].notnull().sum() * 1.0
             angle_vs_steps[i, 5] = epsilon_good / n_epsilon
 
             zeta_good = sum(
-                ((df['zeta'] > limits.loc['zeta1']['low']) &
-                 (df['zeta'] < limits.loc['zeta1']['high'])) |
-                ((df['zeta'] > limits.loc['zeta2']['low']) &
-                 (df['zeta'] < limits.loc['zeta2']['high'])))
+                ((df_BI['zeta'] > limits.loc['zeta1']['low']) &
+                 (df_BI['zeta'] < limits.loc['zeta1']['high'])) |
+                ((df_BII['zeta'] > limits.loc['zeta2']['low']) &
+                 (df_BII[
+                     'zeta'] < limits.loc['zeta2']['high'])))
             n_zeta = df['zeta'].notnull().sum() * 1.0
             angle_vs_steps[i, 6] = zeta_good / n_zeta
 
@@ -387,13 +335,15 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
     plot_order = [2, 3, 4, 7, 1, 5, 6]
     # plot_order = [1, 5, 6]
     # plot_order = [2, 3, 4, 7]
+    ax1.plot([0, 100], [95, 95], '--', c='DimGray', linewidth=2)
+             # label=r'$2\sigma$ cutoff')
     if len(angle_vs_steps)>2:
         for (c, i_angle) in enumerate(plot_order):
             ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
                      c=gwp.qual_color(c), label=angle_labels[i_angle - 1])
-        ax1.set_ylim([0, 110])
+        ax1.set_ylim([73, 102])
         ax1.set_xscale('log')
-        ax1.set_xlim([0, 1800])
+        ax1.set_xlim([0, 100])
     else:
         for (c, i_angle) in enumerate(plot_order):
             ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
@@ -401,12 +351,13 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                      mec=gwp.qual_color(c), label=angle_labels[i_angle - 1],
                      markersize=15, mfc='none')
         ax1.set_ylim([-1, 110])
+
     ax1.set_ylabel(r'% in range')
-    ax1.set_xlabel(r'steps per bp')
+    ax1.set_xlabel(r'Minimization Iterations')
     default_fontsize = 12
-    lg = plt.legend(loc='upper left', bbox_to_anchor=(1, 1),
-                    scatterpoints=1, numpoints=1,
+    lg = plt.legend(loc='lower left', scatterpoints=1, numpoints=1,
                     prop={'size': default_fontsize})
+    lg.draw_frame(False)
     if show:
         plt.show()
     else:
@@ -430,12 +381,20 @@ def get_step_i_dihedrals(i, indices, all_df):
     return i_df, len(frames)
 
 
-def limit_patch(x_key, y_key, limits, ax):
+def limit_patch(x_key, y_key, limits, ax, b1=1):
     red_alpha_p5 = np.array([235, 157, 158], dtype=float) / 255
+    yellow_alpha_p5 = np.array([241, 218, 151], dtype=float) / 255
+    overlap_red_yellow = np.array([228, 182, 48], dtype=float) / 255
+    if b1 == 1:
+        color = red_alpha_p5
+    elif b1 == 2 :
+        color = yellow_alpha_p5
+    elif b1 == 3:
+        color = overlap_red_yellow
     limit_patch = patches.Rectangle(
         (limits.loc[x_key]['low'], limits.loc[y_key]['low']),
         4 * limits.loc[x_key]['sd'], 4 * limits.loc[y_key]['sd'],
-        edgecolor='none', alpha=1, facecolor=red_alpha_p5)
+        edgecolor='none', alpha=1, facecolor=color)
     ax.add_patch(limit_patch)
 
 
@@ -525,8 +484,8 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[0, 0]
     x = 'zeta'
     y = 'alpha'
-    limit_patch('zeta1', 'alpha', limits, ax)
-    limit_patch('zeta2', 'alpha', limits, ax)
+    limit_patch('zeta1', 'alpha', limits, ax, b1=1)
+    limit_patch('zeta2', 'alpha', limits, ax, b1=2)
     ax.plot(df[x][0:-1], df[y][1:], symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y] + ' + 1')
@@ -536,10 +495,10 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[0, 1]
     x = 'zeta'
     y = 'beta'
-    limit_patch('zeta1', 'beta1', limits, ax)
-    limit_patch('zeta1', 'beta2', limits, ax)
-    limit_patch('zeta2', 'beta1', limits, ax)
-    limit_patch('zeta2', 'beta2', limits, ax)
+    limit_patch('zeta1', 'beta1', limits, ax, b1=1)
+    limit_patch('zeta1', 'beta2', limits, ax, b1=3)
+    limit_patch('zeta2', 'beta1', limits, ax, b1=3)
+    limit_patch('zeta2', 'beta2', limits, ax, b1=2)
     ax.plot(df[x][0:-1], df[y][1:], symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y] + ' + 1')
@@ -549,8 +508,8 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[0, 2]
     x = 'zeta'
     y = 'epsilon'
-    limit_patch('zeta1', 'epsilon1', limits, ax)
-    limit_patch('zeta2', 'epsilon2', limits, ax)
+    limit_patch('zeta1', 'epsilon1', limits, ax, b1=1)
+    limit_patch('zeta2', 'epsilon2', limits, ax, b1=2)
     ax.plot(df[x], df[y], symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y])
@@ -561,7 +520,7 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[1, 0]
     x = 'alpha'
     y = 'gamma'
-    limit_patch('alpha', 'gamma', limits, ax)
+    limit_patch('alpha', 'gamma', limits, ax, b1=1)
     ax.plot(df[x], df[y], symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y])
@@ -571,9 +530,9 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[1, 1]
     x = 'zeta'
     y = 'chi'
-    limit_patch('zeta1', 'chi1pu', limits, ax)
-    limit_patch('zeta1', 'chi1py', limits, ax)
-    limit_patch('zeta2', 'chi2', limits, ax)
+    limit_patch('zeta1', 'chi1pu', limits, ax, b1=1)
+    limit_patch('zeta1', 'chi1py', limits, ax, b1=1)
+    limit_patch('zeta2', 'chi2', limits, ax, b1=2)
     ax.plot(df[x], df[y],  symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y])
@@ -583,9 +542,9 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[1, 2]
     x = 'delta'
     y = 'chi'
-    limit_patch('delta1', 'chi1pu', limits, ax)
-    limit_patch('delta1', 'chi1py', limits, ax)
-    limit_patch('delta2', 'chi2', limits, ax)
+    limit_patch('delta1', 'chi1pu', limits, ax, b1=1)
+    limit_patch('delta1', 'chi1py', limits, ax, b1=1)
+    limit_patch('delta2', 'chi2', limits, ax, b1=2)
     ax.plot(df[x], df[y],  symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y])
@@ -596,10 +555,10 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[2, 0]
     x = 'zeta'
     y = 'zeta'
-    limit_patch('zeta1', 'zeta1', limits, ax)
-    limit_patch('zeta1', 'zeta2', limits, ax)
-    limit_patch('zeta2', 'zeta1', limits, ax)
-    # limit_patch('zeta2', 'zeta2', limits, ax)
+    limit_patch('zeta1', 'zeta1', limits, ax, b1=1)
+    limit_patch('zeta1', 'zeta2', limits, ax, b1=3)
+    limit_patch('zeta2', 'zeta1', limits, ax, b1=3)
+    # limit_patch('zeta2', 'zeta2', limits, ax, b1=True)
     ax.plot(df[x][:-1], df[y][1:],  symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y] + ' + 1')
@@ -608,10 +567,10 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[2, 1]
     x = 'epsilon'
     y = 'epsilon'
-    limit_patch('epsilon1', 'epsilon1', limits, ax)
-    limit_patch('epsilon1', 'epsilon2', limits, ax)
-    limit_patch('epsilon2', 'epsilon1', limits, ax)
-    # limit_patch('epsilon2', 'epsilon2', limits, ax)
+    limit_patch('epsilon1', 'epsilon1', limits, ax, b1=1)
+    limit_patch('epsilon1', 'epsilon2', limits, ax, b1=3)
+    limit_patch('epsilon2', 'epsilon1', limits, ax, b1=3)
+    # limit_patch('epsilon2', 'epsilon2', limits, ax, b1=True)
     ax.plot(df[x][:-1], df[y][1:],  symbol, c=gwp.qual_color(i_color))
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y] + ' + 1')
@@ -621,8 +580,8 @@ def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[2, 2]
     x = 'zeta'
     y = 'delta'
-    limit_patch('zeta1', 'delta1', limits, ax)
-    limit_patch('zeta2', 'delta2', limits, ax)
+    limit_patch('zeta1', 'delta1', limits, ax, b1=True)
+    limit_patch('zeta2', 'delta2', limits, ax, b1=True)
     ax.plot(df[x], df[y],  symbol, c=gwp.qual_color(i_color))
     ax.tick_params(labelleft='off')  # , labelright='on')
     ax.set_xlabel(angle_label[x])
@@ -643,3 +602,82 @@ if __name__ == '__main__':
         pass
 
     print 'completed get_dihedral script\n~~~~~ \m/ >.< \m/ ~~~~~~'
+
+
+
+
+# dcd_files.append('raw_min.dcd')
+# dcd_files.append('raw_min.dcd')
+# dcd_files.append(run_dir + 'run0_1k_steps/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run1_1k_steps/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run2_100k_steps/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run2_100k_steps/monte_carlo/5p5_spb.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run9_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparser.dcd')
+
+# dcd_files.append(run_dir + 'run12_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run11_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run9_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/monte_carlo/min_dsDNA60_sparse.dcd')
+
+# dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir +  [61, 120]]
+# run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+# pdb_file_name = run_dir + 'new_dsDNA60.pdb'
+# flex_file = run_dir + 'new_dsDNA60.flex'
+# drude = False
+# dcd_files = []'run9_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization/dsDNA_sparse_min.dcd')
+
+# dcd_files.append(run_dir + 'run12_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run11_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run9_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/energy_minimization_noMD/dsDNA_sparse_min_noMD.dcd')
+
+# dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_1k_noMD/dsDNA_sparse_min_noMD.dcd')
+
+# dcd_files.append(run_dir + 'run12_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run11_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run3_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run4_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run5_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run6_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run7_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run8_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run9_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
+# dcd_files.append(run_dir + 'run10_100k_ngb/c36_energy_minimization_2k_noMD/dsDNA_sparse_min_noMD.dcd')
