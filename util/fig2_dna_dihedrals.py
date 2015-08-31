@@ -55,11 +55,11 @@ def main():
     # dcd_files.append(run_dir + 'min_run_0.dcd')
 
     #~~~ new charmm36 60 bps dsDNA (compare before and after min) ~~~#
-    first_last_resids = [[1, 60], [61, 120]]
-    run_dir = '/home/schowell/data/code/pylib/sassie_2_na/build_mol/dsDNA60/'
-    flex_file = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/new_dsDNA60.flex'
-    drude = False
-    dcd_files = []
+    # first_last_resids = [[1, 60], [61, 120]]
+    # run_dir = '/home/schowell/data/code/pylib/sassie_2_na/build_mol/dsDNA60/'
+    # flex_file = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/new_dsDNA60.flex'
+    # drude = False
+    # dcd_files = []
     # pdb_file_name = run_dir + 'c36_dna_raw.pdb'
     # dcd_files.append(run_dir + 'c36_dna_raw_x2.dcd')
     # pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
@@ -76,21 +76,75 @@ def main():
     # dcd_files.append(run_dir + 'm_ma0_spb1/no_mc/m_x100.dcd')
 
     #~~~ 60 bps dsDNA ~~~#
+    # first_last_resids = [[1, 60], [61, 120]]
+    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    # pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
+    # flex_file = run_dir + 'new_dsDNA60.flex'
+    # drude = False
+    # dcd_files = []
+
+    # dcd_files.append(run_dir + 'ma10_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma1_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma20_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma30_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma40_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma50_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma5_spb1000/mc1_spb1000_sparse.dcd')
+    # dcd_files.append(run_dir + 'ma60_spb1000/mc1_spb1000_sparse.dcd')
+
     first_last_resids = [[1, 60], [61, 120]]
-    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
-    flex_file = run_dir + 'new_dsDNA60.flex'
+    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps'
+    pdb_file_name = os.path.join(run_dir, 'c36_min_dsDNA60.pdb')
+    flex_file = os.path.join(run_dir, 'new_dsDNA60.flex')
     drude = False
     dcd_files = []
 
-    dcd_files.append(run_dir + 'ma10_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma1_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma20_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma30_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma40_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma50_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma5_spb1000/mc1_spb1000_sparse.dcd')
-    dcd_files.append(run_dir + 'ma60_spb1000/mc1_spb1000_sparse.dcd')
+    # prefix = 'debug_MD'
+    # run_dir = os.path.join(run_dir, 'ma20_spb1000')
+    # dcd_files.append(os.path.join(run_dir, 'mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'mc2_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_BK/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_BK/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_redo/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_redo/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_v2/mc2_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_v2/mc1_spb1000_sparse_mmm_tmp.dcd'))
+
+    prefix = 'raw_MD'
+    # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse.dcd'))
+    dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse.dcd'))
+
+    # prefix = 'mmm_MD'
+    # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+
+    # prefix = 'm_MD'
+    # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse_m.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse_m.dcd'))
+
+    # prefix = 'sanity_MD'
+    # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/sanity/monte_carlo/'
+                                  # 'sanity_ma20_1k.dcd'))
 
     # run_dir = 'charmm36/'
     # first_last_resids = [[1,12],[13,24]]
@@ -126,7 +180,7 @@ def main():
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
     calc_dihedrals = True
     good_dihedral = True
-    # scatter_dihedrals = True
+    scatter_dihedrals = True
     parallel = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
@@ -164,15 +218,15 @@ def main():
                                used_goback, show, True)
                 processes.append(mp.Process(target=plot_good_dihedrals,
                                             args=plot_inputs))
-                plot_inputs = (dcd_file_name, max_frame, scale_spb,
-                               used_goback, show, False)
-                processes.append(mp.Process(target=plot_good_dihedrals,
-                                            args=plot_inputs))
+                # plot_inputs = (dcd_file_name, max_frame, scale_spb,
+                               # used_goback, show, False)
+                # processes.append(mp.Process(target=plot_good_dihedrals,
+                                            # args=plot_inputs))
             else:
                 plot_good_dihedrals(dcd_file_name, max_frame, scale_spb,
                                     used_goback, show, True)
-                plot_good_dihedrals(dcd_file_name, max_frame, scale_spb,
-                                    used_goback, show, False)
+                # plot_good_dihedrals(dcd_file_name, max_frame, scale_spb,
+                                    # used_goback, show, False)
 
         if scatter_dihedrals:
             if parallel:
@@ -194,6 +248,7 @@ def main():
         for p in processes:
             p.join()
 
+    # compare_average_in_range(dcd_files)
 
 def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                         used_goback=False, show=False, MD=True):
@@ -263,15 +318,13 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             else:
                 df = angles[angles['frame'] == i+1]
 
-
-            df_BI = df[df['B-type'] == 'BI']
-            df_BII = df[df['B-type'] == 'BII']
-
             beta_good = sum(
-                ((df_BI['beta'] > limits.loc['beta1']['low']) &
-                 (df_BI['beta'] < limits.loc['beta1']['high'])) |
-                ((df_BII['beta'] > limits.loc['beta2']['low']) &
-                 (df_BII['beta'] < limits.loc['beta2']['high'])))
+                ((df['beta'] > limits.loc['beta1']['low']) &
+                 (df['beta'] < limits.loc['beta1']['high']) &
+                 (df['B-type'] == 'BI')) |
+                ((df['beta'] > limits.loc['beta2']['low']) &
+                 (df['beta'] < limits.loc['beta2']['high']) &
+                 (df['B-type'] == 'BII')))
             n_beta = df['beta'].notnull().sum() * 1.0
             angle_vs_steps[i, 2] = beta_good / n_beta
 
@@ -282,22 +335,27 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             angle_vs_steps[i, 3] = gamma_good / n_gamma
 
             delta_good = sum(
-                ((df_BI['delta'] > limits.loc['delta1']['low']) &
-                 (df_BI['delta'] < limits.loc['delta1']['high'])) |
-                ((df_BII['delta'] > limits.loc['delta2']['low']) &
-                 (df_BII['delta'] < limits.loc['delta2']['high'])))
+                ((df['delta'] > limits.loc['delta1']['low']) &
+                 (df['delta'] < limits.loc['delta1']['high']) &
+                (df['B-type'] == 'BI'))  |
+                ((df['delta'] > limits.loc['delta2']['low']) &
+                 (df['delta'] < limits.loc['delta2']['high']) &
+                 (df['B-type'] == 'BII')))
             n_delta = df['delta'].notnull().sum() * 1.0
             angle_vs_steps[i, 4] = delta_good / n_delta
 
             chi_good = sum(
-                (((df_BI['resname'] == 'C') | (df_BI['resname'] == 'T')) &
-                 (df_BI['chi'] > limits.loc['chi1py']['low']) &
-                 (df_BI['chi'] < limits.loc['chi1py']['high'])) |
-                (((df_BI['resname'] == 'G') | (df_BI['resname'] == 'A')) &
-                 (df_BI['chi'] > limits.loc['chi1pu']['low']) &
-                 (df_BI['chi'] < limits.loc['chi1pu']['high'])) |
-                ((df_BII['chi'] > limits.loc['chi2']['low']) &
-                 (df_BII['chi'] < limits.loc['chi2']['high'])))
+                (((df['resname'] == 'C') | (df['resname'] == 'T')) &
+                 (df['chi'] > limits.loc['chi1py']['low']) &
+                 (df['chi'] < limits.loc['chi1py']['high']) &
+                 (df['B-type'] == 'BI'))  |
+                (((df['resname'] == 'G') | (df['resname'] == 'A')) &
+                 (df['chi'] > limits.loc['chi1pu']['low']) &
+                 (df['chi'] < limits.loc['chi1pu']['high']) &
+                 (df['B-type'] == 'BI'))  |
+                ((df['chi'] > limits.loc['chi2']['low']) &
+                 (df['chi'] < limits.loc['chi2']['high']) &
+                 (df['B-type'] == 'BII')))
             n_chi = df['chi'].notnull().sum() * 1.0
             angle_vs_steps[i, 7] = chi_good / n_chi
 
@@ -308,19 +366,22 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             angle_vs_steps[i, 1] = alpha_good / n_alpha
 
             epsilon_good = sum(
-                ((df_BI['epsilon'] > limits.loc['epsilon1']['low']) &
-                 (df_BI['epsilon'] < limits.loc['epsilon1']['high'])) |
-                ((df_BII['epsilon'] > limits.loc['epsilon2']['low']) &
-                 (df_BII['epsilon'] < limits.loc['epsilon2']['high'])))
+                ((df['epsilon'] > limits.loc['epsilon1']['low']) &
+                 (df['epsilon'] < limits.loc['epsilon1']['high']) &
+                 (df['B-type'] == 'BI'))  |
+                ((df['epsilon'] > limits.loc['epsilon2']['low']) &
+                 (df['epsilon'] < limits.loc['epsilon2']['high']) &
+                 (df['B-type'] == 'BII')))
             n_epsilon = df['epsilon'].notnull().sum() * 1.0
             angle_vs_steps[i, 5] = epsilon_good / n_epsilon
 
             zeta_good = sum(
-                ((df_BI['zeta'] > limits.loc['zeta1']['low']) &
-                 (df_BI['zeta'] < limits.loc['zeta1']['high'])) |
-                ((df_BII['zeta'] > limits.loc['zeta2']['low']) &
-                 (df_BII[
-                     'zeta'] < limits.loc['zeta2']['high'])))
+                ((df['zeta'] > limits.loc['zeta1']['low']) &
+                 (df['zeta'] < limits.loc['zeta1']['high']) &
+                 (df['B-type'] == 'BI'))  |
+                ((df['zeta'] > limits.loc['zeta2']['low']) &
+                 (df['zeta'] < limits.loc['zeta2']['high']) &
+                 (df['B-type'] == 'BII')))
             n_zeta = df['zeta'].notnull().sum() * 1.0
             angle_vs_steps[i, 6] = zeta_good / n_zeta
 
@@ -335,7 +396,7 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
     plot_order = [2, 3, 4, 7, 1, 5, 6]
     # plot_order = [1, 5, 6]
     # plot_order = [2, 3, 4, 7]
-    ax1.plot([0, 100], [95, 95], '--', c='DimGray', linewidth=2)
+    ax1.plot([0, 10000], [95, 95], '--', c='DimGray', linewidth=2)
              # label=r'$2\sigma$ cutoff')
     if len(angle_vs_steps)>2:
         for (c, i_angle) in enumerate(plot_order):
@@ -343,7 +404,8 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                      c=gwp.qual_color(c), label=angle_labels[i_angle - 1])
         ax1.set_ylim([73, 102])
         ax1.set_xscale('log')
-        ax1.set_xlim([0, 100])
+        x_max = angle_vs_steps[-1, 0]
+        ax1.set_xlim([0, x_max])
     else:
         for (c, i_angle) in enumerate(plot_order):
             ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
@@ -369,8 +431,64 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
         print 'saving figure to %s' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+
     print 'done plotting'
 
+    all_in_range_file = dcd_file_name[:-4] + '_ave_in_range'
+    if MD:
+        all_in_range_file += '_MD'
+    all_in_range = np.copy(angle_vs_steps[:,:2])
+    all_in_range[:,1] = angle_vs_steps[:,1:].mean(axis=1)
+    np.savetxt(all_in_range_file + '.out', all_in_range)
+
+
+def compare_average_in_range(dcd_files, MD=True, show=False):
+
+    fig = plt.figure(figsize=(6, 4))
+    gs1 = gridspec.GridSpec(1, 1, left=0.075, right=0.75, wspace=0.1,
+                            hspace=0, top=0.95)
+    ax1 = plt.subplot(gs1[:, 0])
+    labels = [r'$\delta\theta=60$', r'$\delta\theta=50$', r'$\delta\theta=40$',
+              r'$\delta\theta=30$', r'$\delta\theta=20$', r'$\delta\theta=10$',
+              r'$\delta\theta=5$', r'$\delta\theta=1$']
+
+    plt.axhline(95, ls='--', c='DimGray', linewidth=2)
+    all_in_range = []
+    max_steps = []
+    min_steps = []
+    for (i, dcd_file) in enumerate(dcd_files):
+        all_in_range_file = os.path.join(os.path.split(dcd_file)[0],
+                                    'average_in_range')
+        if MD:
+            all_in_range_file += '_MD'
+        all_in_range.append(np.loadtxt(all_in_range_file + '.out'))
+        max_steps.append(all_in_range[i][-1, 0])
+        min_steps.append(all_in_range[i][0, 0])
+
+        ax1.plot(all_in_range[i][:, 0], all_in_range[i][:, 1]*100, '-',
+                 c=gwp.qual_color(i), label=labels[i])
+
+    ax1.set_xscale('log')
+    x_min = min(min_steps)
+    x_max = min(max_steps)
+    ax1.set_xlim([x_min, x_max])
+    ax1.set_ylim([73, 102])
+
+    ax1.set_ylabel(r'% in range')
+    ax1.set_xlabel(r'Minimization Iterations')
+    default_fontsize = 12
+    lg = plt.legend(loc='lower left', scatterpoints=1, numpoints=1,
+                    prop={'size': default_fontsize})
+    lg.draw_frame(False)
+    if show:
+        plt.show()
+    else:
+        save_name = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/average_in_range'
+        if MD:
+            save_name += '_MD'
+        print 'saving figure to %s' % save_name
+        plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+        plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
 
 def get_step_i_dihedrals(i, indices, all_df):
     df_list = []
