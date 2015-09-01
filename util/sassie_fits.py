@@ -1981,6 +1981,16 @@ if __name__ == '__main__':
         trimer_runs = [run.replace('foxs/', '') for run in trimer_runs]
         tetramer_runs = [run.replace('foxs/', '') for run in tetramer_runs]
 
+        for run in trimer_runs:
+            print run
+            if '3x167_k200/run97' in run:
+                print 'pause here'
+            sub_dirs = ['sub%02d' % i for i in xrange(1, 100)]
+            for sub_dir in sub_dirs:
+                if op.exists(op.join(run, 'foxs/', sub_dir)):
+                    trimer_runs.remove(run)
+                    break
+
         run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
                     'h5': tetramer_runs}
 
