@@ -63,6 +63,7 @@ def symbol_order(i, l=False):
 
 
 def color_order(i):
+    # Xiangyun's preferred colors
     colors = [[0,    0,    1],
               [0,  0.5,    0],
               [1,    0,    0],
@@ -247,7 +248,7 @@ def diverge_map(low=qual_color(0), high=qual_color(1)):
 if __name__ == '__main__':
     import numpy as np
     import matplotlib
-    matplotlib.use('Agg')
+    # matplotlib.use('Agg')
     import matplotlib.pyplot as plt
 
     j = 11
@@ -264,12 +265,12 @@ if __name__ == '__main__':
     dy = 0.1
     plt.ylim([-dy, x[-1] + dy])
     leg = plt.legend(scatterpoints=1, numpoints=1)
-    plt.show()
     name = 'python_symbol_color'
     fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
     fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
+    plt.show()
 
     j = 12
     x = np.array(range(j))
@@ -290,12 +291,12 @@ if __name__ == '__main__':
     dy = 0.1
     plt.ylim([-dy, x[-1] + dy])
     leg = plt.legend(scatterpoints=1, numpoints=1)
-    plt.show()
     name = 'qual_color_' + style
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
+    plt.show()
 
     j = 25
     x = np.array(range(j))
@@ -312,7 +313,6 @@ if __name__ == '__main__':
     dy = 0.1
     plt.ylim([-dy, x[-1] + dy])
     leg = plt.legend(scatterpoints=1, numpoints=1)
-    plt.show()
     if sort:
         name = 'sorted_seq_color'
     else:
@@ -321,5 +321,6 @@ if __name__ == '__main__':
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
+    plt.show()
 
     print '\m/ >.< \m/'

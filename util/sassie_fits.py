@@ -2001,8 +2001,8 @@ if __name__ == '__main__':
         array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']
         # array_types = ['tet']
-        array_types = ['tri']
-        # array_types = ['h5']
+        # array_types = ['tri']
+        array_types = ['h5']
         # i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
         # i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid
         # points
