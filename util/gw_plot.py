@@ -55,7 +55,7 @@ def prlabel():
 
 
 def symbol_order(i, l=False):
-    symbols = ['s', 'o', '^', 'd', 'v', '*', '<', 'p', 'h', 'x']
+    symbols = ['s', 'o', '^', 'd', 'v', '*', '<', 'p', 'h']
     if l:
         return symbols[i % len(symbols)] + l
     else:
@@ -77,11 +77,23 @@ def color_order(i):
     return colors[i % len(colors)]
 
 
-def qual_color(i, style='set4'):
+def qual_color(i, style='solarized'):
     '''
     http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer.html
     9-class qualitative Set1,
     '''
+    # solarized
+    solarized = [[ 38, 139, 210], # blue      #268bd2  4/4 blue      33 #0087ff 
+                 [220,  50,  47], # red       #dc322f  1/1 red      160 #d70000  
+                 [133, 153,   0], # green     #859900  2/2 green     64 #5f8700 
+                 [211,  54, 130], # magenta   #d33682  5/5 magenta  125 #af005f 
+                 [181, 137,   0], # yellow    #b58900  3/3 yellow   136 #af8700 
+                 [ 42, 161, 152], # cyan      #2aa198  6/6 cyan      37 #00afaf 
+                 [108, 113, 196], # violet    #6c71c4 13/5 brmagenta 61 #5f5faf 
+                 [203,  75,  22], # orange    #cb4b16  9/3 brred    166 #d75f00 
+                 [131, 148, 150], # base0     #839496 12/6 brblue   244 #808080 
+                 [253, 246, 227]] # base3     #fdf6e3 15/7 brwhite  230 #ffffd7 
+
     # 12-class paired
     pair = [[166, 206, 227],
             [31, 120, 180],
@@ -165,12 +177,14 @@ def qual_color(i, style='set4'):
             [202, 82, 147],
             [205, 73, 52],
             [128, 147, 203]]
-
+    
     mpl_set = plt.cm.Set3(np.linspace(0, 1, 12))[:, :3] * 255.0
 
-    styles = {'set1': set1, 'pair': pair, 'dark': dark, 'set2': set2,
+    styles = {'set1': set1, 'pair': pair, 'dark': dark, 'set2': set2, 'solarized': solarized,
               'set3': set3, 'set4': set4, 'set5': set5, 'mpl_set': mpl_set}
+
     colors = styles[style]
+    
     return np.array(colors[i % len(colors)]) / 255.0
 
 
@@ -251,6 +265,28 @@ if __name__ == '__main__':
     # matplotlib.use('Agg')
     import matplotlib.pyplot as plt
 
+
+    title = 'Default Matplotlib Settings (from matplotlibrc file)'
+    j = 11
+    x = np.array(range(j))
+    y = np.ones(j)
+    fig = plt.figure()
+    for i in x:
+        y[:] = i
+        s = symbol_order(i, '-')
+        plt.plot(x, y, s, ms=10, label='default color: %d' %i, linewidth=5)
+    dy = 0.1
+    plt.ylim([-dy, x[-1] + dy])
+    leg = plt.legend(scatterpoints=1, numpoints=1)
+    name = 'default_colors'
+    plt.title(title)
+    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
+    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
+    fig.savefig('%s.eps' % name)
+    fig.savefig('%s.png' % name)
+    plt.show()
+    
+    title = 'Duplicating MATLAB Color Settings'
     j = 11
     x = np.array(range(j))
     y = np.ones(j)
@@ -266,12 +302,14 @@ if __name__ == '__main__':
     plt.ylim([-dy, x[-1] + dy])
     leg = plt.legend(scatterpoints=1, numpoints=1)
     name = 'python_symbol_color'
-    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
-    fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
+    plt.title(title)
+    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
+    # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
     plt.show()
 
+    title = 'Qualitative Colors'
     j = 12
     x = np.array(range(j))
     y = np.ones(j)
@@ -280,7 +318,8 @@ if __name__ == '__main__':
     style = 'dark'
     style = 'set2'
     style = 'set4'
-    # style = 'mpl_set'
+    style = 'mpl_set'
+    style = 'solarized'
     for i in x:
         y[:] = i
         s = symbol_order(i, '-')
@@ -292,12 +331,14 @@ if __name__ == '__main__':
     plt.ylim([-dy, x[-1] + dy])
     leg = plt.legend(scatterpoints=1, numpoints=1)
     name = 'qual_color_' + style
+    plt.title(title)
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
     plt.show()
 
+    title = 'Sequential Colors'
     j = 25
     x = np.array(range(j))
     y = np.ones(j)
@@ -317,6 +358,7 @@ if __name__ == '__main__':
         name = 'sorted_seq_color'
     else:
         name = 'seq_color'
+    plt.title(title)
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.eps' % name)
     # fig.savefig('/home/schowell/Dropbox/gw_phd/%s.png' % name)
     fig.savefig('%s.eps' % name)
