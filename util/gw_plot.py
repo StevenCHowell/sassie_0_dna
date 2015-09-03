@@ -92,7 +92,7 @@ def qual_color(i, style='solarized'):
                  [108, 113, 196], # violet    #6c71c4 13/5 brmagenta 61 #5f5faf 
                  [203,  75,  22], # orange    #cb4b16  9/3 brred    166 #d75f00 
                  [131, 148, 150], # base0     #839496 12/6 brblue   244 #808080 
-                 [253, 246, 227]] # base3     #fdf6e3 15/7 brwhite  230 #ffffd7 
+                 [  0,  43,  54]] # base03    #002b36  8/4 brblack  234 #1c1c1c 
 
     # 12-class paired
     pair = [[166, 206, 227],
