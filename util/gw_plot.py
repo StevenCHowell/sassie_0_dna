@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+# import matplotlib.colors as mcolors
 import numpy as np
 
 
@@ -77,22 +77,22 @@ def color_order(i):
     return colors[i % len(colors)]
 
 
-def qual_color(i, style='solarized'):
+def qual_color(i, style='set4'):
     '''
     http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer.html
     9-class qualitative Set1,
     '''
     # solarized
-    solarized = [[ 38, 139, 210], # blue      #268bd2  4/4 blue      33 #0087ff 
-                 [220,  50,  47], # red       #dc322f  1/1 red      160 #d70000  
-                 [133, 153,   0], # green     #859900  2/2 green     64 #5f8700 
-                 [211,  54, 130], # magenta   #d33682  5/5 magenta  125 #af005f 
-                 [181, 137,   0], # yellow    #b58900  3/3 yellow   136 #af8700 
-                 [ 42, 161, 152], # cyan      #2aa198  6/6 cyan      37 #00afaf 
-                 [108, 113, 196], # violet    #6c71c4 13/5 brmagenta 61 #5f5faf 
-                 [203,  75,  22], # orange    #cb4b16  9/3 brred    166 #d75f00 
-                 [131, 148, 150], # base0     #839496 12/6 brblue   244 #808080 
-                 [  0,  43,  54]] # base03    #002b36  8/4 brblack  234 #1c1c1c 
+    solarized = [[ 38, 139, 210], # blue      #268bd2  4/4 blue      33 #0087ff
+                 [220,  50,  47], # red       #dc322f  1/1 red      160 #d70000
+                 [133, 153,   0], # green     #859900  2/2 green     64 #5f8700
+                 [211,  54, 130], # magenta   #d33682  5/5 magenta  125 #af005f
+                 [181, 137,   0], # yellow    #b58900  3/3 yellow   136 #af8700
+                 [ 42, 161, 152], # cyan      #2aa198  6/6 cyan      37 #00afaf
+                 [108, 113, 196], # violet    #6c71c4 13/5 brmagenta 61 #5f5faf
+                 [203,  75,  22], # orange    #cb4b16  9/3 brred    166 #d75f00
+                 [131, 148, 150], # base0     #839496 12/6 brblue   244 #808080
+                 [  0,  43,  54]] # base03    #002b36  8/4 brblack  234 #1c1c1c
 
     # 12-class paired
     pair = [[166, 206, 227],
@@ -177,14 +177,14 @@ def qual_color(i, style='solarized'):
             [202, 82, 147],
             [205, 73, 52],
             [128, 147, 203]]
-    
+
     mpl_set = plt.cm.Set3(np.linspace(0, 1, 12))[:, :3] * 255.0
 
     styles = {'set1': set1, 'pair': pair, 'dark': dark, 'set2': set2, 'solarized': solarized,
               'set3': set3, 'set4': set4, 'set5': set5, 'mpl_set': mpl_set}
 
     colors = styles[style]
-    
+
     return np.array(colors[i % len(colors)]) / 255.0
 
 
@@ -285,7 +285,7 @@ if __name__ == '__main__':
     fig.savefig('%s.eps' % name)
     fig.savefig('%s.png' % name)
     plt.show()
-    
+
     title = 'Duplicating MATLAB Color Settings'
     j = 11
     x = np.array(range(j))
@@ -318,8 +318,8 @@ if __name__ == '__main__':
     style = 'dark'
     style = 'set2'
     style = 'set4'
-    style = 'mpl_set'
-    style = 'solarized'
+    # style = 'mpl_set'
+    # style = 'solarized'
     for i in x:
         y[:] = i
         s = symbol_order(i, '-')

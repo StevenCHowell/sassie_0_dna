@@ -65,6 +65,15 @@ def main():
     # pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
     # dcd_files.append(run_dir + 'output_building/c36_dna60_raw_min.dcd')
 
+    #~~~ select scatter plot ~~~#
+    first_last_resids = [[1, 60], [61, 120]]
+    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
+    flex_file = run_dir + 'new_dsDNA60.flex'
+    drude = False
+    dcd_files = [run_dir + 'ma10_mc1_1000spb_715_raw_min.dcd']
+    prefix = 'raw_min_MD'
+
     #~~~ determine how many time DNA can be minimized ~~~#
     # first_last_resids = [[1, 60], [61, 120]]
     # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
@@ -92,12 +101,12 @@ def main():
     # dcd_files.append(run_dir + 'ma5_spb1000/mc1_spb1000_sparse.dcd')
     # dcd_files.append(run_dir + 'ma60_spb1000/mc1_spb1000_sparse.dcd')
 
-    first_last_resids = [[1, 60], [61, 120]]
-    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps'
-    pdb_file_name = os.path.join(run_dir, 'c36_min_dsDNA60.pdb')
-    flex_file = os.path.join(run_dir, 'new_dsDNA60.flex')
-    drude = False
-    dcd_files = []
+    # first_last_resids = [[1, 60], [61, 120]]
+    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps'
+    # pdb_file_name = os.path.join(run_dir, 'c36_min_dsDNA60.pdb')
+    # flex_file = os.path.join(run_dir, 'new_dsDNA60.flex')
+    # drude = False
+    # dcd_files = []
 
     # prefix = 'debug_MD'
     # run_dir = os.path.join(run_dir, 'ma20_spb1000')
@@ -112,13 +121,13 @@ def main():
     # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_v2/mc2_spb1000_sparse_m.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_v2/mc1_spb1000_sparse_mmm_tmp.dcd'))
 
-    prefix = 'raw_MD'
+    # prefix = 'raw_MD'
     # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse.dcd'))
-    dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse.dcd'))
+    # dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse.dcd'))
 
@@ -181,7 +190,7 @@ def main():
     calc_dihedrals = True
     good_dihedral = True
     scatter_dihedrals = True
-    parallel = True
+    # parallel = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
     processes = []
@@ -213,6 +222,7 @@ def main():
                     print "finished angle calculations for %s" % hdf_file
 
         if good_dihedral:
+            pub_scatter_dihedrals(dcd_file_name, frequency, scale_spb, True)
             if parallel:
                 plot_inputs = (dcd_file_name, max_frame, scale_spb,
                                used_goback, show, True)
@@ -241,6 +251,8 @@ def main():
                                        True)
                 scatter_plot_dihedrals(dcd_file_name, frequency, scale_spb,
                                        False)
+
+
     if parallel:
         for p in processes:
             p.start()
@@ -474,7 +486,7 @@ def compare_average_in_range(dcd_files, MD=True, show=False):
     ax1.set_xlim([x_min, x_max])
     ax1.set_ylim([73, 102])
 
-    ax1.set_ylabel(r'% in range')
+    ax1.set_ylabel(r'% in Range')
     ax1.set_xlabel(r'Minimization Iterations')
     default_fontsize = 12
     lg = plt.legend(loc='lower left', scatterpoints=1, numpoints=1,
@@ -514,6 +526,78 @@ def limit_patch(x_key, y_key, limits, ax, b1=1):
         4 * limits.loc[x_key]['sd'], 4 * limits.loc[y_key]['sd'],
         edgecolor='none', alpha=1, facecolor=color)
     ax.add_patch(limit_patch)
+
+
+
+def pub_scatter_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
+    prefix = dcd_file_name[:-4] + '_'
+    angles = pd.read_hdf(dcd_file_name[:-3] + 'hdf', 'angles')
+
+    try:
+        all_spb = np.loadtxt(dcd_file_name[:-3] + 'spb')
+    except:
+        all_spb = np.unique(angles['frame'])
+        all_spb = all_spb.reshape(len(all_spb), 1)
+        all_spb = np.concatenate((all_spb, all_spb*scale_spb), axis=1)
+
+    spb, indices = np.unique(all_spb[:, 1], return_inverse=True)
+    n_steps = len(spb)
+
+    if MD:
+        limit_file = ('/home/schowell/data/myData/dihedrals/'
+                      'dsDNA_60bps/md_angles.txt')
+    else:
+        limit_file = ('/home/schowell/data/myData/dihedrals/'
+                      'dsDNA_60bps/dna_angles.txt')
+    limits = pd.read_csv(limit_file, index_col=0)
+    limits['low'] = limits['mean'] - 2 * limits['sd']
+    limits['high'] = limits['mean'] + 2 * limits['sd']
+
+    angle_label = {'alpha': r'$\alpha$', 'beta': r'$\beta$',
+                   'gamma': r'$\gamma$', 'delta': r'$\delta$',
+                   'epsilon': r'$\epsilon$', 'zeta': r'$\zeta$',
+                   'chi': r'$\chi$'}
+    # matplotlib.rcParams['xtick.direction'] = 'in'
+    # matplotlib.rcParams['ytick.direction'] = 'in'
+
+    if n_steps == 2:
+        df_0, _ = get_step_i_dihedrals(0, indices, angles)
+        ax_array = make_pub_scatter_plots(limits, df_0, angle_label,
+                                               symbol='+')
+
+        df_1, _ = get_step_i_dihedrals(1, indices, angles)
+        make_pub_scatter_plots(limits, df_1, angle_label, i_color=2,
+                                    ax_array=ax_array)
+
+        plt.legend(['Raw', 'Minimized'], loc='upper left',
+                   bbox_to_anchor=[1.1475, 1.07], numpoints=1)
+
+        # plt.suptitle('Comparative scatter plot of selected torsional angles')
+        save_name = prefix + 'dihedrals_comparison'
+        if MD:
+            save_name += '_MD'
+        plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+        plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+        plt.show()
+    else:
+        if frequency == -1:
+            frequency = n_steps / 10
+        for step in xrange(frequency-1, n_steps, frequency):
+            df, nf = get_step_i_dihedrals(step, indices, angles)
+            make_pub_scatter_plots(limits, df, angle_label)
+
+            plt.suptitle('%d Steps (%d frame/s): scatter plots of selected'
+                         'torsional angles' % (step + 1, nf))
+            save_name = prefix + 'dihedrals_%dsteps' % (step + 1)
+            if MD:
+                save_name += '_MD'
+            plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+            plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+        plt.show()
+    print 'saving publication scatter plot to: \nevince %s.eps &' % save_name
+    print 'pause'
+
+
 
 
 def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
@@ -590,8 +674,45 @@ def plt_format(ax):
 
     ax.set_xlim([0, 360])
     ax.set_ylim([0, 360])
-    ax.set_xticks([0, 60, 120, 180, 240, 300, 360])
-    ax.set_yticks([0, 60, 120, 180, 240, 300, 360])
+    # ax.set_xticks([0, 60, 120, 180, 240, 300, 360])
+    # ax.set_yticks([0, 60, 120, 180, 240, 300, 360])
+    ax.set_xticks([0, 90, 180, 270, 360])
+    ax.set_yticks([0, 90, 180, 270, 360])
+
+
+def make_pub_scatter_plots(limits, df, angle_label, ax_array=[],
+                                symbol='x', i_color=0):
+
+    if len(ax_array) == 0:
+        fig = plt.figure(figsize=(6, 10))
+        gs = gridspec.GridSpec(2, 1, left=0.1, right=0.9, wspace=0, hspace=0)
+        ax_array = [plt.subplot(gs[0]), plt.subplot(gs[1])]
+
+    ax = ax_array[0]
+    x = 'zeta'
+    y = 'epsilon'
+    limit_patch('zeta1', 'epsilon1', limits, ax, b1=1)
+    limit_patch('zeta2', 'epsilon2', limits, ax, b1=2)
+    ax.plot(df[x], df[y], symbol, c=gwp.qual_color(i_color))
+    ax.set_xlabel(angle_label[x])
+    ax.set_ylabel(angle_label[y])
+    plt_format(ax)
+    ax.tick_params(labelbottom='off')# ,  labeltop='on', labelright='on')
+    ax.xaxis.grid(True, zorder=0)
+
+    ax = ax_array[1]
+    x = 'zeta'
+    y = 'alpha'
+    limit_patch('zeta1', 'alpha', limits, ax, b1=1)
+    limit_patch('zeta2', 'alpha', limits, ax, b1=2)
+    ax.plot(df[x][0:-1], df[y][1:], symbol, c=gwp.qual_color(i_color))
+    ax.set_xlabel(angle_label[x])
+    ax.set_ylabel(angle_label[y] + ' + 1')
+    plt_format(ax)
+    ax.grid(True, zorder=0)    # ax.tick_params(labelbottom='off') # , labeltop='on')
+
+    return ax_array
+
 
 def make_selected_scatter_plots(limits, df, angle_label, ax_array=[],
                                 symbol='x', i_color=0):
