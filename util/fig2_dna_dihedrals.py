@@ -440,7 +440,7 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             save_name += '_MD'
         if max_frame:
             save_name += '_' + str(max_frame)
-        print 'saving figure to %s' % save_name
+        print 'View figure: \nevince %s &' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
 
@@ -498,7 +498,7 @@ def compare_average_in_range(dcd_files, MD=True, show=False):
         save_name = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/average_in_range'
         if MD:
             save_name += '_MD'
-        print 'saving figure to %s' % save_name
+        print 'View figure: \nevince %s &' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
 
@@ -561,19 +561,18 @@ def pub_scatter_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
     # matplotlib.rcParams['ytick.direction'] = 'in'
 
     if n_steps == 2:
-        df_0, _ = get_step_i_dihedrals(0, indices, angles)
-        ax_array = make_pub_scatter_plots(limits, df_0, angle_label,
-                                               symbol='+')
+        df_raw, _ = get_step_i_dihedrals(0, indices, angles)
+        ax_array = make_pub_scatter_plots(limits, df_raw, angle_label)
 
-        df_1, _ = get_step_i_dihedrals(1, indices, angles)
-        make_pub_scatter_plots(limits, df_1, angle_label, i_color=2,
-                                    ax_array=ax_array)
+        df_min, _ = get_step_i_dihedrals(1, indices, angles)
+        ax_array = make_pub_scatter_plots(limits, df_min, angle_label,
+                                          i_color=2, symbol='s',
+                                          ax_array=ax_array)
 
-        plt.legend(['Raw', 'Minimized'], loc='upper left',
-                   bbox_to_anchor=[1.1475, 1.07], numpoints=1)
+        ax_array[1].legend(['Raw', 'Minimized'], loc='lower right', numpoints=1)
 
         # plt.suptitle('Comparative scatter plot of selected torsional angles')
-        save_name = prefix + 'dihedrals_comparison'
+        save_name = prefix + 'dihedrals_pub'
         if MD:
             save_name += '_MD'
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
@@ -594,7 +593,7 @@ def pub_scatter_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
             plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
             plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
         plt.show()
-    print 'saving publication scatter plot to: \nevince %s.eps &' % save_name
+    print 'View publication scatter plot: \nevince %s.eps &' % save_name
     print 'pause'
 
 
@@ -681,10 +680,10 @@ def plt_format(ax):
 
 
 def make_pub_scatter_plots(limits, df, angle_label, ax_array=[],
-                                symbol='x', i_color=0):
+                                symbol='o', i_color=0):
 
     if len(ax_array) == 0:
-        fig = plt.figure(figsize=(6, 10))
+        fig = plt.figure(figsize=(3, 5))
         gs = gridspec.GridSpec(2, 1, left=0.1, right=0.9, wspace=0, hspace=0)
         ax_array = [plt.subplot(gs[0]), plt.subplot(gs[1])]
 
@@ -693,23 +692,23 @@ def make_pub_scatter_plots(limits, df, angle_label, ax_array=[],
     y = 'epsilon'
     limit_patch('zeta1', 'epsilon1', limits, ax, b1=1)
     limit_patch('zeta2', 'epsilon2', limits, ax, b1=2)
-    ax.plot(df[x], df[y], symbol, c=gwp.qual_color(i_color))
+    ax.plot(df[x], df[y], symbol, mec=gwp.qual_color(i_color),
+            mfc='none')
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y])
     plt_format(ax)
     ax.tick_params(labelbottom='off')# ,  labeltop='on', labelright='on')
-    ax.xaxis.grid(True, zorder=0)
 
     ax = ax_array[1]
     x = 'zeta'
     y = 'alpha'
     limit_patch('zeta1', 'alpha', limits, ax, b1=1)
     limit_patch('zeta2', 'alpha', limits, ax, b1=2)
-    ax.plot(df[x][0:-1], df[y][1:], symbol, c=gwp.qual_color(i_color))
+    ax.plot(df[x][0:-1], df[y][1:], symbol, mec=gwp.qual_color(i_color),
+            mfc='none')
     ax.set_xlabel(angle_label[x])
     ax.set_ylabel(angle_label[y] + ' + 1')
     plt_format(ax)
-    ax.grid(True, zorder=0)    # ax.tick_params(labelbottom='off') # , labeltop='on')
 
     return ax_array
 

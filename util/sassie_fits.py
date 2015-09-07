@@ -1396,9 +1396,9 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
         txt_file.write('# structure, Rg, weight\n')
 
         if best_dcd:
+            # create a dcd with the best X2 structures
             n_accept = 0
-            # read pdb (grab a random one from a preceding directory,
-            # DANGEROUS)
+            # read a random pdb from a preceding directory, LIKELY TO FAIL
             random_pdb = glob.glob(op.split(op.split(
                 run_dirs[0])[0])[0] + '/*.pdb')[0]
             print 'reference pdb: %s' % random_pdb
@@ -1430,28 +1430,16 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
                     index += 1
                     txt_file.write('%d\t%0.6f\t%0.6f\n' %
                                    (index, this_rg, accept))
+                    # read specified dcd frame then save to dcd output
+                    mol.read_dcd_step(dcd_in, df_list[i]['id'].iloc[j])
                     if accept:
                         n_accept += 1
-                        # read specified dcd frame then save to dcd output
-                        mol.read_dcd_step(dcd_in, df_list[i]['id'].iloc[j])
                         # this is much slower than aligning all frames at once
                         if do_align:
                             align_inputs.aa_move = mol
                             align.align_mol(align_inputs)
                         mol.write_dcd_step(dcd_out, 0, n_accept)
 
-                        # dcd_name = op.join(op.join(run_dir, 'foxs'), 'foxs_filtered.dcd')
-                        # assert op.exists(dcd_name), ('ERROR!!!, could not find dcd file: %s'
-                        # % dcd_file)
-                        # if i == 0:
-                        # bash_cmd = 'cp %s %s' % (dcd_name, full_dcd_out)
-                        # subprocess.call(bash_cmd.split())
-                        # else:
-                        # bash_cmd1 = ('%s -o %s %s %s' % (catdcd_exe, tmp_dcd_out,
-                        # full_dcd_out, dcd_name))
-                        # subprocess.call(bash_cmd1.split())
-                        # bash_cmd2 = 'mv %s %s' % (tmp_dcd_out, full_dcd_out)
-                        # subprocess.call(bash_cmd2.split())
                 mol.close_dcd_read(dcd_in[0])
             mol.close_dcd_write(dcd_out)
 
@@ -1596,7 +1584,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         fig_file_name = op.join(os.getcwd(), '%s_%s_fit.eps' %
                                 (prefix, data_file))
         # plt.savefig(fig_file_name[:-3] + 'png')
-        print 'storing fit plot as: %s' % fig_file_name
+        print 'View fit plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, bbox_inches='tight')
 
@@ -1665,7 +1653,7 @@ def plot_x2_components(rf_data, mt_data, prefix=None, show=False):
         if prefix:
             out_file = '%s_%s' % (prefix, out_file)
         fig_file_name = op.join(os.getcwd(), out_file)
-        print 'storing X2 component plot as: %s' % fig_file_name
+        print 'View X2 component plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
@@ -1856,7 +1844,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         if prefix:
             out_file = '%s_%s' % (prefix, out_file)
         fig_file_name = op.join(os.getcwd(), out_file)
-        print 'storing pub plot as: %s' % fig_file_name
+        print 'View pub plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
