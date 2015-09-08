@@ -1472,7 +1472,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.title('all %d structures' % n_total)
     ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec='b', mfc='none')
     # plt.xlim(rg_range)
-    plt.ylabel(r'$X^2$')
+    plt.ylabel(r'$\chi^2$')
     plt.xlabel(r'$R_g$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
 
@@ -1490,9 +1490,10 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     i_worst = worst_series.index[0] + 1  # first column is the Q values
     worst = all_data_iq[:, i_worst]
     average = all_data_iq[:, 1:].mean(axis=1)
+    ax.set_yscale('log')
 
     ax = plt.subplot(222)
-    plt.title(r'best $X^2$=%0.1f, worst $X^2$=%0.1f' % (best_X2, worst_X2))
+    plt.title(r'best $\chi^2$=%0.1f, worst $\chi^2$=%0.1f' % (best_X2, worst_X2))
     ax.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
                 label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
@@ -1520,7 +1521,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     best_colors = [gp.qual_color(1), gp.qual_color(8), gp.qual_color(9)]
 
-    plt.subplot(223)
+    ax = plt.subplot(223)
     plt.title('best %d structures' % (n_best))
     plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec='b', mfc='none')
     # plt.plot(x2rg_best['Rg'], x2rg_best['X2'], '.')
@@ -1533,8 +1534,9 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^',
              mec=gp.qual_color(3), mfc=best_colors[2],
              markersize=8)
-    plt.ylabel(r'$X^2$')
+    plt.ylabel(r'$\chi^2$')
     plt.xlabel(r'$R_g$')
+    ax.set_yscale('log')
     # plt.xlim(rg_range)
 
     # update the worst and average I(Q)
@@ -1549,7 +1551,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     assert i_1st == i_best, 'incorrectly indexing'
 
     ax = plt.subplot(224)
-    plt.title(r'best 3 $X^2$s = %0.1f, %0.1f, %0.1f' % (
+    plt.title(r'best 3 $\chi^2$s = %0.1f, %0.1f, %0.1f' % (
         best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
     plt.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
                  label='exp', ms=8, mfc='none', c=gp.qual_color(0),
@@ -1587,7 +1589,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         print 'View fit plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, bbox_inches='tight')
-
+        plt.show()
     plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
                        prefix=(prefix + '_' + data_file))
 
@@ -1612,7 +1614,7 @@ def plot_x2_components(rf_data, mt_data, prefix=None, show=False):
     ax1.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt=None,
                  ecolor=colors(0))
     ax1.plot(mt_data[:, 0], mt_data[:, 1], '-', mfc='none', ms=8,
-             c=colors(1), linewidth=2, label=(r'best $X^2$= %0.1f' % x2))
+             c=colors(1), linewidth=2, label=(r'best $\chi^2$= %0.1f' % x2))
     plt.ylabel(r'$I(Q)$', fontsize=default_fontsize)
     plt.yscale('log')
     plt.xscale('log')
@@ -1742,7 +1744,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         ax.set_title(best_wrst_titles[i], fontsize=inset_fontsize, y=0.95)
         ax.patch.set_visible(False)  # hide the 'canvas'
 
-    ax1.text(0.6, 0.01, '%d structures' % n_total, verticalalignment='bottom',
+    ax1.text(0.01, 0.01, '%d structures' % n_total, verticalalignment='bottom',
              horizontalalignment='left', transform=ax1.transAxes,
              fontsize=inset_fontsize)
     ax1.text(-0.03, -0.15, '(a)', verticalalignment='bottom',
@@ -1752,7 +1754,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 
     # rg_range = [np.floor(x2rg_df['Rg'].min()), np.ceil(x2rg_df['Rg'].max())]
     # plt.xlim(rg_range)
-    ax1.set_ylabel(r'$X^2$', fontsize=default_fontsize)
+    ax1.set_ylabel(r'$\chi^2$', fontsize=default_fontsize)
     ax1.set_xlabel(r'$R_g$', fontsize=default_fontsize)
     ax1.set_zorder(ax.get_zorder() + 1)  # put ax1 in front of ax
     ax1.patch.set_visible(False)  # hide the 'canvas'
@@ -1782,7 +1784,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         i_best = best_series.index[0] + 1  # first column is the Q values
         best = all_data_iq[:, i_best]
     ax2.plot(all_data_iq[:, 0], best[:], '-', mfc='none', ms=8,
-             c=colors(1), linewidth=2, label=(r'best $X^2$= %0.1f' % best_X2))
+             c=colors(1), linewidth=2, label=(r'best $\chi^2$= %0.1f' % best_X2))
 
     # average = all_data_iq[:,1:].mean(axis=1)
     # ax2.plot(all_data_iq[:,0], average[:], '-', mfc='none', ms=8,
@@ -1797,7 +1799,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         i_worst = worst_series.index[0] + 1  # first column is the Q values
         worst = all_data_iq[:, i_worst]
     ax2.plot(all_data_iq[:, 0], worst[:], '-', mfc='none', ms=8, c=colors(2),
-             linewidth=2, label=(r'worst $X^2$= %0.1f' % worst_X2))
+             linewidth=2, label=(r'worst $\chi^2$= %0.1f' % worst_X2))
 
     plt.xlabel(r'$Q (\AA^{-1})$', fontsize=default_fontsize)
     plt.ylabel(r'$I(Q)$', fontsize=default_fontsize)
@@ -1848,6 +1850,265 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
 
+
+def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
+                pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
+                inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
+                show=False):
+    import sassie.calculate.convergence_test as convergence_test
+
+    n_total = len(x2rg_df)
+    n_best = max(int(n_total * 0.1), 3)
+    x2rg_best = x2rg_df.sort('X2')[:n_best]
+    plt.close()
+    colors = gp.qual_color
+
+    # inset_fontsize = 11
+    # default_fontsize = 14
+
+    fig = plt.figure(figsize=(12, 10))
+    # # ~~ code for adding and positioning a suptitle ~~
+    # plt.suptitle(data_file, fontsize=14)
+    # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
+    # wspace = 0.2, hspace = 0.2)
+
+    gs1 = GridSpec(4, 8, left=0.01, right=0.99, bottom=0.01, top=0.99,
+                   wspace=0.3, hspace=0.3)
+    ax1 = plt.subplot(gs1[:2, :4])
+    best_wrst_titles = [r'Best $\chi^2$ Model', r'Worst $\chi^2$ Model']
+    inset_images = auto_crop_group([plt.imread(inset_files[0]),
+                                    plt.imread(inset_files[1])])
+    for (i, img) in enumerate(inset_images):
+        ax_c = plt_inset.add_inset(ax1, inset_loc[i], axisbg='None')
+        mask = np.tile(np.atleast_3d(np.any(img != 255, axis=2)),
+                       (1, 1, img.shape[2]))  # this should mask the white
+        img = np.ma.masked_where(mask, img)
+        ax_c.imshow(img, interpolation='none')
+        ax_c.axis('off')
+        ax_c.set_title(best_wrst_titles[i], y=0.95)
+        ax_c.patch.set_visible(False)  # hide the 'canvas'
+
+    ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
+             verticalalignment='bottom', horizontalalignment='left',
+             transform=ax1.transAxes)
+    ax1.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=colors(0), mfc='none')
+    ax1.set_ylabel(r'$\chi^2$')
+    ax1.set_xlabel(r'$R_g$')
+    ax1.set_yscale('log')
+    rg_range = [np.round(x2rg_df['Rg'].min()), np.round(x2rg_df['Rg'].max())]
+    ax1.set_xlim(rg_range)
+    # ax1.xaxis.labelpad = -1
+    ax1.set_zorder(ax_c.get_zorder() + 1)  # put ax1 in front of ax
+    ax1.patch.set_visible(False)  # hide the 'canvas'
+
+    if i0:
+        all_data_iq = all_data_iq[1:]
+        goal_iq = goal_iq[1:]
+
+    # get the best, worst and average I(Q)
+    ax2 = plt.subplot(gs1[:2, 4:])
+    ax2.text(0.01, 0.015, '(b)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax2.transAxes)
+             # fontsize=default_fontsize)
+
+    # plot errorbar in two parts to get label order correct
+    ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
+             mec=colors(0), label='Experiment')
+    # label='exp', ms=8, mfc='none', color='b')
+    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
+                 ecolor=colors(0))
+
+    best_X2 = x2rg_df.X2.min()
+    if 3 == all_data_iq.shape[1]:
+        best = all_data_iq[:, 1]
+    else:
+        best_series = x2rg_df[x2rg_df.X2 == best_X2]
+        i_best = best_series.index[0] + 1  # first column is the Q values
+        best = all_data_iq[:, i_best]
+    ax2.plot(all_data_iq[:, 0], best[:], c=colors(1), linewidth=2,
+             label=(r'Best $\chi^2$= %0.1f' % best_X2))
+
+    worst_X2 = x2rg_df.X2.max()
+    if 3 == all_data_iq.shape[1]:
+        worst = all_data_iq[:, 2]
+    else:
+        worst_series = x2rg_df[x2rg_df.X2 == worst_X2]
+        i_worst = worst_series.index[0] + 1  # first column is the Q values
+        worst = all_data_iq[:, i_worst]
+    ax2.plot(all_data_iq[:, 0], worst[:], c=colors(3), linewidth=2,
+             label=(r'Worst $\chi^2$= %0.1f' % worst_X2))
+
+    plt.xlabel(r'$Q (\AA^{-1})$')
+    plt.ylabel(r'$I(Q)$')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.axis('tight')
+    gp.zoomout(ax2, 0.1)
+    ax2.get_yaxis().set_ticks([])
+    ax2.xaxis.labelpad = -5
+    ax2.yaxis.labelpad = -1
+    lg = plt.legend(loc='center left', scatterpoints=1, numpoints=1)
+                    # prop={'size': default_fontsize})
+    lg.draw_frame(False)
+
+    # convergence plots
+    ax_c = plt.subplot(gs1[2:, :4])
+    ax_c.text(0.01, 0.015, '(c)', verticalalignment='bottom',
+            horizontalalignment='left', transform=ax_c.transAxes)
+    if all_density_plot:
+        inset_image = auto_crop(plt.imread(all_density_plot))
+        ax_i = plt_inset.add_inset(ax_c, [0.4, 0.05, 0.6, 0.6], axisbg='None')
+        mask = np.tile(np.atleast_3d(np.any(inset_image != 255, axis=2)),
+                       (1, 1, inset_image.shape[2]))  # this should mask the white
+        inset_image = np.ma.masked_where(mask, inset_image)
+        ax_i.imshow(inset_image, interpolation='none')
+        ax_i.axis('off')
+        ax_i.set_title('All versus Best', y=1.05)
+        ax_i.patch.set_visible(False)  # hide the 'canvas'
+
+    # real-space convergence
+    list_new_voxels = []
+    list_occupied_voxels = []
+    convergence_test.count_spatial_voxels(pdb_file_name, dcd_file_names,
+                                          list_new_voxels, list_occupied_voxels)
+    n_structures = sum([len(new_voxels) for new_voxels in list_new_voxels])
+    occupied_voxels = np.zeros((n_structures, 2))
+    occupied_voxels[:, 0] = np.arange(n_structures)
+    for i in xrange(len(dcd_file_names)):
+        rows = list_occupied_voxels[i][:, 0]
+        occupied_voxels[rows, 1] = list_occupied_voxels[i][:, 1]
+    ax_c.plot(occupied_voxels[:, 0], occupied_voxels[:, 1],
+            label='Real-Space Convergence')
+    ax_c.set_ylim((0, occupied_voxels[-1,1]))
+    ax_c.set_xlabel('Number of Structures')
+    # Make the y-axis label and tick labels match the line color.
+    ax_c.set_ylabel('Number of Occupied Spatial Voxels', color=colors(0))
+    for tl in ax_c.get_yticklabels():
+        tl.set_color(colors(0))
+
+    # reciprocal-space convergence
+    ax_c2 = ax_c.twinx()
+    iq_low = []
+    iq_high = []
+    iq_all = []
+    list_new_grids = []
+    list_occupied_grids = []
+    n_q, n_spec = convergence_test.load_iq(sas_folders, 'dat', iq_low, iq_high,
+                                           iq_all)
+    convergence_test.count_sas_grids(sas_folders, iq_low, iq_high, iq_all, n_q,
+                                     n_spec, list_new_grids,
+                                     list_occupied_grids, 100)
+    total_spec = n_spec.sum()
+    occupied_grids = np.zeros((total_spec, len(sas_folders)+1))
+    occupied_grids[:, 0] = np.arange(total_spec)
+    for i in xrange(len(sas_folders)):
+        rows = list_occupied_grids[i][:, 0]
+        occupied_grids[rows, 1] = list_occupied_grids[i][:, 1]
+    ax_c2.plot(occupied_grids[1:, 0], occupied_grids[1:, 1], color=colors(1),
+               label='SAXS Convergence')
+    ax_c2.set_ylim((0, occupied_grids[-1, 1]))
+    # Make the y-axis label and tick labels match the line color.
+    ax_c2.set_ylabel('Number of Occupied SAXS Grids', color=colors(1))
+    for tl in ax_c2.get_yticklabels():
+        tl.set_color(colors(1))
+
+    ax_c.set_xlim((0, occupied_voxels[-1, 0]))
+    ax_c.set_zorder(ax_i.get_zorder() + 1)  # put ax in front of ax_i
+    ax_c.patch.set_visible(False)  # hide the 'canvas'
+
+    # best fit w/ density plot
+    gs2 = GridSpec(2, 4, left=0.57, right=1.0, bottom=0.0, top=0.47,
+                   wspace=0.0, hspace=0.0)
+    ax3 = plt.subplot(gs2[0, 0])
+    ax3.text(0.01, 0.05, '(d)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax3.transAxes)
+             # fontsize=default_fontsize)
+    ax4 = plt.subplot(gs2[1, 0])
+    ax4.text(0.01, 0.09, '(e)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax4.transAxes)
+             # fontsize=default_fontsize)
+
+    img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
+                                  plt.imread(density_plots[1])])
+    ax3.imshow(img1)
+    ax4.imshow(img2)
+
+    # example 1
+    ax5 = plt.subplot(gs2[0, 1])
+    ax5.text(0.01, 0.05, '(f)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax5.transAxes)
+    ax6 = plt.subplot(gs2[1, 1])
+    ax6.text(0.01, 0.09, '(g)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax6.transAxes)
+
+    ex1a, ex1b = auto_crop_group([plt.imread(example_plots[0]),
+                                  plt.imread(example_plots[1])])
+    ax5.imshow(ex1a)
+    ax6.imshow(ex1b)
+
+    # example 2
+    ax7 = plt.subplot(gs2[0, 2])
+    ax7.text(0.01, 0.05, '(h)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax7.transAxes)
+    ax8 = plt.subplot(gs2[1, 2])
+    ax8.text(0.01, 0.09, '(i)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax8.transAxes)
+
+    ex2a, ex2b = auto_crop_group([plt.imread(example_plots[2]),
+                                  plt.imread(example_plots[3])])
+    ax7.imshow(ex2a)
+    ax8.imshow(ex2b)
+
+    # example 3
+    ax9 = plt.subplot(gs2[0, 3])
+    ax9.text(0.01, 0.05, '(j)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax9.transAxes)
+    ax10 = plt.subplot(gs2[1, 3])
+    ax10.text(0.01, 0.09, '(k)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax10.transAxes)
+
+    ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
+                                  plt.imread(example_plots[5])])
+    ax9.imshow(ex3a)
+    ax10.imshow(ex3b)
+
+    ax3.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax3.axis('off')
+    ax4.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax4.axis('off')
+    ax5.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax5.axis('off')
+    ax6.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax6.axis('off')
+    ax7.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax7.axis('off')
+    ax8.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax8.axis('off')
+    ax9.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax9.axis('off')
+    ax10.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax10.axis('off')
+
+    if show:
+        plt.show()
+    else:
+        out_file = 'result.eps'
+        if prefix:
+            out_file = '%s_%s' % (prefix, out_file)
+        fig_file_name = op.join(os.getcwd(), out_file)
+        print 'View pub plot: \nevince %s &' % fig_file_name
+        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+        plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
+        plt.show()
+        print 'pause'
 
 def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
                 sassie_run_dir):
