@@ -294,10 +294,10 @@ def density(variables, segvariables, txtOutput):
                 *_region_X.cube:	Gaussian volumetric cube file of basis atoms in region X
 
 
-        The output density will be normalized as follows against the maximum density value from the composite map including all atoms:
-        rho(norm)[i][j][k] = rho[i][j][k]*100.0/max(rho)
-        where i=1,2,...,Nsegments, j=1,2,...,Nregions, and k=1,2,...,Ngridpoints
-        '''
+                The output density will be normalized as follows against the maximum density value from the composite map including all atoms:
+                rho(norm)[i][j][k] = rho[i][j][k]*100.0/max(rho)
+                where i=1,2,...,Nsegments, j=1,2,...,Nregions, and k=1,2,...,Ngridpoints
+    '''
     runname, dcdfile, pdbfile, ofile, xlength, gridsp, ylength, save_occupancy, zlength, nsegments, equalweights, weightsfile = unpack_variables(
         variables)
 

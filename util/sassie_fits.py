@@ -1897,6 +1897,8 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax1.set_yscale('log')
     rg_range = [np.round(x2rg_df['Rg'].min()), np.round(x2rg_df['Rg'].max())]
     ax1.set_xlim(rg_range)
+    # x2_range = [0.1, np.round(x2rg_df['X2'].max())]
+    # ax1.set_ylim(x2_range)
     # ax1.xaxis.labelpad = -1
     ax1.set_zorder(ax_c.get_zorder() + 1)  # put ax1 in front of ax
     ax1.patch.set_visible(False)  # hide the 'canvas'
