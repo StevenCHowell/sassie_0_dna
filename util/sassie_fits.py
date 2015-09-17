@@ -2216,6 +2216,9 @@ if __name__ == '__main__':
         # tet0 = ['c000_4x167_mg1']
         # tri0 = [tri0[-1]]
 
+        data_dir = ('/home/schowell/data/'
+                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/interp_data/')
+        data_ext = '.int'
         data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
@@ -2244,10 +2247,6 @@ if __name__ == '__main__':
 
         run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
                     'h5': tetramer_runs}
-
-        data_dir = ('/home/schowell/data/'
-                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/interp_data/')
-        data_ext = '.int'
 
         array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']

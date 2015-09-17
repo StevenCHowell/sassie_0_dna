@@ -138,10 +138,14 @@ def align(inputs):
         dcd_out_file = None
 
     error, goal_seg_mask = aa_goal.get_subset_mask(goal_filter)
+    assert not error, error
     error, move_seg_mask = aa_move.get_subset_mask(move_filter)
+    assert not error, error
 
     error = aa_goal.copy_molecule_using_mask(sub_goal, goal_seg_mask, 0)
+    assert not error, error
     error = aa_move.copy_molecule_using_mask(sub_move, move_seg_mask, 0)
+    assert not error, error
 
     # calculate the center of mass of the subset of m1
     com_sub_goal = sub_goal.calccom(0)

@@ -65,14 +65,14 @@ def main():
     # pdb_file_name = run_dir + 'output_building/c36_dna60.pdb'
     # dcd_files.append(run_dir + 'output_building/c36_dna60_raw_min.dcd')
 
-    #~~~ select scatter plot ~~~#
-    first_last_resids = [[1, 60], [61, 120]]
-    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
-    flex_file = run_dir + 'new_dsDNA60.flex'
-    drude = False
-    dcd_files = [run_dir + 'ma10_mc1_1000spb_715_raw_min.dcd']
-    prefix = 'raw_min_MD'
+    # #~~~ select scatter plot ~~~#
+    # first_last_resids = [[1, 60], [61, 120]]
+    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    # pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
+    # flex_file = run_dir + 'new_dsDNA60.flex'
+    # drude = False
+    # dcd_files = [run_dir + 'ma10_mc1_1000spb_715_raw_min.dcd']
+    # prefix = 'raw_min_MD'
 
     #~~~ determine how many time DNA can be minimized ~~~#
     # first_last_resids = [[1, 60], [61, 120]]
@@ -184,6 +184,15 @@ def main():
     # flex_file = run_dir + 'new_dna.flex'
     # dcd_files = []
     # dcd_files.append(run_dir + 'output/dyn1_dna.dcd')
+
+    #~~~ analyze the MD dihedrals ~~~#
+    run_dir = '/home/schowell/data/myData/dihedrals/charmm36/non_polarized/stitched/'
+    first_last_resids = [[1, 12], [13, 24]]
+    pdb_file_name = run_dir + 'new_dna.pdb'
+    flex_file = run_dir + 'new_dna.flex'
+    drude = False
+    dcd_files = []
+    dcd_files.append(run_dir + 'dyn75ns_stride20.dcd')
     # ~~~~~~~~ END FILE INPUT ~~~~~~~~~~ #
 
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
