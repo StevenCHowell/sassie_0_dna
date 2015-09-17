@@ -192,13 +192,14 @@ def main():
     flex_file = run_dir + 'new_dna.flex'
     drude = False
     dcd_files = []
+    # dcd_files.append(run_dir + 'dyn75ns_stride20_test.dcd')
     dcd_files.append(run_dir + 'dyn75ns_stride20.dcd')
     # ~~~~~~~~ END FILE INPUT ~~~~~~~~~~ #
 
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
     calc_dihedrals = True
-    good_dihedral = True
-    scatter_dihedrals = True
+    # good_dihedral = True
+    # scatter_dihedrals = True
     # parallel = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
 
