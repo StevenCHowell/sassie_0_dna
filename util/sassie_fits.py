@@ -2193,25 +2193,49 @@ if __name__ == '__main__':
             fig_sub_rg_v_conc(show=True)
             fig_rg_v_salt(show=True)
 
-        tri5 = ['c500_3x167_k010',
-                'c500_3x167_k050',
-                'c500_3x167_k100',
-                'c500_3x167_k200']
-        tet5 = ['c500_4x167_k010',
-                'c500_4x167_k050',
-                'c500_4x167_k100']
+        # tri5 = ['c500_3x167_k010',
+                # 'c500_3x167_k050',
+                # 'c500_3x167_k100',
+                # 'c500_3x167_k200']
+        # tet5 = ['c500_4x167_k010',
+                # 'c500_4x167_k050',
+                # 'c500_4x167_k100']
         # full
-        tri0 = ['c000_3x167_k010',
+        tri_0 = ['c000_3x167_k010',
                 'c000_3x167_k050',
                 'c000_3x167_k100',
                 'c000_3x167_k200']
-        tet0 = ['c000_4x167_k010',
+        tet_0 = ['c000_4x167_k010',
                 'c000_4x167_k050',
                 'c000_4x167_k100',
                 'c000_4x167_mg1']
-        di0 = ['c000_2x167_k010']
-        h5 = ['c000_4x167_h5_k010',
+        di_0 = ['c000_2x167_k010']
+        h5_0 = ['c000_4x167_h5_k010',
               'c000_4x167_h5_mg1']
+
+        tri_all = tri_0 + [
+            'c068_3x167_k010',
+            'c125_3x167_k010',
+            'c125_3x167_k050',
+            'c125_3x167_k100',
+            'c125_3x167_k200',
+            'c250_3x167_k010',
+            'c250_3x167_k050',
+            'c250_3x167_k100',
+            'c250_3x167_k200',
+            'c500_3x167_k010',
+            'c500_3x167_k050',
+            'c500_3x167_k100',
+            'c500_3x167_k200']
+        tet_all = tet_0 + []
+        di_all = di_0 + []
+        h5_all = h5_0 + [
+            'c200_4x167_h5_k010',
+            'c200_4x167_h5_mg1',
+            'c400_4x167_h5_k010',
+            'c400_4x167_h5_mg1',
+            'c800_4x167_h5_k010',
+            'c800_4x167_h5_mg1']
 
         # quicker to run
         # tet0 = [tet0[-1]]
@@ -2221,7 +2245,9 @@ if __name__ == '__main__':
         data_dir = ('/home/schowell/data/'
                     'Dropbox/gw_phd/paper_tetranucleosome/1406data/interp_data/')
         data_ext = '.int'
-        data_files = {'di': di0, 'tri': tri0, 'tet': tet0, 'h5': h5}
+        # data_files = {'di': di_0, 'tri': tri_0, 'tet': tet_0, 'h5': h5_0}
+        data_files = {'di': di_all, 'tri': tri_all, 'tet': tet_all,
+                      'h5': h5_all}
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
         # dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/foxs/')
@@ -2301,17 +2327,17 @@ if __name__ == '__main__':
                         # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
                         # fresh=False))
 
-        best_dcd = False
-        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        fresh=False, i0=i0))
+        # best_dcd = False
+        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        # fresh=False, i0=i0))
 
-        best_dcd = True
-        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        fresh=False, i0=i0))
+        # best_dcd = True
+        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        # fresh=False, i0=i0))
 
         best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
@@ -2319,7 +2345,7 @@ if __name__ == '__main__':
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
                         fresh=False, i0=i0))
 
-        best_dcd = True
+        best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
