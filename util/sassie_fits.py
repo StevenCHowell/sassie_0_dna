@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
-import x_dna.drivers.myAlign as align
+# import x_dna.drivers.myAlign as align
 import x_dna.util.plt_inset as plt_inset
 debug = True
 op = os.path
@@ -86,10 +86,10 @@ def load_foxs(saspath, i0=None):
                                                  'monte_carlo'), '*.dcd'))
             assert len(dcd_file) == 1, 'ERROR: not clear which dcd file to use'
             dcd_file = dcd_file[0]
-            pdb_file = glob.glob(op.join(op.split(op.split(saspath)[0])[0],
-                                         op.split(dcd_file)[1][:-4] + '*.pdb'))
-            assert len(pdb_file) == 1, 'ERROR: not clear which pdb file to use'
-            pdb_file = pdb_file[0]
+            pdb_search = op.join(op.split(op.split(saspath)[0])[0], '*.pdb')
+            pdb_file = glob.glob(pdb_search)[0]
+            print '\ncalculating the Rg from this dcd: %s' % dcd_file
+            print 'together with this pdb file: %s' % pdb_file
             rg = dcd_rg(pdb_file, dcd_file)
         except:
             print 'did not calculate Rg using dcd and pdb'
@@ -675,7 +675,7 @@ def compare_match(rf_data, in_data, dummy_scale=None, dummy_offset=None,
     if log:
         plt.xscale('log')
         plt.axis('tight')
-    plt.show()
+    # plt.show()
 
     # i_sim = data_iq[1:,1]
     # i_exp = goal_iq[1:,1]
@@ -799,7 +799,7 @@ def examine_rg_i0(do_plot=False):
         plt.xlabel(r'[KCl]')
         plt.xlim(x_range)
 
-        plt.show()
+        # plt.show()
 
     return df, data_files
 
@@ -935,7 +935,7 @@ def fig_rg_v_conc():
     plt.xlabel(r'mg/mL')
     plt.title(r'$R_g$ vs mg/mL comparison')
     plt.xlim(x_range)
-    plt.show()
+    # plt.show()
 
     return
 
@@ -1358,7 +1358,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             x2rg_df.index = range(len(x2rg_df))
             x2rg_df.sort('X2', inplace=True)
 
-            best50 = x2rg_df.iloc[:50]
+            best50 = x2rg_df.iloc[:100]
             best50.to_csv(data_file + '_best.csv', float_format='%5.10f',
                           sep='\t')
 
@@ -1405,17 +1405,19 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
             mol = sasmol.SasMol(0)
             mol.read_pdb(random_pdb)
 
-            align_inputs = align.inputs()
-            ref = sasmol.SasMol(0)
-            ref.read_pdb(random_pdb)
-            align_inputs.aa_goal = ref
-            align_basis = ('((name[i] == "CA") and (segname[i] == "3H2A") and '
-                           '(resid[i] > 105) and (resid[i] < 115))')
-            align_inputs.goal_basis = align_basis
-            align_inputs.move_basis = align_basis
+            if do_align:
+                align_inputs = align.inputs()
+                ref = sasmol.SasMol(0)
+                ref.read_pdb(random_pdb)
+                align_inputs.aa_goal = ref
+                align_basis = ('((name[i] == "CA") and (segname[i] == "3H2A") '
+                               'and (resid[i] > 5) and (resid[i] < 115))')
+                align_inputs.goal_basis = align_basis
+                align_inputs.move_basis = align_basis
 
             dcd_out = mol.open_dcd_write('x2_lt%s%s.dcd' %
-                                         (str(cutoff).replace('.', 'p'), label))
+                                         (str(cutoff).replace('.', 'p'),
+                                          label))
 
             for (i, run_dir) in enumerate(run_dirs):
                 # create read dcd pointer
@@ -1589,7 +1591,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         print 'View fit plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, bbox_inches='tight')
-        plt.show()
+        # plt.show()
     plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
                        prefix=(prefix + '_' + data_file))
 
@@ -2109,7 +2111,7 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
         print 'View pub plot: \nevince %s &' % fig_file_name
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
-        plt.show()
+        # plt.show()
         print 'pause'
 
 def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
@@ -2229,16 +2231,47 @@ if __name__ == '__main__':
         # glob.glob(sassie_run_dir + 'tetramer/flex*/run*/foxs/')
         tetramer_runs = []
         dimer_runs += glob.glob(sassie_run_dir + '2x167*/run*/foxs/')
-        trimer_runs += glob.glob(sassie_run_dir + '3x167*/run*/foxs/')
-        tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
+
+        k010_3x167_folders = glob.glob(sassie_run_dir + '3x167_k010/*/foxs/')
+        k050_3x167_folders = glob.glob(sassie_run_dir + '3x167_k050/*/foxs/')
+        k100_3x167_folders = glob.glob(sassie_run_dir + '3x167_k100/*/foxs/')
+        mg01_3x167_folders = glob.glob(sassie_run_dir + '3x167_mg01/*/foxs/')
+        more_3x167_folders = glob.glob(sassie_run_dir + '3x167/*/foxs/')
+        k010_3x167_folders.sort() # key=os.path.getmtime)
+        k050_3x167_folders.sort() # key=os.path.getmtime)
+        k100_3x167_folders.sort() # key=os.path.getmtime)
+        mg01_3x167_folders.sort() # key=os.path.getmtime)
+        more_3x167_folders.sort() # key=os.path.getmtime)
+        trimer_runs = (k010_3x167_folders +
+                       k050_3x167_folders +
+                       k100_3x167_folders +
+                       mg01_3x167_folders +
+                       more_3x167_folders)
+        # trimer_runs += glob.glob(sassie_run_dir + '3x167*/run*/foxs/')
+
+        k010_4x167_folders = glob.glob(sassie_run_dir + '4x167_k010/*/foxs/')
+        k050_4x167_folders = glob.glob(sassie_run_dir + '4x167_k050/*/foxs/')
+        k100_4x167_folders = glob.glob(sassie_run_dir + '4x167_k100/*/foxs/')
+        mg01_4x167_folders = glob.glob(sassie_run_dir + '4x167_mg01/*/foxs/')
+        more_4x167_folders = glob.glob(sassie_run_dir + '4x167/*/foxs/')
+        k010_4x167_folders.sort() # key=os.path.getmtime)
+        k050_4x167_folders.sort() # key=os.path.getmtime)
+        k100_4x167_folders.sort() # key=os.path.getmtime)
+        mg01_4x167_folders.sort() # key=os.path.getmtime)
+        more_4x167_folders.sort() # key=os.path.getmtime)
+        tetramer_runs = (k010_4x167_folders +
+                         k050_4x167_folders +
+                         k100_4x167_folders +
+                         mg01_4x167_folders +
+                         more_4x167_folders)
+        # tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
+
         dimer_runs = [run.replace('foxs/', '') for run in dimer_runs]
         trimer_runs = [run.replace('foxs/', '') for run in trimer_runs]
         tetramer_runs = [run.replace('foxs/', '') for run in tetramer_runs]
 
         for run in trimer_runs:
-            print run
-            if '3x167_k200/run97' in run:
-                print 'pause here'
+            # print run
             sub_dirs = ['sub%02d' % i for i in xrange(1, 100)]
             for sub_dir in sub_dirs:
                 if op.exists(op.join(run, 'foxs/', sub_dir)):
@@ -2251,15 +2284,13 @@ if __name__ == '__main__':
         array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']
         # array_types = ['tet']
-        # array_types = ['tri']
-        array_types = ['h5']
+        array_types = ['tri', 'h5']
+        # array_types = ['h5']
         # i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
         # i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid
         # points
         i0 = False
-
-        best_dcd = False
-        maxX2 = 4.5
+        maxX2 = 100
         # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
@@ -2270,21 +2301,25 @@ if __name__ == '__main__':
                         # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
                         # fresh=False))
 
+        best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
                         fresh=False, i0=i0))
 
+        best_dcd = True
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
                         fresh=False, i0=i0))
 
+        best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
                         fresh=False, i0=i0))
 
+        best_dcd = True
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                         cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
@@ -2293,13 +2328,13 @@ if __name__ == '__main__':
         save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
                     sassie_run_dir)
 
-        density_plots = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167face_x2_lt_4p5_6A_voxels.png',
-                          '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167side_x2_lt_4p5_6A_voxels.png']]
-        best_wrst = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_best_face.tga',
-                      '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_wrst_side.tga']]
-        inset_loc = [[[0.1, 0.2, 0.3, 0.3], [0.5, 0.6, 0.3, 0.3]]]
-        pub_plot(all_x2rg_dfs[0], all_data_iqs[0], all_goal_iqs[0],
-                 density_plots[0], prefix=all_data_files[0],
-                 inset_files=best_wrst[0], inset_loc=inset_loc[0])
+        # density_plots = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167face_x2_lt_4p5_6A_voxels.png',
+                          # '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167side_x2_lt_4p5_6A_voxels.png']]
+        # best_wrst = [['/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_best_face.tga',
+                      # '/home/schowell/data/code/pylib/x_dna/util/all/woI0ns50_s/3x167_k200_wrst_side.tga']]
+        # inset_loc = [[[0.1, 0.2, 0.3, 0.3], [0.5, 0.6, 0.3, 0.3]]]
+        # pub_plot(all_x2rg_dfs[0], all_data_iqs[0], all_goal_iqs[0],
+                 # density_plots[0], prefix=all_data_files[0],
+                 # inset_files=best_wrst[0], inset_loc=inset_loc[0])
 
     print '\m/ >.< \m/'

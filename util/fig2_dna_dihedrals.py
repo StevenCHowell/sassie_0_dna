@@ -75,14 +75,14 @@ def main():
     # prefix = 'raw_min_MD'
 
     #~~~ determine how many time DNA can be minimized ~~~#
-    # first_last_resids = [[1, 60], [61, 120]]
-    # run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
-    # pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
-    # flex_file = run_dir + 'new_dsDNA60.flex'
-    # drude = False
-    # dcd_files = []
+    first_last_resids = [[1, 60], [61, 120]]
+    run_dir = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/'
+    pdb_file_name = run_dir + 'c36_min_dsDNA60.pdb'
+    flex_file = run_dir + 'new_dsDNA60.flex'
+    drude = False
+    dcd_files = []
     # dcd_files.append(run_dir + 'ma0_spb1/no_mc/mmm_x100.dcd')
-    # dcd_files.append(run_dir + 'm_ma0_spb1/no_mc/m_x100.dcd')
+    dcd_files.append(run_dir + 'm_ma0_spb1/no_mc/m_x100.dcd')
 
     #~~~ 60 bps dsDNA ~~~#
     # first_last_resids = [[1, 60], [61, 120]]
@@ -108,18 +108,18 @@ def main():
     # drude = False
     # dcd_files = []
 
-    # prefix = 'debug_MD'
-    # run_dir = os.path.join(run_dir, 'ma20_spb1000')
-    # dcd_files.append(os.path.join(run_dir, 'mc1_spb1000_sparse.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'mc2_spb1000_sparse.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_BK/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization/mc1_spb1000_sparse_m.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_BK/mc1_spb1000_sparse_m.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_redo/mc1_spb1000_sparse_m.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_redo/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_v2/mc2_spb1000_sparse_m.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_v2/mc1_spb1000_sparse_mmm_tmp.dcd'))
+    # # prefix = 'debug_MD'
+    # # run_dir = os.path.join(run_dir, 'ma20_spb1000')
+    # # dcd_files.append(os.path.join(run_dir, 'mc1_spb1000_sparse.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'mc2_spb1000_sparse.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_BK/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization/mc1_spb1000_sparse_m.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_BK/mc1_spb1000_sparse_m.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_redo/mc1_spb1000_sparse_m.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_redo/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'm_energy_minimization_v2/mc2_spb1000_sparse_m.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'mmm_energy_minimization_v2/mc1_spb1000_sparse_mmm_tmp.dcd'))
 
     # prefix = 'raw_MD'
     # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse.dcd'))
@@ -131,15 +131,15 @@ def main():
     # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse.dcd'))
     # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse.dcd'))
 
-    # prefix = 'mmm_MD'
-    # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse_mmm.dcd'))
-    # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # prefix = 'mmm_MD'
+    # # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma50_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma40_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma30_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma20_spb1000/mc2_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma10_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma5_spb1000/mc1_spb1000_sparse_mmm.dcd'))
+    # # dcd_files.append(os.path.join(run_dir, 'ma1_spb1000/mc1_spb1000_sparse_mmm.dcd'))
 
     # prefix = 'm_MD'
     # dcd_files.append(os.path.join(run_dir, 'ma60_spb1000/mc1_spb1000_sparse_m.dcd'))
@@ -185,20 +185,21 @@ def main():
     # dcd_files = []
     # dcd_files.append(run_dir + 'output/dyn1_dna.dcd')
 
-    #~~~ analyze the MD dihedrals ~~~#
-    run_dir = '/home/schowell/data/myData/dihedrals/charmm36/non_polarized/stitched/'
-    first_last_resids = [[1, 12], [13, 24]]
-    pdb_file_name = run_dir + 'new_dna.pdb'
-    flex_file = run_dir + 'new_dna.flex'
-    drude = False
-    dcd_files = []
-    # dcd_files.append(run_dir + 'dyn75ns_stride20_test.dcd')
-    dcd_files.append(run_dir + 'dyn75ns_stride20.dcd')
+    #~~~ DO NOT analyze the MD dihedrals WITH THIS FILE --> INSTEAD USE: ~~~#
+    #~~~ /home/schowell/data/myData/dihedrals/charmm36/average_angles.py ~~~#
+    # run_dir = '/home/schowell/data/myData/dihedrals/charmm36/non_polarized/stitched/'
+    # first_last_resids = [[1, 12], [13, 24]]
+    # pdb_file_name = run_dir + 'new_dna.pdb'
+    # flex_file = run_dir + 'new_dna.flex'
+    # drude = False
+    # dcd_files = []
+    # # dcd_files.append(run_dir + 'dyn75ns_stride20_test.dcd')
+    # dcd_files.append(run_dir + 'dyn75ns_stride20.dcd')
     # ~~~~~~~~ END FILE INPUT ~~~~~~~~~~ #
 
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
     calc_dihedrals = True
-    # good_dihedral = True
+    good_dihedral = True
     # scatter_dihedrals = True
     # parallel = True
     # ~~~~~~~~ RUN INPUT ~~~~~~~~~~ #
@@ -232,7 +233,7 @@ def main():
                     print "finished angle calculations for %s" % hdf_file
 
         if good_dihedral:
-            pub_scatter_dihedrals(dcd_file_name, frequency, scale_spb, True)
+            # pub_scatter_dihedrals(dcd_file_name, frequency, scale_spb, True)
             if parallel:
                 plot_inputs = (dcd_file_name, max_frame, scale_spb,
                                used_goback, show, True)
@@ -297,8 +298,8 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
         angles['+90'] = np.abs(90 - (angles['epsilon'] - angles['zeta']))
         angles['min'] = angles.loc[:,['+90', '-90']].min(axis=1)
         angles['B-type'] = 'B'
-        angles['B-type'][angles['min'] == angles['+90']] = 'BII'
-        angles['B-type'][angles['min'] == angles['-90']] = 'BI'
+        angles.loc[angles['min'] == angles['+90'], 'B-type'] = 'BII'
+        angles.loc[angles['min'] == angles['-90'], 'B-type'] = 'BI'
 
         try:
             scale_spb == 1  # enforce there is not a scale
@@ -409,7 +410,7 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
 
         np.save(npy_file, angle_vs_steps)
 
-    fig = plt.figure(figsize=(6, 4))
+    fig = plt.figure() # figsize=(6, 4))
     gs1 = gridspec.GridSpec(1, 1, left=0.075, right=0.75, wspace=0.1,
                             hspace=0, top=0.95)
     ax1 = plt.subplot(gs1[:, 0])
@@ -418,7 +419,7 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
     plot_order = [2, 3, 4, 7, 1, 5, 6]
     # plot_order = [1, 5, 6]
     # plot_order = [2, 3, 4, 7]
-    ax1.plot([0, 10000], [95, 95], '--', c='DimGray', linewidth=2)
+    ax1.axhline(95, ls='--', c='DimGray', linewidth=2)
              # label=r'$2\sigma$ cutoff')
     if len(angle_vs_steps)>2:
         for (c, i_angle) in enumerate(plot_order):
@@ -427,7 +428,8 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
         ax1.set_ylim([73, 102])
         ax1.set_xscale('log')
         x_max = angle_vs_steps[-1, 0]
-        ax1.set_xlim([0, x_max])
+        x_min = angle_vs_steps[0, 0]
+        ax1.set_xlim([x_min, x_max])
     else:
         for (c, i_angle) in enumerate(plot_order):
             ax1.plot(angle_vs_steps[:, 0], angle_vs_steps[:, i_angle]*100, '-',
@@ -436,7 +438,7 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
                      markersize=15, mfc='none')
         ax1.set_ylim([-1, 110])
 
-    ax1.set_ylabel(r'% in range')
+    ax1.set_ylabel(r'% of Dihedrals in $2\sigma$ Range')
     ax1.set_xlabel(r'Minimization Iterations')
     default_fontsize = 12
     lg = plt.legend(loc='lower left', scatterpoints=1, numpoints=1,
@@ -450,9 +452,9 @@ def plot_good_dihedrals(dcd_file_name, max_frame=None, scale_spb=1,
             save_name += '_MD'
         if max_frame:
             save_name += '_' + str(max_frame)
-        print 'View figure: \nevince %s &' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+        print 'View figure: \nevince %s.eps &' % save_name
 
     print 'done plotting'
 
@@ -508,9 +510,9 @@ def compare_average_in_range(dcd_files, MD=True, show=False):
         save_name = '/home/schowell/data/myData/dihedrals/dsDNA_60bps/average_in_range'
         if MD:
             save_name += '_MD'
-        print 'View figure: \nevince %s &' % save_name
         plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
         plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+        print 'View figure: \nevince %s.eps &' % save_name
 
 def get_step_i_dihedrals(i, indices, all_df):
     df_list = []
@@ -676,7 +678,7 @@ def scatter_plot_dihedrals(dcd_file_name, frequency=-1, scale_spb=1, MD=True):
             plt.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
             plt.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
 
-    # plt.show()
+    plt.show()
     print 'pause'
 
 def plt_format(ax):
@@ -700,8 +702,8 @@ def make_pub_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[0]
     x = 'zeta'
     y = 'epsilon'
-    limit_patch('zeta1', 'epsilon1', limits, ax, b1=1)
     limit_patch('zeta2', 'epsilon2', limits, ax, b1=2)
+    limit_patch('zeta1', 'epsilon1', limits, ax, b1=1)
     ax.plot(df[x], df[y], symbol, mec=gwp.qual_color(i_color),
             mfc='none')
     ax.set_xlabel(angle_label[x])
@@ -712,8 +714,8 @@ def make_pub_scatter_plots(limits, df, angle_label, ax_array=[],
     ax = ax_array[1]
     x = 'zeta'
     y = 'alpha'
-    limit_patch('zeta1', 'alpha', limits, ax, b1=1)
     limit_patch('zeta2', 'alpha', limits, ax, b1=2)
+    limit_patch('zeta1', 'alpha', limits, ax, b1=1)
     ax.plot(df[x][0:-1], df[y][1:], symbol, mec=gwp.qual_color(i_color),
             mfc='none')
     ax.set_xlabel(angle_label[x])
