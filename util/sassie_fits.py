@@ -50,9 +50,10 @@ def load_crysol(saspath, i0):
     nfilestring = 'find ' + saspath + ' -name "*.log" | grep -c log'
     nfout = os.popen(nfilestring, 'r').readlines()
     nf = locale.atoi(nfout[0])
+
     print "\n# READING Rg VALUES FROM LOG FILES"
     log = []
-
+    assert nf > 0, 'no I(Q) calculations in %s' % saspath
     for i in xrange(nf):
 
         mst = str(i + 1).zfill(5)  # 99999 maximum number of frames
@@ -64,13 +65,14 @@ def load_crysol(saspath, i0):
     return Rg, iq_data, log
 
 
-def load_foxs(saspath, i0=None):
+def load_foxs(saspath):
     '''
     load in the FoXS output (Rg and I(Q))
     '''
     result_file = op.join(saspath, 'rg.csv')
 
     syn_files = glob.glob(op.join(saspath, '*.dat'))
+    assert len(syn_files) > 0, 'no I(Q) calculations in %s' % saspath
     syn_files.sort()
 
     rg = [None] * len(syn_files)
@@ -101,8 +103,6 @@ def load_foxs(saspath, i0=None):
     label = []
     for (i, syn_file) in enumerate(syn_files):
         data = np.loadtxt(syn_file)
-        if i0:
-            data[:, 1:] /= data[0, 1] * i0
         all_data.append(data)
         iq.append(data[:, 1])
         q.append(data[:, 0])
@@ -224,7 +224,7 @@ def gnom_rg(gnom_files):
 
     gnom_dict = {'Rg grp': rg_reci, 'Rg grl': rg_real, 'RgEr grl': rger_real,
                  'I0 grp': i0_reci, 'I0 grl': i0_real, 'I0Er grl': i0er_real}
-    return DataFrame(gnom_dict, index=prefix)
+    return pd.DataFrame(gnom_dict, index=prefix)
 
 
 def crysol_rg(ns, log):
@@ -273,8 +273,8 @@ def mkdir_p(path):
             raise
 
 
-def compare_run_to_iq(run_dir, goal_iq, filter_dir, out_file=None, i0=True,
-                      s=True, o=True, run_label=''):
+def compare_run_to_iq(run_dir, goal_iq, filter_dir, out_file=None, s=True,
+                      o=True, run_label=''):
 
     assert op.exists(run_dir), 'No such run directory: %s' % run_dir
     if op.exists(op.join(run_dir, 'crysol')) and False:
@@ -285,18 +285,14 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, out_file=None, i0=True,
         ext = '/*.dat'
     else:
         assert False, 'failed to find the calculated scattering data'
-    syn_files = glob.glob(syn_data_dir + ext)
-    assert len(syn_files) > 0, 'no I(Q) calculations in %s' % syn_data_dir
-    syn_files.sort()
 
     # get the Rg and I(Q) for each structure from the calculation rusults
     if ext[-3:] == 'int':
         Rg, data_iq, labels = load_crysol(syn_data_dir, goal_iq[0, 1])
     elif ext[-3:] == 'dat':
-        Rg, data_iq, labels = load_foxs(syn_data_dir, goal_iq[0, 1])
+        Rg, data_iq, labels = load_foxs(syn_data_dir) #, goal_iq[0, 1])
 
     data_iq = interp_iq(data_iq, goal_iq)
-
 
     # compare I(Q) of the experimental and synthetic structures
     nf = data_iq.shape[1]
@@ -321,6 +317,12 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, out_file=None, i0=True,
             match_iq[:, [0, i]], iq_offset[j], X2[j] = offset(
                 data_iq[:, [0, i]], goal_iq)
             iq_scale[j] = 0
+        else:
+            # X2[j] = get_R(goal_iq, data_iq[:, [0, i]])
+            X2[j] = get_X2(goal_iq, data_iq[:, [0, i]])
+            match_iq[:, [0, i]] = data_iq[:, [0, i]]
+            iq_offset[j] = 0
+            iq_scale[j] = 1
 
     res_dict = {'Rg': Rg, 'X2': X2, 'scale': iq_scale,
                 'offset': iq_offset, 'labels': labels}
@@ -355,9 +357,11 @@ def interp_iq(data_iq, goal, q_max=0.2):
     else:
         print ('Interpolating %d calculated I(Q) curves' %
                (data_iq.shape[1]-1))
+        # todo: find a way to do this w/o looping
         for i in xrange(1, data_iq.shape[1]):
             interp_data = interpolate.splrep(data_iq[:, 0], data_iq[:, i])
-            data_int[:, i] = interpolate.splev(q_grid, interp_data)
+            interp_iq = interpolate.splev(q_grid, interp_data)
+            data_int[:, i] = interp_iq / interp_iq[0]
 
     data_iq = data_int
 
@@ -427,10 +431,46 @@ def match_poly(in_data, rf_data):
     return mt_data, scale, offset, X2
 
 
+def scale_i0(in_data, rf_data):
+    """
+    determine the scale to match the I(0) or first value in the reference
+    and input data
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx3 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    X2:      X^2 comparison between the reference data and matched input data
+
+    See also
+    --------
+    match_poly, match_lstsq, scale_offset, scale
+
+    """
+    assert (in_data[:, 0] - rf_data[:, 0]).sum() == 0, (
+        'mismatch between input and reference x-grid')
+
+    scale = rf_data[0, 1] / in_data[0, 1]
+
+    mt_data = np.vstack([in_data[:, 0], scale * in_data[:, 1]]).T
+
+    R = get_R(rf_data, mt_data)
+
+    return mt_data, scale, R
+
+
 def scale(in_data, rf_data):
     """
     determine the scale to match the input data to the reference
-    data by minimizing the X2 calculation
+    data by minimizing the X2 calculation (critical that the
+    error estimates are reasonable for all Q values)
 
     Parameters
     ----------
@@ -450,8 +490,8 @@ def scale(in_data, rf_data):
     match_poly, match_lstsq, scale_offset
 
     """
-    assert (in_data[:, 0] - rf_data[:, 0]).sum() == 0, ('mismatch between input and'
-                                                        ' reference x-grid')
+    assert (in_data[:, 0] - rf_data[:, 0]).sum() == 0, (
+        'mismatch between input and reference x-grid')
 
     sigma2 = rf_data[:, 2] * rf_data[:, 2]
     scale = ((rf_data[:, 1] * in_data[:, 1] / sigma2).sum() /
@@ -503,11 +543,42 @@ def offset(in_data, rf_data):
     return mt_data, offset, X2
 
 
+def get_R(rf_data, mt_data):
+    R, _ = get_R_components(rf_data, mt_data)
+    return R
+
+
+def get_R_components(rf_data, mt_data):
+    # # only use the sum of the differences
+    # diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
+    # components = diff
+    #
+    # # use the sum of the differences normalized by the experimental
+    # diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
+    # components = diff / rf_data[:, 1]
+    #
+    # # use the sum of the differences squared
+    # diff = mt_data[:, 1] - rf_data[:, 1]
+    # diff2 = diff * diff
+    # components = diff2
+    #
+    # # use the sum of the differences squared normalized by the experimental squared
+    # diff = mt_data[:, 1] - rf_data[:, 1]
+    # diff2 = diff * diff
+    # rf_data2 = rf_data[:, 1] * rf_data[:, 1]
+    # components = diff2 / rf_data2
+
+    # # R value as defined by: 10.1042/bj2670203
+    diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
+    norm = np.abs(rf_data[:, 1]).sum()  # the abs seems necessary but whatever...
+    components = diff / norm
+
+    R = components.sum()
+    return R, components
+
+
 def get_X2(rf_data, mt_data):
-    diff = mt_data[:, 1] - rf_data[:, 1]
-    diff2 = diff * diff
-    er2 = rf_data[:, 2] * rf_data[:, 2]
-    X2 = (diff2 / er2).sum() / len(rf_data)
+    X2, _ = get_X2_components(rf_data, mt_data)
     return X2
 
 
@@ -622,16 +693,16 @@ def kratky(iq_data):
 
 def compare_match(rf_data, in_data, dummy_scale=None, dummy_offset=None,
                   log=False):
-    s = np.zeros(4)
-    o = np.zeros(4)
+    scale = np.zeros(4)
+    offset = np.zeros(4)
     X2 = np.zeros(4)
-    mt_data_polyf, s[0], o[0], X2[0] = match_poly(in_data, rf_data)
-    mt_data_lstsq, s[1], o[1], X2[1] = match_lstsq(in_data, rf_data)
-    mt_data_scale, s[2], X2[2] = scale(in_data, rf_data)
-    mt_data_sclof, s[3], o[3], X2[3] = scale_offset(in_data, rf_data)
+    mt_data_polyf, scale[0], offset[0], X2[0] = match_poly(in_data, rf_data)
+    mt_data_lstsq, scale[1], offset[1], X2[1] = match_lstsq(in_data, rf_data)
+    mt_data_scale, scale[2], X2[2] = scale(in_data, rf_data)
+    mt_data_sclof, scale[3], offset[3], X2[3] = scale_offset(in_data, rf_data)
     info = []
     for i in xrange(4):
-        info.append('s=%0.1f, o=%0.3f, X2=%0.1f' % (s[i], o[i], X2[i]))
+        info.append('s=%0.1f, o=%0.3f, X2=%0.1f' % (scale[i], offset[i], X2[i]))
     if dummy_scale and dummy_offset:
         ref_str = ', s=%0.1f, o=%0.1f' % (dummy_scale, dummy_offset)
     else:
@@ -976,7 +1047,7 @@ def fig_sub_rg_v_conc(show=False):
     dod_labels.append(r'H5 1mM $Mg^{2+}$')
 
     tri.append(['c000_3x167_k010',
-                'c068_3x167_k010',
+                # 'c068_3x167_k010',
                 'c125_3x167_k010',
                 'c250_3x167_k010',
                 'c500_3x167_k010'])
@@ -987,15 +1058,6 @@ def fig_sub_rg_v_conc(show=False):
                 'c250_3x167_k050',
                 'c500_3x167_k050'])
     tri_labels.append(r'50mM $K^+$')
-    inputs.run_name = 'run1'
-    inputs.dcd_path = 'run1/dna_mc/'
-    calc_foxs.main(inputs)
-    print 'finished %s' % op.split(inputs.dcd_path[:-1])[0]
-
-    inputs.run_name = 'run2'
-    inputs.dcd_path = 'run2/dna_mc/'
-    calc_foxs.main(inputs)
-    print 'finished %s' % op.split(inputs.dcd_path[:-1])[0]
 
     tri.append(['c000_3x167_k100',
                 'c125_3x167_k100',
@@ -1046,7 +1108,7 @@ def fig_sub_rg_v_conc(show=False):
     tet_labels.append(r'H5 10mM $K^{+}$')
 
     tet.append(['c000_4x167_h5_mg1',
-                'c200_4x167_h5_mg1',
+                # 'c200_4x167_h5_mg1',
                 'c400_4x167_h5_mg1',
                 'c800_4x167_h5_mg1'])
     tet_labels.append(r'H5 1mM $Mg^{2+}$')
@@ -1064,17 +1126,20 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
                      mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
 
-    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
-    lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
     # plt.title(r'3x167', x=0.3, y=0.92)
-    ylim = np.array(plt.ylim())
-    ylim[1] *= 1.08
-    plt.ylim(ylim)
-    tri_ylim = ylim  # store for dimer ylim
+    # ylim = np.array(plt.ylim())
+    # ylim[1] *= 1.08
+    # plt.ylim(ylim)
+    # tri_ylim = ylim
+    tri_ylim = [90, 116]  # store for dimer ylim
+    plt.ylim(tri_ylim)
     plt.xlim(x_range)
-    ax.get_xaxis().set_ticks([])
+    lg = plt.legend(loc='center right', scatterpoints=1, numpoints=1)
+    # lg = plt.legend(scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    ax.get_xaxis().set_ticklabels([])
     ax.text(0.03, 0.92, r'a) 3x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
@@ -1086,20 +1151,22 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
                      mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
 
-    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
+    # lg = plt.legend(loc='upper right', scatterpoints=1, numpoints=1)
+    lg = plt.legend(scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
     # plt.title(r'4x167', x=0.3, y=0.92)
-    ylim = np.array(plt.ylim())
-    ylim[1] *= 1.03
-    plt.ylim(ylim)
-    ax.set_yticks(ax.get_yticks()[:-2])
+    # ylim = np.array(plt.ylim())
+    # ylim[1] *= 1.03
+    # plt.ylim(ylim)
+    plt.ylim([80, 145])
+    ax.set_yticks(ax.get_yticks()[:-1])
     plt.xlim(x_range)
     ax.text(0.03, 0.92, r'b) 4x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
-    x_range = [-0.05, 0.95]
+    x_range = [-0.05, 0.8]
 
     # SUBPLOT(1,2) c)
     ax = plt.subplot(gs1[1])
@@ -1111,8 +1178,12 @@ def fig_sub_rg_v_conc(show=False):
                      c=this_color, fmt=gp.symbol_order(i, '--'),
                      mec=this_color, mfc='none', ms=15, linewidth=2)
 
-    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
-    lg.draw_frame(False)
+    lg = plt.legend(loc='center right', scatterpoints=1, numpoints=1)
+    # lg = plt.legend(scatterpoints=1, numpoints=1)
+    try:
+        lg.draw_frame(False)
+    except:
+        pass
     plt.ylabel(r'$R_g$')
     # plt.xlabel(r'mg/mL')
     # plt.title('2x167', x=0.3, y=0.92)
@@ -1121,7 +1192,7 @@ def fig_sub_rg_v_conc(show=False):
     # transform=plt.transAxes)
     plt.xlim(x_range)
     plt.ylim(tri_ylim)
-    ax.get_xaxis().set_ticks([])
+    ax.get_xaxis().set_ticklabels([])
     ax.text(0.03, 0.92, r'c) 2x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
@@ -1133,13 +1204,14 @@ def fig_sub_rg_v_conc(show=False):
                      c=gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
                      mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
 
-    lg = plt.legend(loc=4, scatterpoints=1, numpoints=1)
+    # lg = plt.legend(loc='upper right', scatterpoints=1, numpoints=1)
+    lg = plt.legend(scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     plt.ylabel(r'$R_g$')
     plt.xlabel(r'mg/mL')
     # plt.title(r'12x167', x=0.3, y=0.92)
     ylim = np.array(plt.ylim())
-    ax.set_yticks(ax.get_yticks()[:-1])
+    # ax.set_yticks(ax.get_yticks()[:-1])
     ylim[1] *= 1.03
     plt.ylim(ylim)
     plt.xlim(x_range)
@@ -1147,8 +1219,10 @@ def fig_sub_rg_v_conc(show=False):
             horizontalalignment='left', transform=ax.transAxes)
 
     fig.tight_layout()
-    fig.savefig('Rg_v_mgmL.png')
-    fig.savefig('Rg_v_mgmL.eps')
+    save_name = 'Rg_v_mgmL'
+    fig.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+    fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+    print 'view Rg vs mg/mL file: \nevince %s.eps &' % save_name
     if show:
         plt.show()
 
@@ -1157,8 +1231,6 @@ def fig_sub_rg_v_conc(show=False):
 
 def fig_rg_v_salt(show=False):
     df = load_rg_csv()
-    tetA = ['tetraAtek010_zeroCon', 'tetraAtek050_zeroCon',
-            'tetraAtek100_zeroCon']
     tri0 = ['c000_3x167_k010',
             'c000_3x167_k050',
             'c000_3x167_k100',
@@ -1177,13 +1249,17 @@ def fig_rg_v_salt(show=False):
     # 'triEtek100_zeroCon']
     di0 = ['c000_2x167_k010']
     di5 = ['c500_2x167_k010']
-    series = [di0, di5, tri0, tri5, tet0, tet5]
+    # series = [di0, di5, tri0, tri5, tet0, tet5]
+    # labels = ['2x167 (0.0 mg/mL)',
+              # '2x167 (0.5 mg/mL)',
+              # '3x167 (0.0 mg/mL)',
+              # '3x167 (0.5 mg/mL)',
+              # '4x167 (0.0 mg/mL)',
+              # '4x167 (0.5 mg/mL)']
+    series = [di0, tri0, tet0]
     labels = ['2x167 (0.0 mg/mL)',
-              '2x167 (0.5 mg/mL)',
               '3x167 (0.0 mg/mL)',
-              '3x167 (0.5 mg/mL)',
-              '4x167 (0.0 mg/mL)',
-              '4x167 (0.5 mg/mL)']
+              '4x167 (0.0 mg/mL)']
     fig = plt.figure()
     x_range = [-10, 220]
     for i in xrange(len(series)):
@@ -1226,7 +1302,7 @@ def combine_rg_i0():
 
     # chess_dir = '/home/schowell/Dropbox/gw_phd/experiments/1406CHESS/'
     chess_dir = '/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/chess/'
-    chess_matlab_file = 'rg_i0_chess_nor.csv'
+    chess_matlab_file = 'rg_i0_chess.csv'
     chess_matlab_df = pd.read_csv(op.join(chess_dir, chess_matlab_file))
     chess_matlab_df = chess_matlab_df.set_index(
         chess_matlab_df['prefix']).drop('prefix', 1)
@@ -1236,7 +1312,7 @@ def combine_rg_i0():
 
     # nsls_dir = '/home/schowell/Dropbox/gw_phd/experiments/1406NSLS/'
     nsls_dir = '/home/schowell/Dropbox/gw_phd/paper_tetranucleosome/1406data/nsls/'
-    nsls_matlab_file = 'rg_i0_nsls_nor.csv'
+    nsls_matlab_file = 'rg_i0_nsls.csv'
     nsls_matlab_df = pd.read_csv(op.join(nsls_dir, nsls_matlab_file))
     nsls_matlab_df = nsls_matlab_df.set_index(
         nsls_matlab_df['prefix']).drop('prefix', 1)
@@ -1271,7 +1347,8 @@ def combine_rg_i0():
     return df
 
 
-def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
+def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns,
+                  scale=0, offset=0):
 
     for array_type in array_types:
         for data_file in data_files[array_type]:
@@ -1307,12 +1384,13 @@ def evaluate_qqiq(array_types, data_files, data_dir, data_ext, run_dirs, ns):
                 all_data_qqiq = np.concatenate((all_data_qqiq, data_qqiq[:, 1:]),
                                                axis=1)
 
-            plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file)
+            plot_run_best(x2rg_df, all_data_qqiq, goal_iq, data_file,
+                          s=s, o=o)
 
 
 def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                prefix='', do_plot='True', cutoff=None, best_dcd=False,
-                fresh=False, s=True, o=True, i0=False):
+                prefix='', do_plot=True, cutoff=None, best_dcd=False,
+                fresh=False, s=False, o=False):
     all_x2rg_dfs = []
     all_data_iqs = []
     all_goal_iqs = []
@@ -1320,9 +1398,9 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
 
     for array_type in array_types:
         for data_file in data_files[array_type]:
-            rg_file = op.join(data_dir, data_file + data_ext)
-            assert op.exists(rg_file), (
-                "No such file: '%s'" % rg_file)
+            rf_file = op.join(data_dir, data_file + data_ext)
+            assert op.exists(rf_file), (
+                "No such file: '%s'" % rf_file)
 
             df_list = []
             data_iq_list = []
@@ -1338,13 +1416,14 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                     goal_iq = np.loadtxt(op.join(filter_dir, 'goal%s.iq' %
                                                  run_label))
                 else:
-                    print 'loading rg then calculating X^2 values'
-                    data = np.loadtxt(rg_file)
+                    print ('loading rg then calculating X^2 values for %s' %
+                           run_dir)
+                    rf_data = np.loadtxt(rf_file)
+                    rf_data[:, 1:] /= rf_data[0, 1] # normalize data
                     result_df, data_iq, iq_df, goal_iq = compare_run_to_iq(
-                        run_dir, data, filter_dir, out_file, i0=i0, s=s, o=o,
+                        run_dir, rf_data, filter_dir, out_file, s=s, o=o,
                         run_label=run_label)
-                run_name = run_dir.split(
-                    '/')[-3] + '/' + run_dir.split('/')[-2]
+                run_name = run_dir.split('/')[-3] + '/' + run_dir.split('/')[-2]
                 result_df['run'] = run_name
                 df_list.append(result_df)
                 data_iq_list.append(data_iq)
@@ -1358,9 +1437,9 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             x2rg_df.index = range(len(x2rg_df))
             x2rg_df.sort('X2', inplace=True)
 
-            best50 = x2rg_df.iloc[:100]
-            best50.to_csv(data_file + '_best.csv', float_format='%5.10f',
-                          sep='\t')
+            best200 = x2rg_df.iloc[:200]
+            best200.to_csv(run_label[1:] + '_' + data_file + '_best.csv',
+                           float_format='%5.10f', sep='\t')
 
             q = data_iq_list[0][:, :1]
             for (i, data_iq) in enumerate(data_iq_list):
@@ -1371,7 +1450,7 @@ def evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                                                   axis=1)
             if do_plot:
                 plot_run_best(x2rg_df, run_data_iqs, goal_iq, data_file,
-                              prefix + run_label[1:], i0=i0)
+                              prefix + run_label[1:], s=s, o=o)
 
             all_x2rg_dfs.append(x2rg_df)
             all_data_iqs.append(run_data_iqs)
@@ -1456,7 +1535,10 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
 
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
-                  i0=True):
+                  s=False, o=False, residual = r'$\chi^2$'):
+
+    if not residual == r'$\chi^2$':
+        residual == r'$R$'
 
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
@@ -1472,9 +1554,9 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     ax = plt.subplot(221)
     plt.title('all %d structures' % n_total)
-    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec='b', mfc='none')
+    ax.plot(x2rg_df['Rg'], x2rg_df['X2'], 'o', mec=gp.qual_color(0), mfc='none')
     # plt.xlim(rg_range)
-    plt.ylabel(r'$\chi^2$')
+    plt.ylabel(residual)
     plt.xlabel(r'$R_g$')
     # ax.xaxis.set_major_formatter(plt.NullFormatter())
 
@@ -1482,9 +1564,10 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     best_X2 = x2rg_df.X2.min()
     best_series = x2rg_df[x2rg_df.X2 == best_X2]
     i_best = best_series.index[0] + 1  # first column is the Q values
-    if i0:
-        all_data_iq = all_data_iq[1:]
-        goal_iq = goal_iq[1:]
+    if goal_iq[0, 0] < 0.00001:
+        xlim_min = goal_iq[1, 0] * .9
+    else:
+        xlim_min = goal_iq[0, 0] * .9
 
     best = all_data_iq[:, i_best]
     worst_X2 = x2rg_df.X2.max()
@@ -1492,10 +1575,11 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     i_worst = worst_series.index[0] + 1  # first column is the Q values
     worst = all_data_iq[:, i_worst]
     average = all_data_iq[:, 1:].mean(axis=1)
-    ax.set_yscale('log')
+    # ax.set_yscale('log')
 
     ax = plt.subplot(222)
-    plt.title(r'best $\chi^2$=%0.1f, worst $\chi^2$=%0.1f' % (best_X2, worst_X2))
+    plt.title(r'best %s=%0.1f, worst %s=%0.1f' % (residual, best_X2,
+                                                  residual, worst_X2))
     ax.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
                 label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                 mec=gp.qual_color(0))
@@ -1517,7 +1601,8 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
-    gp.zoomout(ax, 0.1)
+    gp.zoomout(ax, 0.2)
+    plt.xlim([xlim_min, 0.21])
     lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
@@ -1525,7 +1610,8 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     ax = plt.subplot(223)
     plt.title('best %d structures' % (n_best))
-    plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec='b', mfc='none')
+    plt.plot(x2rg_best['Rg'], x2rg_best['X2'], 'o', mec=gp.qual_color(0)
+             , mfc='none')
     # plt.plot(x2rg_best['Rg'], x2rg_best['X2'], '.')
     plt.plot(x2rg_best.iloc[0]['Rg'], x2rg_best.iloc[0]['X2'], '>',
              mec=gp.qual_color(1), mfc=best_colors[0],
@@ -1536,10 +1622,11 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.plot(x2rg_best.iloc[2]['Rg'], x2rg_best.iloc[2]['X2'], '^',
              mec=gp.qual_color(3), mfc=best_colors[2],
              markersize=8)
-    plt.ylabel(r'$\chi^2$')
+    plt.ylabel(residual)
     plt.xlabel(r'$R_g$')
-    ax.set_yscale('log')
-    # plt.xlim(rg_range)
+    # ax.set_yscale('log')
+    plt.axis('tight')
+    gp.zoomout(ax, 0.1)
 
     # update the worst and average I(Q)
     # worst_X2 = x2rg_best.X2.max()
@@ -1553,8 +1640,8 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     assert i_1st == i_best, 'incorrectly indexing'
 
     ax = plt.subplot(224)
-    plt.title(r'best 3 $\chi^2$s = %0.1f, %0.1f, %0.1f' % (
-        best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
+    plt.title(r'best 3 %s values = %0.1f, %0.1f, %0.1f' % (
+        residual, best_X2, x2rg_best.iloc[1].X2, x2rg_best.iloc[2].X2))
     plt.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
                  label='exp', ms=8, mfc='none', c=gp.qual_color(0),
                  mec=gp.qual_color(0))
@@ -1574,10 +1661,10 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
-    plt.xscale('log')
     plt.axis('tight')
     gp.zoomout(ax, 0.1)
-    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    plt.xlim([-0.01, 0.21])        # plt.xscale('log')
+    lg = plt.legend(loc='upper right', scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
     plt.tight_layout()
@@ -1585,71 +1672,118 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     if show:
         plt.show()
     else:
-        fig_file_name = op.join(os.getcwd(), '%s_%s_fit.eps' %
-                                (prefix, data_file))
+        fig_file_name = op.join(os.getcwd(), '%s_%s_fit' % (prefix, data_file))
         # plt.savefig(fig_file_name[:-3] + 'png')
-        print 'View fit plot: \nevince %s &' % fig_file_name
-        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
-        plt.savefig(fig_file_name, bbox_inches='tight')
+        print 'View fit plot: \neog %s.png &' % fig_file_name
+        plt.savefig(fig_file_name + '.png', dpi=400, bbox_inches='tight')
+        # plt.savefig(fig_file_name + '.eps', dpi=400, bbox_inches='tight')
         # plt.show()
     plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
-                       prefix=(prefix + '_' + data_file))
+                       prefix=(prefix + '_' + data_file), s=s, o=o)
 
 
-def plot_x2_components(rf_data, mt_data, prefix=None, show=False):
+def plot_x2_components(rf_data, mt_data, prefix=None, show=False, s=False,
+                       o=False, residual = r'$\chi^2$'):
     '''
     plot the point-by-point components of the X^2 summation
     '''
+    if residual == r'$\chi^2$':
+        x2, components = get_X2_components(rf_data, mt_data)
+        components *= 100 / x2
+    else:
+        residual = r'$R$'
+        x2, components = get_R_components(rf_data, mt_data)
+        components *= 100 / x2
+
     colors = gp.color_order  # gp.qual_color
-    x2, components = get_X2_components(rf_data, mt_data)
-    components *= 100 / x2
-    plt.figure(figsize=(4, 3))
-    default_fontsize = 13
+
+    plt.figure()
     if prefix:
         plt.suptitle(prefix)
-    gs1 = GridSpec(4, 1, left=0.1, right=0.925, bottom=0.075, top=0.925,
-                   hspace=0, wspace=0)
-    ax1 = plt.subplot(gs1[:3, :])
+    gs1 = GridSpec(4, 2, hspace=0, wspace=0)#, left=0.1, right=0.9, bottom=0.075, top=0.925,
+
+    # # log-log scale # #
+    ax1 = plt.subplot(gs1[:3, 0])
     ax1.plot(rf_data[:, 0], rf_data[:, 1], 'o', ms=8, mfc='none',
              mec=colors(0), label='exp')
     # label='exp', ms=8, mfc='none', color='b')
     ax1.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt=None,
                  ecolor=colors(0))
     ax1.plot(mt_data[:, 0], mt_data[:, 1], '-', mfc='none', ms=8,
-             c=colors(1), linewidth=2, label=(r'best $\chi^2$= %0.1f' % x2))
-    plt.ylabel(r'$I(Q)$', fontsize=default_fontsize)
+             c=colors(1), linewidth=2, label=(r'best %s= %0.1f' % (residual,
+                                                                   x2)))
+    plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
     plt.xscale('log')
     plt.axis('tight')
     gp.zoomout(ax1, 0.1)
     ax1.get_yaxis().set_ticks([])
-    ax1.yaxis.labelpad = -.5
-    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1,
-                    prop={'size': default_fontsize})
+    ax1.get_xaxis().set_ticks([])
+    # ax1.yaxis.labelpad = -.5
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
-    xlim = ax1.get_xlim()
-    ax2 = plt.subplot(gs1[3, :])
+
+    ax2 = plt.subplot(gs1[3, 0])
     width_vals = np.copy(mt_data[:, 0])
     width_vals[:-1] = mt_data[1:, 0] - mt_data[:-1, 0]
     width_vals[-1] = width_vals[-2]
     rects = ax2.bar(
         mt_data[:, 0] - width_vals / 2, components, width=width_vals, color=colors(0))
-    for rect in rects:
-        height = rect.get_height()
-        label = int(round(height))
-        if label > 1:
-            ax2.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
-                     str(label), ha='center', va='bottom')
+    # for rect in rects:
+        # height = rect.get_height()
+        # label = int(round(height))
+        # if label > 1:
+            # ax2.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
+                     # str(label), ha='center', va='bottom')
     ax2.set_xscale('log')
     gp.zoomout(ax2, 0.7)
     ylim = ax2.get_ylim()
     ax2.set_ylim([0, ylim[1]])
-    ax2.set_xlim(xlim)
-    ax2.set_xlabel(r'$Q (\AA^{-1})$', fontsize=default_fontsize)
-    ax2.set_ylabel(r'% of X$^2$', fontsize=default_fontsize)
+    ax2.set_xlim(ax1.get_xlim())
+    ax2.set_xlabel(r'$Q (\AA^{-1})$')
+    ax2.set_ylabel(r'%% of %s' % residual)
     ax2.get_yaxis().set_ticks([])
-    ax2.xaxis.labelpad = -10
-    ax2.yaxis.labelpad = -.5
+    # ax2.xaxis.labelpad = -10
+    # ax2.yaxis.labelpad = -.5
+
+    # # log-lin scale # #
+    ax3 = plt.subplot(gs1[:3, 1])
+    ax3.plot(rf_data[:, 0], rf_data[:, 1], 'o', ms=8, mfc='none',
+             mec=colors(0), label='exp')
+    # label='exp', ms=8, mfc='none', color='b')
+    ax3.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt=None,
+                 ecolor=colors(0))
+    ax3.plot(mt_data[:, 0], mt_data[:, 1], '-', mfc='none', ms=8,
+             c=colors(1), linewidth=2, label=(r'best %s= %0.1f' % (residual,
+                                                                   x2)))
+    ax3.set_yscale('log')
+    # ax3.set_xlim([-0.01, 0.21])
+    ax3.set_ylim(ax1.get_ylim())
+    ax3.get_xaxis().set_ticks([])
+    ax3.get_yaxis().set_ticks([])
+    # ax3.yaxis.labelpad = -.5
+
+    ax4 = plt.subplot(gs1[3, 1])
+    width_vals = np.copy(mt_data[:, 0])
+    width_vals[:-1] = mt_data[1:, 0] - mt_data[:-1, 0]
+    width_vals[-1] = width_vals[-2]
+    rects = ax4.bar(
+        mt_data[:, 0] - width_vals / 2, components, width=width_vals, color=colors(0))
+    for rect in rects:
+        height = rect.get_height()
+        label = int(round(height))
+        # if label > 1:
+            # ax4.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
+                     # str(label), ha='center', va='bottom')
+    # ax4.set_xscale('log')
+    ax4.set_ylim(ax2.get_ylim())
+    ax4.set_xlim(ax3.get_xlim())
+    ax4.set_xlabel(r'$Q (\AA^{-1})$')
+    ax4.get_yaxis().set_ticks([])
+    # ax4.xaxis.labelpad = -10
+    # ax4.yaxis.labelpad = -.5
+
+    plt.tight_layout()
     if show:
         plt.show()
     else:
@@ -2115,7 +2249,7 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
         print 'pause'
 
 def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
-                sassie_run_dir):
+                sassie_run_dir, prefix=''):
     for (i, data_file) in enumerate(all_data_files):
         best_X2 = all_x2rg_dfs[i].X2.min()
         best_series = all_x2rg_dfs[i][all_x2rg_dfs[i].X2 == best_X2]
@@ -2125,17 +2259,18 @@ def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
         i_worst = wrst_series.index[0] + 1  # first column is the Q values
 
         all_x2rg_dfs[i].index.name = 'index'
-        all_x2rg_dfs[i].to_csv(data_file + '_x2rg.csv', sep=',')
-        np.savetxt(data_file + '_bst_wrst.iq',
+        all_x2rg_dfs[i].to_csv(prefix + data_file + '_x2rg.csv', sep=',')
+        np.savetxt(prefix + data_file + '_bst_wrst.iq',
                    all_data_iqs[i][:, [0, i_best, i_worst]],
                    header='Q, best I(Q), worst I(Q)')
-        np.savetxt(data_file + '_exp.iq', all_goal_iqs[i],
+        np.savetxt(prefix + data_file + '_exp.iq', all_goal_iqs[i],
                    header='Q, I(Q), Error I(Q)')
 
         # save the best and worst dcd frame as a pdb
         mol = sasmol.SasMol(0)
-        random_pdb = glob.glob(op.join(sassie_run_dir, op.split(
-            best_series.iloc[0]['run'])[0], '*.pdb'))[0]
+        pdb_search = op.join(sassie_run_dir, op.split(
+            best_series.iloc[0]['run'])[0], '*.pdb')
+        random_pdb = glob.glob(pdb_search)[0]
         mol.read_pdb(random_pdb)
 
         best_mc_dir = op.join(sassie_run_dir, best_series.iloc[0]['run'],
@@ -2143,8 +2278,8 @@ def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
         best_dcd = glob.glob(op.join(best_mc_dir, '*.dcd'))
         assert len(best_dcd) == 1, 'ERROR: multiple dcd in %s' % best_mc_dir
         best_dcd = best_dcd[0]
-        mol.read_single_dcd_step(best_dcd, best_series.iloc[0]['id'])
-        mol.write_pdb(data_file + '_best.pdb', 0, 'w')
+        mol.read_single_dcd_step(best_dcd, int(best_series.iloc[0]['id']))
+        mol.write_pdb(prefix + data_file + '_best.pdb', 0, 'w')
 
         wrst_mc_dir = op.join(sassie_run_dir, wrst_series.iloc[0]['run'],
                               'monte_carlo')
@@ -2152,7 +2287,7 @@ def save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
         assert len(wrst_dcd) == 1, 'ERROR: multiple dcd in %s' % wrst_mc_dir
         wrst_dcd = wrst_dcd[0]
         mol.read_single_dcd_step(wrst_dcd, wrst_series.iloc[0]['id'])
-        mol.write_pdb(data_file + '_wrst.pdb', 0, 'w')
+        mol.write_pdb(prefix + data_file + '_wrst.pdb', 0, 'w')
 
         # cp the psf-file to local directory
         random_psf = glob.glob(op.join(sassie_run_dir, op.split(
@@ -2186,12 +2321,12 @@ if __name__ == '__main__':
         compare_match(rf_data, in_data, dummy_scale, 0)
 
     else:
-        # fig_rg_v_conc()
         # data_rg_i0_df, data_files = examine_rg_i0(True)
 
         if False:
+            # fig_rg_v_conc()
             fig_sub_rg_v_conc(show=True)
-            fig_rg_v_salt(show=True)
+            # fig_rg_v_salt(show=True)
 
         # tri5 = ['c500_3x167_k010',
                 # 'c500_3x167_k050',
@@ -2202,16 +2337,16 @@ if __name__ == '__main__':
                 # 'c500_4x167_k100']
         # full
         tri_0 = ['c000_3x167_k010',
-                'c000_3x167_k050',
-                'c000_3x167_k100',
-                'c000_3x167_k200']
+                 'c000_3x167_k050',
+                 'c000_3x167_k100',
+                 'c000_3x167_k200']
         tet_0 = ['c000_4x167_k010',
                 'c000_4x167_k050',
                 'c000_4x167_k100',
                 'c000_4x167_mg1']
         di_0 = ['c000_2x167_k010']
         h5_0 = ['c000_4x167_h5_k010',
-              'c000_4x167_h5_mg1']
+                'c000_4x167_h5_mg1']
 
         tri_all = tri_0 + [
             'c068_3x167_k010',
@@ -2227,6 +2362,7 @@ if __name__ == '__main__':
             'c500_3x167_k050',
             'c500_3x167_k100',
             'c500_3x167_k200']
+        # tri_all = tri_all[-4:]
         tet_all = tet_0 + []
         di_all = di_0 + []
         h5_all = h5_0 + [
@@ -2237,31 +2373,39 @@ if __name__ == '__main__':
             'c800_4x167_h5_k010',
             'c800_4x167_h5_mg1']
 
-        # quicker to run
-        # tet0 = [tet0[-1]]
-        # tet0 = ['c000_4x167_mg1']
-        # tri0 = [tri0[-1]]
+        tri_k010 = ['c000_3x167_k010']
+        tri_k050 = ['c000_3x167_k050']
+        tri_k100 = ['c000_3x167_k100']
+        tri_k200 = ['c000_3x167_k200']
 
-        data_dir = ('/home/schowell/data/'
-                    'Dropbox/gw_phd/paper_tetranucleosome/1406data/interp_data/')
-        data_ext = '.int'
-        # data_files = {'di': di_0, 'tri': tri_0, 'tet': tet_0, 'h5': h5_0}
-        data_files = {'di': di_all, 'tri': tri_all, 'tet': tet_all,
-                      'h5': h5_all}
+        data_dir = ('/home/schowell/data/Dropbox/gw_phd/paper_tetranucleosome/'
+                    '1406data/chess/iqdata/coarse_grid/')
+        data_ext = '_29.wi0'
+
+        data_files = {'di': di_0, 'tri': tri_0, 'tet': tet_0, 'h5': h5_0}
+        # data_files = {'di': di_all, 'tri': tri_all, 'tet': tet_all,
+                      # 'h5': h5_all}
+
+        # data_files['tri'] = tri_k010
+        # maxX2 =  12.4301 # 3x167_k010
+        # data_files['tri'] = tri_k050
+        # maxX2 =  52.3015 # 3x167_k050
+        # data_files['tri'] = tri_k100
+        # maxX2 = 807.1556 # 3x167_k100
+        # data_files['tri'] = tri_k200
+        maxX2 =  12.7109 # 3x167_k200
+
 
         sassie_run_dir = '/home/schowell/data/myData/sassieRuns/'
-        # dimer_runs = glob.glob(sassie_run_dir + 'dimer/flex*/run*/foxs/')
         dimer_runs = []
-        # glob.glob(sassie_run_dir + 'trimer/flex*/run*/foxs/')
         trimer_runs = []
-        # glob.glob(sassie_run_dir + 'tetramer/flex*/run*/foxs/')
         tetramer_runs = []
         dimer_runs += glob.glob(sassie_run_dir + '2x167*/run*/foxs/')
 
         k010_3x167_folders = glob.glob(sassie_run_dir + '3x167_k010/*/foxs/')
         k050_3x167_folders = glob.glob(sassie_run_dir + '3x167_k050/*/foxs/')
         k100_3x167_folders = glob.glob(sassie_run_dir + '3x167_k100/*/foxs/')
-        mg01_3x167_folders = glob.glob(sassie_run_dir + '3x167_mg01/*/foxs/')
+        mg01_3x167_folders = glob.glob(sassie_run_dir + '3x167_k200/*/foxs/')
         more_3x167_folders = glob.glob(sassie_run_dir + '3x167/*/foxs/')
         k010_3x167_folders.sort() # key=os.path.getmtime)
         k050_3x167_folders.sort() # key=os.path.getmtime)
@@ -2273,7 +2417,6 @@ if __name__ == '__main__':
                        k100_3x167_folders +
                        mg01_3x167_folders +
                        more_3x167_folders)
-        # trimer_runs += glob.glob(sassie_run_dir + '3x167*/run*/foxs/')
 
         k010_4x167_folders = glob.glob(sassie_run_dir + '4x167_k010/*/foxs/')
         k050_4x167_folders = glob.glob(sassie_run_dir + '4x167_k050/*/foxs/')
@@ -2290,7 +2433,6 @@ if __name__ == '__main__':
                          k100_4x167_folders +
                          mg01_4x167_folders +
                          more_4x167_folders)
-        # tetramer_runs += glob.glob(sassie_run_dir + '4x167*/run*/foxs/')
 
         dimer_runs = [run.replace('foxs/', '') for run in dimer_runs]
         trimer_runs = [run.replace('foxs/', '') for run in trimer_runs]
@@ -2310,46 +2452,36 @@ if __name__ == '__main__':
         array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']
         # array_types = ['tet']
-        array_types = ['tri', 'h5']
+        # array_types = ['tri']
         # array_types = ['h5']
-        # i0 = True; ns = {'di': 26, 'tri': 26,'tet': 26, 'h5': 26}  # Q grid points
-        # i0 = False; ns = {'di': 25, 'tri': 25,'tet': 25, 'h5': 25}  # Q grid
-        # points
-        i0 = False
-        maxX2 = 100
-        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        # fresh=True))
+        array_types = ['h5', 'tri']
 
-        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        # fresh=False))
-
-        # best_dcd = False
-        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        # fresh=False, i0=i0))
+        best_dcd = False
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        fresh=False))
 
         # best_dcd = True
-        # all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
-            # evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        # cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
-                        # fresh=False, i0=i0))
+        all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
+            evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
+                        cutoff=maxX2, o=False, s=True, best_dcd=best_dcd,
+                        fresh=False))
+
+        save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
+                    sassie_run_dir)
 
         best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
-                        fresh=False, i0=i0))
+                        cutoff=maxX2, o=False, s=False, best_dcd=best_dcd,
+                        fresh=False))
 
-        best_dcd = False
+        # best_dcd = True
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
             evaluate_iq(array_types, data_files, data_dir, data_ext, run_dirs,
-                        cutoff=maxX2, o=True, s=True, best_dcd=best_dcd,
-                        fresh=False, i0=i0))
+                        cutoff=maxX2, o=False, s=False, best_dcd=best_dcd,
+                        fresh=False))
 
         save_output(all_data_files, all_x2rg_dfs, all_data_iqs, all_goal_iqs,
                     sassie_run_dir)
