@@ -1011,6 +1011,162 @@ def fig_rg_v_conc():
     return
 
 
+def fig_sub_i0_v_conc(show=False):
+    df = load_rg_csv()
+    chess = []
+    nsls = []
+    chess_labels = []
+    nsls_labels = []
+
+    chess.append(['c000_12x167_k010',
+                  'c125_12x167_k010',
+                  'c250_12x167_k010',
+                  'c500_12x167_k010'])
+    chess_labels.append(r'12x167: 10 mM $K^{+}$')
+
+    chess.append(['c000_12x167_mg1',
+                  'c125_12x167_mg1',
+                  'c250_12x167_mg1',
+                  'c500_12x167_mg1'])
+    chess_labels.append(r'12x167: 1 mM $Mg^{2+}$')
+
+    chess.append(['c000_12x167_h5_k010',
+                  'c125_12x167_h5_k010',
+                  'c250_12x167_h5_k010',
+                  'c500_12x167_h5_k010'])
+    chess_labels.append(r'12x167 gH5: 10 mM $K^+$')
+
+    chess.append(['c000_12x167_h5_mg1',
+                  'c125_12x167_h5_mg1',
+                  'c250_12x167_h5_mg1',
+                  'c500_12x167_h5_mg1'])
+    chess_labels.append(r'12x167 gH5: 1 mM $Mg^{2+}$')
+
+    chess.append(['c000_3x167_k010',
+                  # 'c068_3x167_k010',
+                  'c125_3x167_k010',
+                  'c250_3x167_k010',
+                  'c500_3x167_k010'])
+    chess_labels.append(r'3x167: 10 mM $K^+$')
+
+    chess.append(['c000_3x167_k050',
+                  'c125_3x167_k050',
+                  'c250_3x167_k050',
+                  'c500_3x167_k050'])
+    chess_labels.append(r'3x167: 50 mM $K^+$')
+
+    chess.append(['c000_3x167_k100',
+                  'c125_3x167_k100',
+                  'c250_3x167_k100',
+                  'c500_3x167_k100'])
+    chess_labels.append(r'3x167: 100 mM $K^+$')
+
+    chess.append(['c000_3x167_k200',
+                  'c125_3x167_k200',
+                  'c250_3x167_k200',
+                  'c500_3x167_k200'])
+    chess_labels.append(r'3x167: 200 mM $K^+$')
+
+    nsls.append(['c000_2x167_k010',
+               'c125_2x167_k010',
+               'c250_2x167_k010',
+               'c500_2x167_k010'])
+    nsls_labels.append(r'2x167: 10 mM $K^+$')
+
+    nsls.append(['c000_4x167_k010',
+                'c125_4x167_k010',
+                'c250_4x167_k010',
+                'c500_4x167_k010'])
+    nsls_labels.append(r'4x167: 10 mM $K^+$')
+
+    nsls.append(['c000_4x167_k050',
+                'c125_4x167_k050',
+                'c250_4x167_k050',
+                'c500_4x167_k050'])
+    nsls_labels.append(r'4x167: 50 mM $K^+$')
+
+    nsls.append(['c000_4x167_k100',
+                'c125_4x167_k100',
+                'c250_4x167_k100',
+                'c500_4x167_k100'])
+    nsls_labels.append(r'4x167: 100 mM $K^+$')
+
+    nsls.append(['c000_4x167_mg1',
+                'c125_4x167_mg1',
+                'c250_4x167_mg1',
+                'c500_4x167_mg1'])
+    nsls_labels.append(r'4x167: 1 mM $Mg^{2+}$')
+
+    chess.append(['c000_4x167_h5_k010',
+                'c200_4x167_h5_k010',
+                'c400_4x167_h5_k010',
+                'c800_4x167_h5_k010'])
+    chess_labels.append(r'4x167 gH5: 10 mM $K^{+}$')
+
+    chess.append(['c000_4x167_h5_mg1',
+                # 'c200_4x167_h5_mg1',
+                'c400_4x167_h5_mg1',
+                'c800_4x167_h5_mg1'])
+    chess_labels.append(r'4x167 gH5: 1 mM $Mg^{2+}$')
+
+    fig = plt.figure(figsize=(7, 9))
+    gs1 = GridSpec(2, 1)
+    gs1.update(hspace=0)
+    x_range = [0, 1.5]
+
+    # SUBPLOT(1,1) a)
+    ax = plt.subplot(gs1[0])
+    for i in xrange(len(chess)):
+        plt.errorbar(df['conc'].loc[chess[i]],
+                     df['I0'].loc[chess[i]]/df['conc'].loc[chess[i]],
+                     df['I0Er'].loc[chess[i]]/df['conc'].loc[chess[i]],
+                     label=chess_labels[i],
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
+
+    plt.ylabel(r'I(0)/(mg/mL)')
+    plt.xlabel(r'mg/mL')
+    plt.ylim([0, 0.0009])
+    plt.xlim(x_range)
+    lg = plt.legend(loc='upper right', scatterpoints=1, numpoints=1)
+    # lg = plt.legend(scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    ax.get_xaxis().set_ticklabels([])
+    ax.text(0.03, 0.92, r'(a) G1/CHESS', verticalalignment='bottom', fontweight='bold',
+            horizontalalignment='left', transform=ax.transAxes)
+
+    # SUBPLOT(2,1) b)
+    ax = plt.subplot(gs1[1])
+    for i in xrange(len(nsls)):
+        plt.errorbar(df['conc'].loc[nsls[i]],
+                     df['I0'].loc[nsls[i]]/df['conc'].loc[nsls[i]],
+                     df['I0Er'].loc[nsls[i]]/df['conc'].loc[nsls[i]],
+                     label=nsls_labels[i],
+                     c=gp.qual_color(i), fmt=gp.symbol_order(i, '--'),
+                     mec=gp.qual_color(i), mfc='none', ms=15, linewidth=2)
+
+    lg = plt.legend(loc='lower right', scatterpoints=1, numpoints=1)
+    # lg = plt.legend(scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    plt.ylabel(r'I(0)/(mg/mL)')
+    plt.xlabel(r'mg/mL')
+    plt.ylim([140, 305])
+    ax.set_yticks(ax.get_yticks()[:-1])
+    plt.xlim(x_range)
+    ax.text(0.03, 0.92, r'(b) X9/NSLS', verticalalignment='bottom', fontweight='bold',
+            horizontalalignment='left', transform=ax.transAxes)
+
+    fig.tight_layout()
+    save_name = 'I0_v_mgmL'
+    fig.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
+    fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+    print 'view Rg vs mg/mL file: \nevince %s.eps &' % save_name
+    if show:
+        plt.show()
+
+    return
+
+
 def fig_sub_rg_v_conc(show=False):
     df = load_rg_csv()
     dod = []
@@ -1140,7 +1296,7 @@ def fig_sub_rg_v_conc(show=False):
     # lg = plt.legend(scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
     ax.get_xaxis().set_ticklabels([])
-    ax.text(0.03, 0.92, r'a) 3x167', verticalalignment='bottom', fontweight='bold',
+    ax.text(0.03, 0.92, r'(a) 3x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
     # SUBPLOT(2,1) b)
@@ -1163,7 +1319,7 @@ def fig_sub_rg_v_conc(show=False):
     plt.ylim([80, 145])
     ax.set_yticks(ax.get_yticks()[:-1])
     plt.xlim(x_range)
-    ax.text(0.03, 0.92, r'b) 4x167', verticalalignment='bottom', fontweight='bold',
+    ax.text(0.03, 0.92, r'(b) 4x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
     x_range = [-0.05, 0.8]
@@ -1193,7 +1349,7 @@ def fig_sub_rg_v_conc(show=False):
     plt.xlim(x_range)
     plt.ylim(tri_ylim)
     ax.get_xaxis().set_ticklabels([])
-    ax.text(0.03, 0.92, r'c) 2x167', verticalalignment='bottom', fontweight='bold',
+    ax.text(0.03, 0.92, r'(c) 2x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
     # SUBPLOT(2,2) d)
@@ -1215,7 +1371,7 @@ def fig_sub_rg_v_conc(show=False):
     ylim[1] *= 1.03
     plt.ylim(ylim)
     plt.xlim(x_range)
-    ax.text(0.03, 0.92, r'd) 12x167', verticalalignment='bottom', fontweight='bold',
+    ax.text(0.03, 0.92, r'(d) 12x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
 
     fig.tight_layout()
