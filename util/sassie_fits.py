@@ -1182,94 +1182,94 @@ def fig_sub_rg_v_conc(show=False):
                 'c125_12x167_k010',
                 'c250_12x167_k010',
                 'c500_12x167_k010'])
-    dod_labels.append(r'10mM $K^{+}$')
+    dod_labels.append(r'10mM K$^{+}$')
 
     dod.append(['c000_12x167_mg1',
                 'c125_12x167_mg1',
                 'c250_12x167_mg1',
                 'c500_12x167_mg1'])
-    dod_labels.append(r'1mM $Mg^{2+}$')
+    dod_labels.append(r'1mM Mg$^{2+}$')
 
     dod.append(['c000_12x167_h5_k010',
                 'c125_12x167_h5_k010',
                 'c250_12x167_h5_k010',
                 'c500_12x167_h5_k010'])
-    dod_labels.append(r'H5 10mM $K^+$')
+    dod_labels.append(r'gH5 10mM K$^+$')
 
     dod.append(['c000_12x167_h5_mg1',
                 'c125_12x167_h5_mg1',
                 'c250_12x167_h5_mg1',
                 'c500_12x167_h5_mg1'])
-    dod_labels.append(r'H5 1mM $Mg^{2+}$')
+    dod_labels.append(r'gH5 1mM Mg$^{2+}$')
 
     tri.append(['c000_3x167_k010',
                 # 'c068_3x167_k010',
                 'c125_3x167_k010',
                 'c250_3x167_k010',
                 'c500_3x167_k010'])
-    tri_labels.append(r'10mM $K^+$')
+    tri_labels.append(r'10mM K$^+$')
 
     tri.append(['c000_3x167_k050',
                 'c125_3x167_k050',
                 'c250_3x167_k050',
                 'c500_3x167_k050'])
-    tri_labels.append(r'50mM $K^+$')
+    tri_labels.append(r'50mM K$^+$')
 
     tri.append(['c000_3x167_k100',
                 'c125_3x167_k100',
                 'c250_3x167_k100',
                 'c500_3x167_k100'])
-    tri_labels.append(r'100mM $K^+$')
+    tri_labels.append(r'100mM K$^+$')
 
     tri.append(['c000_3x167_k200',
                 'c125_3x167_k200',
                 'c250_3x167_k200',
                 'c500_3x167_k200'])
-    tri_labels.append(r'200mM $K^+$')
+    tri_labels.append(r'200mM K$^+$')
 
     di.append(['c000_2x167_k010',
                'c125_2x167_k010',
                'c250_2x167_k010',
                'c500_2x167_k010'])
-    di_labels.append(r'10mM $K^+$')
+    di_labels.append(r'10mM K$^+$')
 
     tet.append(['c000_4x167_k010',
                 'c125_4x167_k010',
                 'c250_4x167_k010',
                 'c500_4x167_k010'])
-    tet_labels.append(r'10mM $K^+$')
+    tet_labels.append(r'10mM K$^+$')
 
     tet.append(['c000_4x167_k050',
                 'c125_4x167_k050',
                 'c250_4x167_k050',
                 'c500_4x167_k050'])
-    tet_labels.append(r'50mM $K^+$')
+    tet_labels.append(r'50mM K$^+$')
 
     tet.append(['c000_4x167_k100',
                 'c125_4x167_k100',
                 'c250_4x167_k100',
                 'c500_4x167_k100'])
-    tet_labels.append(r'100mM $K^+$')
+    tet_labels.append(r'100mM K$^+$')
 
     tet.append(['c000_4x167_mg1',
                 'c125_4x167_mg1',
                 'c250_4x167_mg1',
                 'c500_4x167_mg1'])
-    tet_labels.append(r'1mM $Mg^{2+}$')
+    tet_labels.append(r'1mM Mg$^{2+}$')
 
     tet.append(['c000_4x167_h5_k010',
                 'c200_4x167_h5_k010',
                 'c400_4x167_h5_k010',
                 'c800_4x167_h5_k010'])
-    tet_labels.append(r'H5 10mM $K^{+}$')
+    tet_labels.append(r'gH5 10mM K$^{+}$')
 
     tet.append(['c000_4x167_h5_mg1',
-                # 'c200_4x167_h5_mg1',
+                'c200_4x167_h5_mg1',
                 'c400_4x167_h5_mg1',
                 'c800_4x167_h5_mg1'])
-    tet_labels.append(r'H5 1mM $Mg^{2+}$')
+    tet_labels.append(r'gH5 1mM Mg$^{2+}$')
 
-    fig = plt.figure(figsize=(13, 10))
+    fig = plt.figure(figsize=(12, 9))
     gs1 = GridSpec(2, 2)
     gs1.update(hspace=0)
     x_range = [-0.05, 1.5]
@@ -1316,11 +1316,12 @@ def fig_sub_rg_v_conc(show=False):
     # ylim = np.array(plt.ylim())
     # ylim[1] *= 1.03
     # plt.ylim(ylim)
-    plt.ylim([80, 145])
-    ax.set_yticks(ax.get_yticks()[:-1])
-    plt.xlim(x_range)
     ax.text(0.03, 0.92, r'(b) 4x167', verticalalignment='bottom', fontweight='bold',
             horizontalalignment='left', transform=ax.transAxes)
+    plt.xlim(x_range)
+    plt.ylim([75, 150])
+    ax.set_yticks(ax.get_yticks()[1:-1])
+
 
     x_range = [-0.05, 0.8]
 
