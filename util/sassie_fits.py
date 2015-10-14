@@ -26,6 +26,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+
 import sassie.sasmol.sasmol as sasmol
 import x_dna.util.gw_plot as gp
 # import x_dna.drivers.myAlign as align
