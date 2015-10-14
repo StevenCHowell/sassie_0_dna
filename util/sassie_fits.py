@@ -21,6 +21,7 @@ import shutil
 import numpy as np
 import pandas as pd
 from scipy import interpolate
+from scipy import optimize
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import sassie.sasmol.sasmol as sasmol
@@ -389,6 +390,80 @@ def polyspace(x1, x2, p, n):
     return grid
 
 
+def min_R(c, rf_data, mt_data):
+    mt_data[:,1:] *= c
+    R = get_R(rf_data, mt_data)
+    return R
+
+def get_R(rf_data, mt_data):
+    R, _ = get_R_components(rf_data, mt_data)
+
+    return R
+
+
+def get_R_components(rf_data, mt_data):
+    # R value as defined by doi: 10.1042/bj2670203
+    diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
+    norm = np.abs(rf_data[:, 1]).sum()
+    components = diff / norm
+    R = components.sum()
+
+    return R, components
+
+
+def get_F(rf_data, mt_data):
+    F, _ = get_f_components(rf_data, mt_data)
+
+    return F
+
+
+def get_F2_components(rf_data, mt_data):
+    # F-factor as defined by doi: 10.1042/bj2670203
+    diff = (np.log(mt_data[:, 1]) - np.log(rf_data[:, 1]))**2
+    Np = len(mt_data[:, 1])
+    F2_components = diff / Np
+    F = np.sqrt(F2_components.sum())
+
+    return F, F2_components
+
+
+def get_wR(rf_data, mt_data):
+    wR, _ = get_wR_components(rf_data, mt_data)
+
+    return wR
+
+
+def get_wR_components(rf_data, mt_data):
+    # weighted R-factor as defined by doi: 10.1042/bj2670203
+    w = rf_data[:, 0]
+    w2 = w**2
+    i1 = mt_data[:, 1]
+    i2 = rf_data[:, 1]
+    sf = np.sum(i1 * i2 * w2) / np.sum(i2 * w2)
+    wR_num = (w * sf * i1 * i2)**2
+    wR_den = w2 * sf * i1 * i2
+    wR_components = wR_num / wR_den.sum()
+    wR = wR_components.sum()
+
+    return wR, wR_components
+
+
+def get_X2(rf_data, mt_data):
+    X2, _ = get_X2_components(rf_data, mt_data)
+
+    return X2
+
+
+def get_X2_components(rf_data, mt_data):
+    diff = mt_data[:, 1] - rf_data[:, 1]
+    diff2 = diff * diff
+    er2 = rf_data[:, 2] * rf_data[:, 2]
+    components = (diff2 / er2) / len(rf_data)
+    X2 = components.sum()
+
+    return X2, components
+
+
 def match_poly(in_data, rf_data):
     """
     determine the scale and offset to match the input data to the
@@ -543,54 +618,6 @@ def offset(in_data, rf_data):
     return mt_data, offset, X2
 
 
-def get_R(rf_data, mt_data):
-    R, _ = get_R_components(rf_data, mt_data)
-    return R
-
-
-def get_R_components(rf_data, mt_data):
-    # # only use the sum of the differences
-    # diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
-    # components = diff
-    #
-    # # use the sum of the differences normalized by the experimental
-    # diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
-    # components = diff / rf_data[:, 1]
-    #
-    # # use the sum of the differences squared
-    # diff = mt_data[:, 1] - rf_data[:, 1]
-    # diff2 = diff * diff
-    # components = diff2
-    #
-    # # use the sum of the differences squared normalized by the experimental squared
-    # diff = mt_data[:, 1] - rf_data[:, 1]
-    # diff2 = diff * diff
-    # rf_data2 = rf_data[:, 1] * rf_data[:, 1]
-    # components = diff2 / rf_data2
-
-    # # R value as defined by: 10.1042/bj2670203
-    diff = np.abs(mt_data[:, 1] - rf_data[:, 1])
-    norm = np.abs(rf_data[:, 1]).sum()  # the abs seems necessary but whatever...
-    components = diff / norm
-
-    R = components.sum()
-    return R, components
-
-
-def get_X2(rf_data, mt_data):
-    X2, _ = get_X2_components(rf_data, mt_data)
-    return X2
-
-
-def get_X2_components(rf_data, mt_data):
-    diff = mt_data[:, 1] - rf_data[:, 1]
-    diff2 = diff * diff
-    er2 = rf_data[:, 2] * rf_data[:, 2]
-    components = (diff2 / er2) / len(rf_data)
-    X2 = components.sum()
-    return X2, components
-
-
 def scale_offset(in_data, rf_data):
     """
     determine the scale and offset to match the input data to the reference
@@ -616,8 +643,8 @@ def scale_offset(in_data, rf_data):
     match_poly, match_lstsq, scale
 
     """
-    e = 1E-4  # small parameter
-    assert np.allclose((in_data[:, 0] - rf_data[:, 0]).sum(), 0, atol=e), (
+    small = 1E-4  # small parameter
+    assert np.allclose((in_data[:, 0] - rf_data[:, 0]).sum(), 0, atol=small), (
         'mismatch between input and reference x-grid')
 
     sigma2 = rf_data[:, 2] * rf_data[:, 2]
@@ -667,6 +694,7 @@ def match_lstsq(in_data, rf_data):
     assert (in_data[:, 0] - rf_data[:, 0]).sum() == 0, ('mismatch between input and'
                                                         ' reference x-grid')
 
+    # could implement weights by changeing the second column to be 1/error
     A = np.vstack([in_data[:, 1], np.ones(len(in_data))]).T
     scale, offset = np.linalg.lstsq(A, rf_data[:, 1])[0]
     mt_data = np.vstack([in_data[:, 0], scale * in_data[:, 1] + offset]).T
@@ -674,6 +702,46 @@ def match_lstsq(in_data, rf_data):
     X2 = get_X2(rf_data, mt_data)
 
     return mt_data, scale, offset, X2
+
+
+def scale_R(in_data, rf_data):
+    """
+    determine the scale to use to match the input data to the reference
+    data by minimizing the R-factor
+
+    Parameters
+    ----------
+    in_data:
+        input data to match to the rf_data (should be Nx2 np.array)
+    rf_data:
+        reference data for matching the in_data (should be Nx2 np.array)
+
+    Returns
+    -------
+    mt_data: version of in_data matched to the reference data
+    scale:   scale factor applied to the input data
+    offset:  offset applied to the input data
+
+    Notes
+    --------
+    does not use error bars to weight the data
+
+    See also
+    --------
+    match_poly, scale_offset, scale, match_lstsq
+
+    """
+    assert (in_data[:, 0] - rf_data[:, 0]).sum() == 0, ('mismatch between input and'
+                                                        ' reference x-grid')
+
+    c0 = 1
+    scale = optimize.minimize(min_R, c0, args=(rf_data, in_data))
+
+    mt_data = in_data
+    mt_data[:,1:] *= scale
+    R = get_R(rf_data, mt_data)
+
+    return mt_data, scale, R
 
 
 def kratky(iq_data):
