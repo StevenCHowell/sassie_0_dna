@@ -22,6 +22,8 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 from scipy import optimize
+import matplotlib 
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import sassie.sasmol.sasmol as sasmol
