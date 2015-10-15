@@ -481,7 +481,7 @@ def get_f2_components(rf_data, mt_data):
     diff = (np.log(mt_data[:, 1]) - np.log(rf_data[:, 1]))**2
     n = len(mt_data[:, 1])
     f2 = diff / n
-    f = np.sqrt(f2.sum())
+    f = np.sqrt(np.nansum(f2)) # log produces nan from negative data
 
     return f, f2
 
@@ -1816,27 +1816,40 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
 
             # plot the residual values vs structure index to compare
             fig = plt.figure()
-            plt.plot(x2rg_df.i1_x2/x2rg_df.i1_x2.iloc[0], label='i1_x2')
-            plt.plot(x2rg_df.i1_wr/x2rg_df.i1_wr.iloc[0], label='i1_wr')
-            plt.plot(x2rg_df.i1_r/x2rg_df.i1_r.iloc[0], label='i1_r')
-            plt.plot(x2rg_df.i1_f/x2rg_df.i1_f.iloc[0], label='i1_f')
-            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            gs1 = GridSpec(4, 4, hspace=0, wspace=0)#, left=0.1, right=0.9, bottom=0.075, top=0.925,
+
+            ax0 = plt.subplot(gs1[0,:])
+            ax0.plot(x2rg_df.i1_x2/x2rg_df.i1_x2.iloc[0], label='i1_x2')
+            ax0.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+            ax1 = plt.subplot(gs1[1,:])
+            ax1.plot(x2rg_df.i1_wr/x2rg_df.i1_wr.iloc[0], label='i1_wr')
+            ax1.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+            ax2 = plt.subplot(gs1[2,:])
+            ax2.plot(x2rg_df.i1_r/x2rg_df.i1_r.iloc[0], label='i1_r')
+            ax2.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+            ax3 = plt.subplot(gs1[3,:])
+            ax3.plot(x2rg_df.i1_f/x2rg_df.i1_f.iloc[0], label='i1_f')
+            ax3.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
-            plt.ylabel('Discrepancy')
+
+            # ax1.ylabel('Discrepancy')
             save_name = 'i1_discrepancy'
             fig.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
-            fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
+            # fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
             # plt.show()
 
             fig = plt.figure()
-            plt.plot(x2rg_df.mx2_x2/x2rg_df.mx2_x2.iloc[0], label='mx2_x2')
-            plt.plot(x2rg_df.mx2_wr/x2rg_df.mx2_wr.iloc[0], label='mx2_wr')
-            plt.plot(x2rg_df.mx2_r / x2rg_df.mx2_r.iloc[0],  label='mx2_r')
-            plt.plot(x2rg_df.mx2_f / x2rg_df.mx2_f.iloc[0],  label='mx2_f')
-            plt.plot(x2rg_df.mwr_x2/x2rg_df.mwr_x2.iloc[0], label='mwr_x2')
-            plt.plot(x2rg_df.mwr_wr/x2rg_df.mwr_wr.iloc[0], label='mwr_wr')
-            plt.plot(x2rg_df.mwr_r / x2rg_df.mwr_r.iloc[0],  label='mwr_r')
-            plt.plot(x2rg_df.mwr_f / x2rg_df.mwr_f.iloc[0],  label='mwr_f')
+            ax.plot(x2rg_df.mx2_x2/x2rg_df.mx2_x2.iloc[0], label='mx2_x2')
+            ax.plot(x2rg_df.mx2_wr/x2rg_df.mx2_wr.iloc[0], label='mx2_wr')
+            ax.plot(x2rg_df.mx2_r / x2rg_df.mx2_r.iloc[0],  label='mx2_r')
+            ax.plot(x2rg_df.mx2_f / x2rg_df.mx2_f.iloc[0],  label='mx2_f')
+            ax.plot(x2rg_df.mwr_x2/x2rg_df.mwr_x2.iloc[0], label='mwr_x2')
+            ax.plot(x2rg_df.mwr_wr/x2rg_df.mwr_wr.iloc[0], label='mwr_wr')
+            ax.plot(x2rg_df.mwr_r / x2rg_df.mwr_r.iloc[0],  label='mwr_r')
+            ax.plot(x2rg_df.mwr_f / x2rg_df.mwr_f.iloc[0],  label='mwr_f')
             plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
             plt.ylabel('Discrepancy')
