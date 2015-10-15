@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 from scipy import optimize
-import matplotlib 
+import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -1820,7 +1820,7 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             plt.plot(x2rg_df.i1_wr/x2rg_df.i1_wr.iloc[0], label='i1_wr')
             plt.plot(x2rg_df.i1_r/x2rg_df.i1_r.iloc[0], label='i1_r')
             plt.plot(x2rg_df.i1_f/x2rg_df.i1_f.iloc[0], label='i1_f')
-            plt.legend(loc='top left', bbox_to_anchor=(1, 1))
+            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
             plt.ylabel('Discrepancy')
             save_name = 'i1_discrepancy'
@@ -1837,7 +1837,7 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             plt.plot(x2rg_df.mwr_wr/x2rg_df.mwr_wr.iloc[0], label='mwr_wr')
             plt.plot(x2rg_df.mwr_r / x2rg_df.mwr_r.iloc[0],  label='mwr_r')
             plt.plot(x2rg_df.mwr_f / x2rg_df.mwr_f.iloc[0],  label='mwr_f')
-            plt.legend(loc='top left', bbox_to_anchor=(1, 1))
+            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
             plt.ylabel('Discrepancy')
             save_name = 'highQ_discrepancy'
@@ -2061,6 +2061,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     # get the best, worst and average I(Q)
     best_x2 = x2rg_df[key].min()
+    print best_x2
     best_series = x2rg_df[x2rg_df[key] == best_x2]
     i_best = best_series.index[0] + 1  # first column is the Q values
     if goal_iq[0, 0] < 0.00001:
@@ -2074,7 +2075,7 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     i_worst = worst_series.index[0] + 1  # first column is the Q values
     worst = all_data_iq[:, i_worst]
     average = all_data_iq[:, 1:].mean(axis=1)
-    # ax.set_yscale('log')
+    ax.set_yscale('log')
 
     ax = plt.subplot(222)
     plt.title(r'best %s=%0.1f, worst %s=%0.1f' % (residual, best_x2,
@@ -2160,9 +2161,10 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
+    plt.xscale('log')
     plt.axis('tight')
     gp.zoomout(ax, 0.1)
-    plt.xlim([-0.01, 0.21])        # plt.xscale('log')
+    # plt.xlim([-0.01, 0.21])
     lg = plt.legend(loc='upper right', scatterpoints=1, numpoints=1)
     lg.draw_frame(False)
 
