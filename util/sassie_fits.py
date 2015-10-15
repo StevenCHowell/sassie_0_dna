@@ -2235,10 +2235,12 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     else:
         fig_file_name = op.join(os.getcwd(), '%s_%s_fit' % (prefix, data_file))
         # plt.savefig(fig_file_name[:-3] + 'png')
-        # print 'View fit plot: \neog %s.png &' % fig_file_name
         plt.savefig(fig_file_name + '.png', dpi=400, bbox_inches='tight')
-        print 'View fit plot: \nevince %s.eps &' % fig_file_name
-        plt.savefig(fig_file_name + '.eps', dpi=400, bbox_inches='tight')
+        if n_total > 20000:
+            print 'View fit plot: \neog %s.png &' % fig_file_name
+        else:
+            print 'View fit plot: \nevince %s.eps &' % fig_file_name
+            plt.savefig(fig_file_name + '.eps', dpi=400, bbox_inches='tight')
         # plt.show()
     # plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
                        # prefix=(prefix + '_' + data_file), s=s, o=o)
@@ -3011,12 +3013,12 @@ if __name__ == '__main__':
         run_dirs = {'di': dimer_runs, 'tri': trimer_runs, 'tet': tetramer_runs,
                     'h5': tetramer_runs}
 
-        array_types = ['di', 'tri', 'tet', 'h5']
+        # array_types = ['di', 'tri', 'tet', 'h5']
         # array_types = ['di']
         # array_types = ['tet']
-        # array_types = ['tri']
+        array_types = ['tri']
         # array_types = ['h5']
-        array_types = ['h5', 'tri']
+        # array_types = ['h5', 'tri']
 
         best_dcd = False
         all_x2rg_dfs, all_data_iqs, all_goal_iqs, all_data_files = (
