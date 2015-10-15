@@ -1814,48 +1814,96 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             x2rg_df = pd.concat(df_list)
             x2rg_df.index = range(len(x2rg_df))
 
-            # plot the residual values vs structure index to compare
+            # plot the residual values vs index when scaled using i1
             fig = plt.figure()
             gs1 = GridSpec(4, 4, hspace=0, wspace=0)#, left=0.1, right=0.9, bottom=0.075, top=0.925,
 
             ax0 = plt.subplot(gs1[0,:])
             ax0.plot(x2rg_df.i1_x2/x2rg_df.i1_x2.iloc[0], label='i1_x2')
             ax0.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax0.get_xaxis().set_ticks([])
+            ax0.get_yaxis().set_ticks([])
 
             ax1 = plt.subplot(gs1[1,:])
             ax1.plot(x2rg_df.i1_wr/x2rg_df.i1_wr.iloc[0], label='i1_wr')
             ax1.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax1.get_xaxis().set_ticks([])
+            ax1.get_yaxis().set_ticks([])
 
             ax2 = plt.subplot(gs1[2,:])
             ax2.plot(x2rg_df.i1_r/x2rg_df.i1_r.iloc[0], label='i1_r')
             ax2.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax2.get_xaxis().set_ticks([])
+            ax2.get_yaxis().set_ticks([])
 
             ax3 = plt.subplot(gs1[3,:])
             ax3.plot(x2rg_df.i1_f/x2rg_df.i1_f.iloc[0], label='i1_f')
             ax3.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
+            ax3.get_xaxis().set_ticks([])
 
-            # ax1.ylabel('Discrepancy')
-            save_name = 'i1_discrepancy'
+            save_name = data_file + '_i1_disc'
             fig.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
-            # fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
             # plt.show()
 
+            # plot the residual values vs index when scaled using high Q
+
             fig = plt.figure()
-            ax.plot(x2rg_df.mx2_x2/x2rg_df.mx2_x2.iloc[0], label='mx2_x2')
-            ax.plot(x2rg_df.mx2_wr/x2rg_df.mx2_wr.iloc[0], label='mx2_wr')
-            ax.plot(x2rg_df.mx2_r / x2rg_df.mx2_r.iloc[0],  label='mx2_r')
-            ax.plot(x2rg_df.mx2_f / x2rg_df.mx2_f.iloc[0],  label='mx2_f')
-            ax.plot(x2rg_df.mwr_x2/x2rg_df.mwr_x2.iloc[0], label='mwr_x2')
-            ax.plot(x2rg_df.mwr_wr/x2rg_df.mwr_wr.iloc[0], label='mwr_wr')
-            ax.plot(x2rg_df.mwr_r / x2rg_df.mwr_r.iloc[0],  label='mwr_r')
-            ax.plot(x2rg_df.mwr_f / x2rg_df.mwr_f.iloc[0],  label='mwr_f')
+            gs2 = GridSpec(8, 4, hspace=0, wspace=0)
+
+            ax0 = plt.subplot(gs2[0,:])
+            ax0.plot(x2rg_df.mx2_x2/x2rg_df.mx2_x2.iloc[0], label='mx2_x2')
+            ax0.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax0.get_xaxis().set_ticks([])
+            ax0.get_yaxis().set_ticks([])
+
+            ax1 = plt.subplot(gs2[1,:])
+            ax1.plot(x2rg_df.mx2_wr/x2rg_df.mx2_wr.iloc[0], label='mx2_wr')
+            ax1.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax1.get_xaxis().set_ticks([])
+            ax1.get_yaxis().set_ticks([])
+
+            ax2 = plt.subplot(gs2[2,:])
+            ax2.plot(x2rg_df.mx2_r / x2rg_df.mx2_r.iloc[0],  label='mx2_r')
+            ax2.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax2.get_xaxis().set_ticks([])
+            ax2.get_yaxis().set_ticks([])
+
+            ax3 = plt.subplot(gs2[3,:])
+            ax3.plot(x2rg_df.mx2_f / x2rg_df.mx2_f.iloc[0],  label='mx2_f')
+            ax3.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax3.get_xaxis().set_ticks([])
+            ax3.get_yaxis().set_ticks([])
+
+            ax4 = plt.subplot(gs2[4,:])
+            ax4.plot(x2rg_df.mwr_x2/x2rg_df.mwr_x2.iloc[0], label='mwr_x2')
+            ax4.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax4.get_xaxis().set_ticks([])
+            ax4.get_yaxis().set_ticks([])
+
+            ax5 = plt.subplot(gs2[5,:])
+            ax5.plot(x2rg_df.mwr_wr/x2rg_df.mwr_wr.iloc[0], label='mwr_wr')
+            ax5.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax5.get_xaxis().set_ticks([])
+            ax5.get_yaxis().set_ticks([])
+
+            ax6 = plt.subplot(gs2[6,:])
+            ax6.plot(x2rg_df.mwr_r / x2rg_df.mwr_r.iloc[0],  label='mwr_r')
+            ax6.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax6.get_xaxis().set_ticks([])
+            ax6.get_yaxis().set_ticks([])
+
+            ax7 = plt.subplot(gs2[7,:])
+            ax7.plot(x2rg_df.mwr_f / x2rg_df.mwr_f.iloc[0],  label='mwr_f')
+            ax7.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            ax7.get_xaxis().set_ticks([])
+            ax7.get_yaxis().set_ticks([])
+
             plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.xlabel('Structure Number')
-            plt.ylabel('Discrepancy')
-            save_name = 'highQ_discrepancy'
+
+            save_name = data_file + '_hiQ_disc'
             fig.savefig(save_name + '.png', dpi=400, bbox_inches='tight')
-            fig.savefig(save_name + '.eps', dpi=400, bbox_inches='tight')
             # plt.show()
 
 
@@ -2074,7 +2122,6 @@ def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     # get the best, worst and average I(Q)
     best_x2 = x2rg_df[key].min()
-    print best_x2
     best_series = x2rg_df[x2rg_df[key] == best_x2]
     i_best = best_series.index[0] + 1  # first column is the Q values
     if goal_iq[0, 0] < 0.00001:
