@@ -23,7 +23,10 @@ import pandas as pd
 from scipy import interpolate
 from scipy import optimize
 import matplotlib
-matplotlib.use('Agg')
+try:
+    print os.environ["DISPLAY"]
+except:
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
@@ -1979,55 +1982,57 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 else:
                     i1_data_iqs = np.concatenate((i1_data_iqs, i1_data_iq[:, 1:]),
                                                  axis=1)
+                assert np.abs(np.sum(i1_data_iq[0, 1:] -goal_iq[0,1])) < 1e-5, (
+                    'ERROR: Failed to scale data to I(0)')
 
             # i1 scale, x2
             prefix = 'i1_x2'
-            plot_run_best(x2rg_df, i1_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_i1_x2',
+            plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'$\chi^2$', key='i1_x2')
             # x2 scale, x2
-            prefix = 'x2_x2'
-            plot_run_best(x2rg_df, x2_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_x2_x2',
+            prefix = 'mx2_x2'
+            plot_discrepancy(x2rg_df, x2_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'$\chi^2$', key='mx2_x2')
             # i1 scale, wr
             prefix = 'i1_wr'
-            plot_run_best(x2rg_df, i1_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_i1_wr',
+            plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'weighted R', key='i1_wr')
             # wr scale, wr
             prefix = 'mwr_wr'
-            plot_run_best(x2rg_df, wr_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_wr_wr',
+            plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'weighted R', key='mwr_wr')
             # i1 scale, r
             prefix = 'i1_r'
-            plot_run_best(x2rg_df, i1_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_i1_r',
+            plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'R-factor', key='i1_r')
             # x2 scale, r
             prefix = 'mx2_r'
-            plot_run_best(x2rg_df, x2_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_x2_r',
+            plot_discrepancy(x2rg_df, x2_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'R-Factor', key='mx2_r')
             # wr scale, r
             prefix = 'mwr_r'
-            plot_run_best(x2rg_df, wr_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_wr_r',
+            plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'R-Factor', key='mwr_r')
             # i1 scale, f
             prefix = 'i1_f'
-            plot_run_best(x2rg_df, i1_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_i1_f',
+            plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'F-Factor', key='i1_f')
             # x2 scale, f
             prefix = 'mx2_f'
-            plot_run_best(x2rg_df, x2_data_iqs, goal_iq, data_file,
-                          prefix + run_label[1:] + '_x2_f',
+            plot_discrepancy(x2rg_df, x2_data_iqs, goal_iq, data_file,
+                          prefix + run_label[1:],
                           residual=r'F-Factor', key='mx2_f')
             # wr scale, f
             prefix = 'mwr_f'
-            plot_run_best(x2rg_df, wr_data_iqs, goal_iq, data_file,
+            plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
                           residual=r'F-Factor', key='mwr_f')
 
@@ -2100,6 +2105,112 @@ def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
                     index += 1
                     txt_file.write('%d\t%0.6f\t%0.6f\n' %
                                    (index, this_rg, accept))
+
+
+def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
+                     residual = r'$\chi^2$', key='x2'):
+
+    n_total = len(x2rg_df)
+    n_best = max(int(n_total * 0.1), 3)
+    x2rg_best = x2rg_df.sort(key)[:n_best]
+
+    plt.figure(figsize=(9, 4.5))
+    gs = GridSpec(8, 2, hspace=0)
+
+    ax0 = plt.subplot(gs[:, 0])
+    ax0.text(0.01, 0.01, '%d structures' % n_total, verticalalignment='bottom',
+             horizontalalignment='left', transform=ax0.transAxes)
+    ax0.text(-0.03, -0.15, '(a)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax0.transAxes)
+    ax0.text(1.13, -0.15, '(b)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax0.transAxes)
+
+    ax0.plot(x2rg_df['Rg'], x2rg_df[key], 'o', mec=gp.qual_color(0), mfc='none')
+    # plt.xlim(rg_range)
+    plt.ylabel(residual)
+    plt.xlabel(r'$R_g$')
+
+    # get the best, worst and average I(Q)
+    best_x2 = x2rg_df[key].min()
+    best_series = x2rg_df[x2rg_df[key] == best_x2]
+    i_best = best_series.index[0] + 1  # first column is the Q values
+    if goal_iq[0, 0] < 0.00001:
+        xlim_min = goal_iq[1, 0] * .9 # set reasonable xlim
+    else:
+        xlim_min = goal_iq[0, 0] * .9
+
+    best = all_data_iq[:, i_best]
+    worst_x2 = x2rg_df[key].max()
+    worst_series = x2rg_df[x2rg_df[key] == worst_x2]
+    i_worst = worst_series.index[0] + 1  # first column is the Q values
+    worst = all_data_iq[:, i_worst]
+    average = all_data_iq[:, 1:].mean(axis=1)
+    # ax0.set_yscale('log')
+    plt.axis('tight')
+
+
+    ax_dummy = plt.subplot(gs[:, 1])
+
+
+    ax1 = plt.subplot(gs[:-1, 1])
+    # plot errorbar in two parts to get label order correct
+    ax1.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
+             mec=gp.qual_color(0), label='Experimental')
+    ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
+                 ecolor=gp.qual_color(0))
+    # ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
+                # label='Exp', ms=8, mfc='none', c=gp.qual_color(0),
+                # mec=gp.qual_color(0))
+    ax1.plot(all_data_iq[:, 0], best[:], '-', mfc='none', ms=8,
+            c=gp.qual_color(1), mec=gp.qual_color(1), linewidth=2,
+            label='Best %s' % residual)
+    ax1.plot(all_data_iq[:, 0], average[:], '-', mfc='none', ms=8,
+             c=gp.qual_color(2), linewidth=2,
+             label=(r'Average %s' % residual))
+    ax1.plot(all_data_iq[:, 0], worst[:], '-', mfc='none', ms=8,
+             c=gp.qual_color(3), linewidth=2,
+             label=(r'Worst %s' % residual))
+    ax1.set_ylabel(r'$I(Q)$')
+    ax1.set_yscale('log')
+    ax1.set_xscale('log')
+    plt.axis('tight')
+    ax1.set_xlim([xlim_min, 0.21])
+    xlim = ax1.get_xlim()
+    lg = plt.legend(loc=3, scatterpoints=1, numpoints=1)
+    lg.draw_frame(False)
+    ax1.get_xaxis().set_ticks([])
+    ax1.get_yaxis().set_ticks([])
+
+    ax2 = plt.subplot(gs[-1, 1])
+    ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, 'k--')
+    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:], c=gp.qual_color(1))
+    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-average[:], c=gp.qual_color(2))
+    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-worst[:], c=gp.qual_color(3))
+    plt.xlabel(r'$Q (\AA^{-1})$')
+    ax2.get_yaxis().set_ticks([])
+    ax2.set_xscale('log')
+    gp.zoomout(ax0, 0.2)
+    ax2.set_xlim(xlim)
+    # ax2.text(-0.03, -1.5, '(b)', verticalalignment='bottom',
+             # horizontalalignment='left', transform=ax2.transAxes)
+
+    plt.tight_layout()
+    show = False
+    if show:
+        plt.show()
+    else:
+        fig_file_name = op.join(os.getcwd(), '%s_%s_fit' % (prefix, data_file))
+        # plt.savefig(fig_file_name[:-3] + 'png')
+        plt.savefig(fig_file_name + '.png', dpi=400, bbox_inches='tight')
+        if n_total > 20000:
+            print 'View fit plot: \neog %s.png &' % fig_file_name
+        else:
+            print 'View fit plot: \nevince %s.eps &' % fig_file_name
+            plt.savefig(fig_file_name + '.eps', dpi=400, bbox_inches='tight')
+        # plt.show()
+    # plot_x2_components(goal_iq, all_data_iq[:, [0, i_best]], show=show,
+                        # prefix=(prefix + '_' + data_file), s=s, o=o)
+
 
 
 def plot_run_best(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
