@@ -1999,42 +1999,42 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             prefix = 'i1_wr'
             plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'weighted R', key='i1_wr')
+                          residual=r'weighted $R$', key='i1_wr')
             # wr scale, wr
             prefix = 'mwr_wr'
             plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'weighted R', key='mwr_wr')
+                          residual=r'weighted $R$', key='mwr_wr')
             # i1 scale, r
             prefix = 'i1_r'
             plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'R-factor', key='i1_r')
+                          residual=r'$R$-factor', key='i1_r')
             # x2 scale, r
             prefix = 'mx2_r'
             plot_discrepancy(x2rg_df, x2_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'R-Factor', key='mx2_r')
+                          residual=r'$R$-Factor', key='mx2_r')
             # wr scale, r
             prefix = 'mwr_r'
             plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'R-Factor', key='mwr_r')
+                          residual=r'$R$-Factor', key='mwr_r')
             # i1 scale, f
             prefix = 'i1_f'
             plot_discrepancy(x2rg_df, i1_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'F-Factor', key='i1_f')
+                          residual=r'$F$-Factor', key='i1_f')
             # x2 scale, f
             prefix = 'mx2_f'
             plot_discrepancy(x2rg_df, x2_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'F-Factor', key='mx2_f')
+                          residual=r'$F$-Factor', key='mx2_f')
             # wr scale, f
             prefix = 'mwr_f'
             plot_discrepancy(x2rg_df, wr_data_iqs, goal_iq, data_file,
                           prefix + run_label[1:],
-                          residual=r'F-Factor', key='mwr_f')
+                          residual=r'$F$-Factor', key='mwr_f')
 
 
 def write_filter_output(run_dirs, df_list, cutoff, best_dcd=False, label='',
@@ -2158,18 +2158,15 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
              mec=gp.qual_color(0), label='Experimental')
     ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  ecolor=gp.qual_color(0))
-    # ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt='o',
-                # label='Exp', ms=8, mfc='none', c=gp.qual_color(0),
-                # mec=gp.qual_color(0))
-    ax1.plot(all_data_iq[:, 0], best[:], '-', mfc='none', ms=8,
-            c=gp.qual_color(1), mec=gp.qual_color(1), linewidth=2,
-            label='Best %s' % residual)
-    ax1.plot(all_data_iq[:, 0], average[:], '-', mfc='none', ms=8,
-             c=gp.qual_color(2), linewidth=2,
-             label=(r'Average %s' % residual))
     ax1.plot(all_data_iq[:, 0], worst[:], '-', mfc='none', ms=8,
              c=gp.qual_color(3), linewidth=2,
              label=(r'Worst %s' % residual))
+    ax1.plot(all_data_iq[:, 0], average[:], '-', mfc='none', ms=8,
+             c=gp.qual_color(2), linewidth=2,
+             label=(r'Average %s' % residual))
+    ax1.plot(all_data_iq[:, 0], best[:], '-', mfc='none', ms=8,
+             c=gp.qual_color(1), mec=gp.qual_color(1), linewidth=2,
+             label='Best %s' % residual)
     ax1.set_ylabel(r'$I(Q)$')
     ax1.set_yscale('log')
     ax1.set_xscale('log')
@@ -2183,9 +2180,9 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
     ax2 = plt.subplot(gs[-1, 1])
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, 'k--')
-    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:], c=gp.qual_color(1))
-    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-average[:], c=gp.qual_color(2))
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-worst[:], c=gp.qual_color(3))
+    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-average[:], c=gp.qual_color(2))
+    ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:], c=gp.qual_color(1))
     plt.xlabel(r'$Q (\AA^{-1})$')
     ax2.get_yaxis().set_ticks([])
     ax2.set_xscale('log')
