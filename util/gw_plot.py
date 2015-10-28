@@ -3,33 +3,60 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def zoomout(ax, factor):
+def zoomout(ax, factor, x=True, y=True):
 
-    xlim = ax.get_xlim()
-    if 'log' == ax.get_yscale():
-        xlim = np.log(xlim)
-        xlim = (xlim[0] + xlim[1]) / 2 + np.array((-0.5, 0.5)) * \
-            (xlim[1] - xlim[0]) * (1 + factor)
-        xlim = np.exp(xlim)
-    else:
-        xlim = (xlim[0] + xlim[1]) / 2 + np.array((-0.5, 0.5)) * \
-            (xlim[1] - xlim[0]) * (1 + factor)
-    ax.set_xlim(xlim)
+    if x:
+        xlim = ax.get_xlim()
+        if 'log' == ax.get_yscale():
+            xlim = np.log(xlim)
+            xlim = (xlim[0] + xlim[1]) / 2 + np.array((-0.5, 0.5)) * \
+                (xlim[1] - xlim[0]) * (1 + factor)
+            xlim = np.exp(xlim)
+        else:
+            xlim = (xlim[0] + xlim[1]) / 2 + np.array((-0.5, 0.5)) * \
+                (xlim[1] - xlim[0]) * (1 + factor)
+        ax.set_xlim(xlim)
 
-    ylim = ax.get_ylim()
-    if 'log' == ax.get_yscale():
-        ylim = np.log(ylim)
-        ylim = (ylim[0] + ylim[1]) / 2 + np.array((-0.5, 0.5)) * \
-            (ylim[1] - ylim[0]) * (1 + factor)
-        ylim = np.exp(ylim)
-    else:
-        ylim = (ylim[0] + ylim[1]) / 2 + np.array((-0.5, 0.5)) * \
-            (ylim[1] - ylim[0]) * (1 + factor)
-    ax.set_ylim(ylim)
+    if y:
+        ylim = ax.get_ylim()
+        if 'log' == ax.get_yscale():
+            ylim = np.log(ylim)
+            ylim = (ylim[0] + ylim[1]) / 2 + np.array((-0.5, 0.5)) * \
+                (ylim[1] - ylim[0]) * (1 + factor)
+            ylim = np.exp(ylim)
+        else:
+            ylim = (ylim[0] + ylim[1]) / 2 + np.array((-0.5, 0.5)) * \
+                (ylim[1] - ylim[0]) * (1 + factor)
+        ax.set_ylim(ylim)
 
 
 def xyplot(data, fmt='-', label=''):
     return plt.plot(data[:, 0], data[:, 1], fmt, label=label)
+
+
+def guinier(iq_data):
+    '''
+    return the Guinier data
+    '''
+    giq_data = np.zeros(iq_data.shape)
+    giq_data[:, 0] = iq_data[:, 0] * iq_data[:, 0]
+
+    # replace non-positive number by nan
+    iq = np.copy(iq_data[:, 1])
+    i_nonpositive = iq <= 0
+    iq[i_nonpositive] = np.nan
+
+    giq_data[:, 1] = np.log(iq)
+
+    return giq_data
+
+
+def guinier_plot(iq_data, fmt='-', label=''):
+    '''
+    plot the Guinier data
+    '''
+    giq_data = guinier(iq_data)
+    return xyplot(giq_data, fmt=fmt, label=label)
 
 
 def xyerror(data, fmt='-', label=''):

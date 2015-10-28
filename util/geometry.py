@@ -79,7 +79,7 @@ def get_alignment_angles(axes1, axes2):
         phi_x, phi_y, and phi_z angles to rotate axes2 about
     Notes
     -----
-    to align axes, rotation order should be: 
+    to align axes, rotation order should be:
         phi_x about axes1[0]
         phi_y about axes1[1]
         phi_z about axes1[2]
@@ -98,7 +98,7 @@ def get_alignment_angles(axes1, axes2):
 
     See Also
     --------
-    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4 
+    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4
                  array of coordinate vectors to be on the z-axis
     rotate_about_v : rotate coordinates about an arbitrary vector
 
@@ -165,7 +165,7 @@ def rotate_about_v(coor3, v, theta):
     '''
     this function is designed to generate a modified version of the input
     coordinates (coor3)
-    1) translate all coordinates so the first one is at the origin 
+    1) translate all coordinates so the first one is at the origin
        (rotation origin should be first coordinate)
     2) orient the rotation vector, v, along the z-axis
     3) performs rotations using the angle theta
@@ -217,21 +217,21 @@ def rotate_about_v(coor3, v, theta):
 
 def angle_btwn_v1_v2(v1, v2):
     '''
-    get the angle between two arbitrary vectors 
+    get the angle between two arbitrary vectors
 
     Parameters
     ----------
     v1 : Nx3 np.array
-        set 1 of the vector/s to use in calculation 
+        set 1 of the vector/s to use in the calculation
     v2 : Nx3 np.array
-        set 2 of the vector/s to use in calculation 
-
+        set 2 of the vector/s to use in the calculation
 
     Returns
     -------
-    R : Nx1 np.array
-        The angles between v1 and v2
-
+    theta_deg : Nx1 np.array
+        The angles between v1 and v2 in degrees
+    theta_rad : Nx1 np.array
+        The angles between v1 and v2 in radians
 
     Notes
     -----
@@ -255,12 +255,19 @@ def angle_btwn_v1_v2(v1, v2):
 
     '''
     if len(v2.shape) != len(v1.shape):
+        # pad the arrays to have the same length
         if len(v2.shape) > len(v1.shape):
+            assert len(v1) == 1, ('ERROR: vector lengths are not compatible, '
+                                  'review input')
             new_v1 = np.zeros(v2.shape)
             new_v1[:] = v1
             v1 = new_v1
         else:
-            pass  # THIS WILL BREAK
+            assert len(v2) == 1, ('ERROR: vector lengths are not compatible, '
+                                  'review input')
+            new_v2 = np.zeros(v1.shape)
+            new_v2[:] = v2
+            v2 = vew_v2
 
     if len(v2.shape) == 1:
         # make sure v1 and v2 are unit vectors:
@@ -284,9 +291,105 @@ def angle_btwn_v1_v2(v1, v2):
     return theta_deg, theta_rad
 
 
+def dihedral_btwn_v1_v2(v1, v2, x1, x2):
+    '''
+    get the dihedral angle between two vectors given their origins
+
+    Parameters
+    ----------
+    v1 : Nx3 np.array
+        set 1 of the vector/s to use in the calculation
+    v2 : Nx3 np.array
+        set 2 of the vector/s to use in the calculation
+    x1 : Nx3 np.array
+        set 1 of the origin/s to use in the calculation
+    x2 : Nx3 np.array
+        set 2 of the origin/s to use in the calculation
+
+    Returns
+    -------
+    theta_deg : Nx1 np.array
+        The angles between v1 and v2 in degrees
+    theta_rad : Nx1 np.array
+        The angles between v1 and v2 in radians
+
+
+    Notes
+    -----
+    Implementated from: http://math.stackexchange.com/a/47084/221321
+    According to the definition on wikipedia
+    (https://en.wikipedia.org/wiki/Dihedral_angle),
+    the direction of the angle does not use the right-hand-rule along
+    b1.  It is defined using the negative or the left-hand-rule.
+
+    See Also
+    --------
+    rorate_v2_to_v1: get the rotation matrix using the angle between two vectors
+    angle_btwn_v1_v2: get the angle between two vectors
+
+    Examples
+    --------
+    >>> v1 = np.array([1, 1, 0])
+    >>> v2 = np.array([-1, 0, 1])
+    >>> x1 = np.array([1, 0, 0])
+    >>> x2 = np.array([-1, 0, 0])
+    >>> theta_deg, theta_rad = geometry.dihedral_btwn_v1_v2(v1, v2, x1, x2)
+    >>> print theta_deg
+    90.0
+    >>> print theta_rad
+    1.57079632679
+    >>> print theta_rad-np.pi/2
+    0.0
+    >>> v2 = np.array([-1, -1, 1])
+    >>> theta_deg, theta_rad = geometry.dihedral_btwn_v1_v2(v1, v2, x1, x2)
+    >>> print theta_deg
+    135.0
+    >>> print theta_rad-3*np.pi/4
+    0.0
+
+    '''
+
+    assert v1.shape == v2.shape == x1.shape == x1.shape, (
+        'ERROR: array sizes do not match, review input')
+
+    if len(v1.shape) == 1:
+        # vector between origins
+        v3 = x2 - x1
+
+        # make sure v1, v2, and v3 are unit vectors:
+        b1 = -v1 / np.sqrt(v1.dot(v1)) # negative b/c want to point at x1
+        b3 = v2 / np.sqrt(v2.dot(v2))
+        b2 = v3 / np.sqrt(v3.dot(v3))
+
+        # get the normal to the two planes:
+        n1 = np.cross(b1, b2)
+        n2 = np.cross(b2, b3)
+
+        # get the angle between n1 and n2
+        m1 = np.cross(n1, b2)
+        x = n2.dot(n1)
+        y = n2.dot(m1)
+        theta_rad = np.arctan2(y, x)
+        theta_deg = theta_rad / np.pi * 180.0
+
+    else:
+        # have not figured out cross products using einsum
+
+        # setup the output
+        theta_rad = np.zeros((len(v1),1))
+        theta_deg = np.zeros((len(v1),1))
+
+        # iteratively call self
+        for i in xrange(len(v1)):
+            theta_deg[i], theta_rad[i] = dihedral_btwn_v1_v2(v1[i], v2[i],
+                                                             x1[i], x2[i])
+
+    return theta_deg, theta_rad
+
+
 def rotate_v2_to_v1(v1, v2):
     '''
-    get the rotation matrix that rotate from v2 to v1 along the vector 
+    get the rotation matrix that rotate from v2 to v1 along the vector
     orthongal to both
 
     Parameters
@@ -309,7 +412,7 @@ def rotate_v2_to_v1(v1, v2):
 
     See Also
     --------
-    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4 
+    align_to_z : aligns the axis connecting the first 2 coordinates of a 1x4
                  array of coordinate vectors to be on the z-axis
 
     Examples
@@ -429,7 +532,7 @@ def transform_coor(coor3, vector, origin):
         transform coordinates to a new cartesian configuration
 
     input parameters:
-        coor3:  coordinates originating at [0, 0, 0] oriented along the 
+        coor3:  coordinates originating at [0, 0, 0] oriented along the
                 z-axis [0, 0, 1]
         origin: final origin
         vector: final orientation
@@ -705,7 +808,7 @@ def axisEqual3D(ax):
         getattr(ax, 'set_{}lim'.format(dim))(ctr - r, ctr + r)
 
 
-def show_ncps(all_ncp_plot_vars, title='NCP array'):
+def show_ncps(all_ncp_plot_vars, title='NCP array', save_name=[]):
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
@@ -770,19 +873,23 @@ def show_ncps(all_ncp_plot_vars, title='NCP array'):
     plt.title(title)
     plt.axis('equal')
     plt.legend(loc='upper left', numpoints=1, bbox_to_anchor=(1, 0.5))
-    plt.show()
+    if save_name:
+        fig.savefig(save_name, dpi=200, bbox_inches='tight')
+        print 'eog %s &' % save_name
+    else:
+        plt.show()
 
 
 def get_dna_bp_reference_frame(dna_ids, bp_mol, dna_id_type='segname'):
     '''
-    The x-axis points in the direction of the major groove along what would 
-    be the pseudo-dyad axis of an ideal Watson-Crick base-pair, i.e. the 
-    perpendicular bisector of the C1'...C1' vector spanning the base-pair. 
+    The x-axis points in the direction of the major groove along what would
+    be the pseudo-dyad axis of an ideal Watson-Crick base-pair, i.e. the
+    perpendicular bisector of the C1'...C1' vector spanning the base-pair.
     The y-axis runs along the long axis of the idealized base-pair in the
-    direction of the sequence strand, parallel with the C1'...C1' vector, 
-    and displaced so as to pass through the intersection on the 
-    (pseudo-dyad) x-axis of the vector connecting the pyrimidine Y(C6) and 
-    purine R(C8) atoms. The z-axis is defined by the right-handed rule, 
+    direction of the sequence strand, parallel with the C1'...C1' vector,
+    and displaced so as to pass through the intersection on the
+    (pseudo-dyad) x-axis of the vector connecting the pyrimidine Y(C6) and
+    purine R(C8) atoms. The z-axis is defined by the right-handed rule,
     i.e. z = x cross y. (doi:10.1006/jmbi.2001.4987)
     '''
     c6c8_string = ('(((resname[i] == "CYT" or resname[i] == "THY") and name[i] == "C6") or'
@@ -910,8 +1017,8 @@ def get_axes_from_points(origin, p1, p2):
     accordingly (p1, p2) should be (pX, pY), (pY, pZ), or (pZ, pX)
 
     example:
-    >>> get_axes_from_points(np.array([0,0,0]), np.array([2,0,0]), 
-                             np.array([0,3,0])) 
+    >>> get_axes_from_points(np.array([0,0,0]), np.array([2,0,0]),
+                             np.array([0,3,0]))
     (array([ 1.,  0.,  0.]), array([ 0.,  1.,  0.]), array([ 0.,  0.,  1.]))
     '''
     ax1 = p1 - origin
@@ -933,29 +1040,37 @@ def get_ncp_origin_and_axes(ncp_c1p_mask, dyad_mask, dyad_dna_id, ncp,
     coor = coor[0]
     ideal = np.zeros(len(coor))
 
-    if prev_opt_params is None:
-        # use the dyad_z_axis as the guess for the ncp_z_axis
-        R = 41.5
-        dyad_y_axis = dyad_axes[1, :] / dyad_axes[1, 2]
-
-        # guess where the cylinder crosses the z=0 plane
-        ncp_origin_guess = dyad_origin + R / 2 * dyad_axes[0]
-        cyl_origin_guess = ncp_origin_guess - \
-            ncp_origin_guess[2] / dyad_axes[1, 2] * dyad_axes[1]
-
-        guess = np.array([R, cyl_origin_guess[0], cyl_origin_guess[1], dyad_y_axis[
-                         0], dyad_y_axis[1]])  # (R, X0, Y0, Vx, Vy)
-    else:
-        guess = prev_opt_params
-
     # fit a cylinder
     if debug:
         import time
         tic = time.time()
 
-    opt_params, cov_params = curve_fit(
-        cylinder_distances_from_R, coor, ideal, p0=guess)
+    '''
+    try using the previous optimization parameters
+    this works well if it has not moved far, otherwise it can be bad
+    '''
+    # if prev_opt_params is None:
+        # x = no_such_var
+    # else:
+        # opt_params, cov_params = curve_fit(cylinder_distances_from_R,
+                                           # coor, ideal, p0=prev_opt_params)
 
+    '''
+    use the dyad_z_axis as the guess for the ncp_z_axis
+    this consistently works well
+    '''
+    R = 41.5
+    dyad_y_axis = dyad_axes[1, :] / dyad_axes[1, 2]
+
+    # guess where the cylinder crosses the z=0 plane
+    ncp_origin_guess = dyad_origin + R / 2 * dyad_axes[0]
+    cyl_origin_guess = ncp_origin_guess - \
+        ncp_origin_guess[2] / dyad_axes[1, 2] * dyad_axes[1]
+
+    guess = np.array([R, cyl_origin_guess[0], cyl_origin_guess[1], dyad_y_axis[
+                     0], dyad_y_axis[1]])  # (R, X0, Y0, Vx, Vy)
+    opt_params, cov_params = curve_fit(cylinder_distances_from_R, coor,
+                                       ideal, p0=guess)
     if debug:
         toc = time.time() - tic
         print 'fitting a cylinder to the NCP took %0.3f s' % toc

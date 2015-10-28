@@ -35,7 +35,7 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
         all_ncp_masks = pickle.load(pkl_in)
         all_dyad_bases = pickle.load(pkl_in)
         all_dyad_masks = pickle.load(pkl_in)
-        all_ref_masks = pickle.load(pkl_in)
+        all_ref_atom_masks = pickle.load(pkl_in)
         all_ncp_origins = pickle.load(pkl_in)
         all_ncp_axes = pickle.load(pkl_in)
         all_ncp_opt_params = pickle.load(pkl_in)
@@ -72,7 +72,6 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
     # array.setCoor(coor)
     # array.write_pdb('gH5c11_r.pdb', 0, 'w')
 
-    errors = []
     for (i, resids) in enumerate(ncp_dna_resids):
         print 'fitting NCP %d' % (i + 1)
         if load_masks:
@@ -88,19 +87,20 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
                                 dna_ids[i][1], resids[0, 1], resids[1, 1]))
             ncp_basis = basis_to_python.parse_basis(ncp_basis_vmd)
             error, ncp_mask = array.get_subset_mask(ncp_basis)
-            errors.append(errors)
+            assert not error, error
 
             dyad_basis = ('( segname[i] == "%s" and resid[i] == %d ) or'
                           '( segname[i] == "%s" and resid[i] == %d )'
                           % (dna_ids[i][0], ncp_dyad_resids[i][0],
                              dna_ids[i][1], ncp_dyad_resids[i][1]))
             error, dyad_mask = array.get_subset_mask(dyad_basis)
-            errors.append(errors)
+            assert not error, error
 
             ref_atom_basis_vmd = ("(segname %s and resid %d and name C1\')" %
                                   (dna_ids[i][0], ncp_ref_atom_resids[i]))
             ref_atom_basis = basis_to_python.parse_basis(ref_atom_basis_vmd)
             error, ref_atom_mask = array.get_subset_mask(ref_atom_basis)
+            assert not error, error
 
             ncp_opt_params = None
             all_ncp_bases[i] = ncp_basis
@@ -109,9 +109,10 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
             all_dyad_masks[i] = dyad_mask
             all_ref_atom_masks[i] = ref_atom_mask
 
+        debug = not load_masks
         (ncp_origin, ncp_axes, ncp_opt_params, ncp_dyad_mol, ncp_plot_vars
          ) = geometry.get_ncp_origin_and_axes(ncp_mask, dyad_mask, dna_ids[i],
-                                              array, ref_atom_mask, debug=True,
+                                              array, ref_atom_mask, debug=debug,
                                               prev_opt_params=ncp_opt_params)
 
         # store all the variables for debug purposes
@@ -121,24 +122,28 @@ def get_tetramer_axes(pdb, ncp_dna_resids, dna_ids, ncp_dyad_resids,
         all_ncp_dyad_mol[i] = ncp_dyad_mol
         all_ncp_plot_vars[i] = ncp_plot_vars
 
-    print 'saving masks and other results to: %s' % pkl_file
-    pkl_out = open(pkl_file, 'wb')
-    pickle.dump(all_ncp_bases, pkl_out, -1)
-    pickle.dump(all_ncp_masks, pkl_out, -1)
-    pickle.dump(all_dyad_bases, pkl_out, -1)
-    pickle.dump(all_dyad_masks, pkl_out, -1)
-    pickle.dump(all_ref_atom_masks, pkl_out, -1)
-    pickle.dump(all_ncp_origins, pkl_out, -1)
-    pickle.dump(all_ncp_axes, pkl_out, -1)
-    pickle.dump(all_ncp_opt_params, pkl_out, -1)
-    pickle.dump(all_ncp_dyad_mol, pkl_out, -1)
-    pickle.dump(all_ncp_plot_vars, pkl_out, -1)
-    pkl_out.close()
+    if not load_masks:
+        print 'saving masks and other results to: %s' % pkl_file
+        pkl_out = open(pkl_file, 'wb')
+        pickle.dump(all_ncp_bases, pkl_out, -1)
+        pickle.dump(all_ncp_masks, pkl_out, -1)
+        pickle.dump(all_dyad_bases, pkl_out, -1)
+        pickle.dump(all_dyad_masks, pkl_out, -1)
+        pickle.dump(all_ref_atom_masks, pkl_out, -1)
+        pickle.dump(all_ncp_origins, pkl_out, -1)
+        pickle.dump(all_ncp_axes, pkl_out, -1)
+        pickle.dump(all_ncp_opt_params, pkl_out, -1)
+        pickle.dump(all_ncp_dyad_mol, pkl_out, -1)
+        pickle.dump(all_ncp_plot_vars, pkl_out, -1)
+        pkl_out.close()
     return all_ncp_plot_vars, all_ncp_axes, all_ncp_origins
 
 
 def get_tetramer_angles(all_ncp_axes, all_ncp_origins):
-    # get tetramer angles
+    '''
+    angles to repeatedly transform one NCP to create the matching array
+    '''
+
     all_ncp_axes = np.array(all_ncp_axes)
     all_ncp_origins = np.array(all_ncp_origins)
 
@@ -259,6 +264,8 @@ if __name__ == '__main__':
     # 33.373636182110772]
 
     pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_10d.pdb'
+
+    pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_m1d.pdb'
 
     # the opening starting structure
     # pdb = '/home/schowell/data/myData/manualStructures/gH5_opening/pdb/gH5x4_opening_0d.pdb'
