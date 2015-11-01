@@ -2404,7 +2404,7 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
 
         average_label = r'Average of Best %d Structures' % N
 
-    ax0.set_yscale('log')
+    # ax0.set_yscale('log')
     plt.axis('tight')
 
 
