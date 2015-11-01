@@ -412,7 +412,7 @@ def compare_run_to_iq_all_metrics(run_dir, goal_iq, filter_dir, out_file=None,
     return result_df, x2_scaled_iq, wr_scaled_iq, i1_scaled_iq, goal_iq
 
 
-def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
+def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='r', out_file=None,
                            run_label='', match_range=None):
     '''
     compare the data and models using selected discrepancy metrics
@@ -458,7 +458,14 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
                 # data_iq[:, [0, i]], goal_iq)
 
         iq_offset[j] = 0
-        if match_range:
+
+        if metric == 'r':
+                # do not minimize the discrepancy
+                min_scale = i1_scale
+                min_scaled_iq = i1_scaled_iq
+                min_residual = i1_residual
+
+        elif match_range:
             # only scale a specific Q-range (e.g. high-Q range)
             i_min = np.argmin(np.abs(goal_iq[:, 0] - match_range[0]))
             i_max = np.argmin(np.abs(goal_iq[:, 0] - match_range[1]))
@@ -476,8 +483,8 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
                 min_scaled_iq[:, i] = min_scale[j] * data_iq[:, i]
                 min_residual[j] = get_wr(goal_iq, min_scaled_iq[:, [0, i]])
             else:
-                assert False, ('ERROR: use predefined metric (x2 or wr), or '
-                               'define a new one')
+                assert False, ('ERROR: use predefined metric (x2, wr, or r), '
+                               'or define a new one')
         else:
             # match the entire Q-range
             if metric == 'x2':
@@ -487,8 +494,8 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
                 min_scaled_iq[:, [0, i]], min_scale[j], min_residual[j] = scale_wr(
                     data_iq[:, [0, i]], goal_iq)
             else:
-                assert False, ('ERROR: use predefined metric (x2 or wr), or '
-                               'define a new one')
+                assert False, ('ERROR: use predefined metric (x2, wr, or r), '
+                               'or define a new one')
 
         # scale using the first data point
         i1_scale[j] = goal_iq[0, 1]/data_iq[0, i]
@@ -497,11 +504,16 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
         if metric == 'x2':
             # X^2
             i1_residual[j] = get_x2(goal_iq, i1_scaled_iq[:, [0, i]])
+            min_key = 'min_%s' % metric
         elif metric == 'wR':
             # weighted R-factor
             i1_residual[j] = get_wr(goal_iq, i1_scaled_iq[:, [0, i]])
+            min_key = 'min_%s' % metric
+        elif metric == 'r':
+            # R-factor
+            i1_residual[j] = get_r(goal_iq, i1_scaled_iq[:, [0, i]])
+            min_key = 'min_i0'
 
-    min_key = 'min_%s' % metric
     i1_key = 'i1_%s' % metric
     res_dict = {'Rg': Rg, 'offset': iq_offset, 'labels': labels, 'min_scale':
                 min_scale, min_key: min_residual, i1_key: i1_residual}
@@ -516,6 +528,7 @@ def compare_run_to_iq(run_dir, goal_iq, filter_dir, metric='wR', out_file=None,
 
     # small file
     np.savetxt(op.join(filter_dir, 'goal_%s.iq' % run_label), goal_iq)
+
     # too big to be useful as text file
     np.save(op.join(filter_dir, 'min_data_%s.npy' % run_label), min_scaled_iq)
     np.save(op.join(filter_dir, 'i1_data_%s.npy' % run_label), i1_scaled_iq)
@@ -593,9 +606,8 @@ def get_f(rf_data, mt_data):
 
     return f
 
-
 def get_f2_components(rf_data, mt_data):
-    # F-factor as defined by doi: 10.1042/bj2670203
+    # F-factor as defined by doi: 10.1016/S0006-3495(98)77984-6
     diff = (np.log(mt_data[:, 1]) - np.log(rf_data[:, 1]))**2
     n = len(mt_data[:, 1])
     f2 = diff / n
@@ -611,7 +623,7 @@ def get_wr(rf_data, mt_data):
 
 
 def get_wr_components(rf_data, mt_data):
-    # weighted R-factor as defined by doi: 10.1042/bj2670203
+    # weighted R-factor, correctly defined in doi: 10.1107/S0021889803000220
     w = rf_data[:, 0]
     w2 = w**2
     i1 = mt_data[:, 1]
@@ -1849,7 +1861,7 @@ def combine_rg_i0():
 
 def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 prefix='', do_plot=True, cutoff=None, best_dcd=False,
-                fresh=False, run_label='', metric='wR'):
+                fresh=False, run_label='', metric='r', N=100):
     all_result_dfs = []
     all_i1_data_iqs = []
     all_min_data_iqs = []
@@ -1895,18 +1907,21 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
             result_df = pd.concat(df_list)
             result_df.index = range(len(result_df))
 
-            i1_key = 'i1_%s' % metric
-            min_key = 'min_%s' % metric
 
+            i1_key = 'i1_%s' % metric
             result_df.sort(i1_key, inplace=True)
             best200 = result_df.iloc[:200]
             best200.to_csv(data_file + '_%s_best.csv' % i1_key,
                            float_format='%5.10f', sep='\t')
 
-            result_df.sort(min_key, inplace=True)
-            best200 = result_df.iloc[:200]
-            best200.to_csv(data_file + '_%s_best.csv' % min_key,
+            if metric == 'x2' or metric == 'wR':
+                min_key = 'min_%s' % metric
+                result_df.sort(min_key, inplace=True)
+                best200 = result_df.iloc[:200]
+                best200.to_csv(data_file + '_%s_best.csv' % min_key,
                            float_format='%5.10f', sep='\t')
+            else:
+                min_key = 'min_i0'
 
             q = i1_data_iq_list[0][:, :1]
             for (i, i1_data_iq) in enumerate(i1_data_iq_list):
@@ -1923,10 +1938,10 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 prefix += '_%s' % run_label
             plot_discrepancy(result_df, i1_data_iqs, goal_iq, data_file,
                              prefix=prefix, key=i1_key,
-                             residual=r'weighted $R$')
+                             residual=r'$R$-factor', N=N)
             plot_discrepancy(result_df, i1_data_iqs, goal_iq, data_file,
                              prefix=prefix, key=i1_key,
-                             residual=r'weighted $R$', sub_label=False)
+                             residual=r'$R$-factor', sub_label=False, N=N)
 
             for (i, min_data_iq) in enumerate(min_data_iq_list):
                 if i == 0:
@@ -1942,14 +1957,14 @@ def compare_iq(array_types, data_files, data_dir, data_ext, run_dirs,
                 prefix += '_%s' % run_label
             plot_discrepancy(result_df, min_data_iqs, goal_iq, data_file,
                              prefix=prefix, key=min_key,
-                             residual=r'weighted $R$')
+                             residual=r'$R$-factor', N=N)
 
             if cutoff or best_dcd:
                 write_filter_output(run_dirs[array_type], df_list, cutoff,
                                     result_df, i1_data_iq_list, key=i1_key,
                                     best_dcd=best_dcd, data_file=data_file,
                                     label='_%s%s' % ( data_file, run_label),
-                                    goal_iq=goal_iq)
+                                    goal_iq=goal_iq, N=N)
 
             all_result_dfs.append(result_df)
             all_i1_data_iqs.append(i1_data_iqs)
@@ -2249,10 +2264,9 @@ def compare_iq_all_metrics(array_types, data_files, data_dir, data_ext,
 def write_filter_output(run_dirs, df_list, cutoff, result_df, data_iq_list,
                         best_dcd=False, key='i1_wR', label='', data_file='',
                         catdcd_exe='/home/schowell/data/myPrograms/bin/catdcd',
-                        goal_iq=[], do_align=False):
+                        goal_iq=[], do_align=False, N=100):
     txt_name = 'rglowweights%s.txt' % label
     index = 0
-    N = 1000
 
     with open(op.join(txt_name), 'w') as txt_file:
         txt_file.write('# file generated on FILL THIS IN\n')
@@ -2339,7 +2353,7 @@ def write_filter_output(run_dirs, df_list, cutoff, result_df, data_iq_list,
 
 
 def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
-                     residual = r'$\chi^2$', key='x2', sub_label=True):
+                     residual = r'$\chi^2$', key='x2', sub_label=True, N=None):
 
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
@@ -2376,7 +2390,20 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     worst_series = x2rg_df[x2rg_df[key] == worst_x2]
     i_worst = worst_series.index[0] + 1  # first column is the Q values
     worst = all_data_iq[:, i_worst]
-    average = all_data_iq[:, 1:].mean(axis=1)
+    if not N:
+        average = all_data_iq[:, 1:].mean(axis=1)
+        average_label = r'Average of All Structures'
+    else:
+        # get the index for the best N structures
+        tmp_df = x2rg_df.sort(key)
+        cutoff = tmp_df.iloc[N-1:N+1][key].mean()
+        best_N_df = tmp_df.loc[tmp_df[key] < cutoff]
+
+        # average the best N structures
+        average = all_data_iq[:,best_N_df.index+1].mean(axis=1) # +1 b/c 0 is Q
+
+        average_label = r'Average of Best %d Structures' % N
+
     ax0.set_yscale('log')
     plt.axis('tight')
 
@@ -2389,27 +2416,27 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     # plot errorbar in two parts to get label order correct
     ax1.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
              mec=gp.qual_color(0), label='Experimental')
-    ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+    ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  ecolor=gp.qual_color(0))
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, '--', c=gp.qual_color(0))
 
     ax1.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst %s' % residual))
+             label=(r'Worst Structure'))
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-worst[:],
              c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst %s' % residual))
+             label=(r'Worst Structure'))
 
     ax1.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
-             label=(r'Average %s' % residual))
+             label=average_label)
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-average[:],
              c=gp.qual_color(2), linewidth=2,
-             label=(r'Average %s' % residual))
+             label=average_label)
 
     ax1.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
-             label='Best %s' % residual)
+             label='Best Structure')
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:],
              c=gp.qual_color(1), linewidth=2,
-             label='Best %s' % residual)
+             label='Best Structure')
 
 
     ax1.set_ylabel(r'$I(Q)$')
@@ -3171,7 +3198,7 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
         print 'pause'
 
 def save_output(all_data_files, all_result_dfs, all_data_iqs, all_goal_iqs,
-                sassie_run_dir, metric='i1_wR', prefix=''):
+                sassie_run_dir, metric='i1_r', prefix=''):
     for (i, data_file) in enumerate(all_data_files):
 
         best_residual = all_result_dfs[i][metric].min()
