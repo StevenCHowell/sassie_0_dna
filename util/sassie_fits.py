@@ -93,7 +93,8 @@ def load_foxs(saspath):
         try:
             dcd_file = glob.glob(op.join(op.join(op.split(saspath)[0],
                                                  'monte_carlo'), '*.dcd'))
-            assert len(dcd_file) == 1, 'ERROR: not clear which dcd file to use'
+            assert len(dcd_file) == 1, ('ERROR: not clear which dcd file to use'
+                                        ' for calculating the Rg')
             dcd_file = dcd_file[0]
             pdb_search = op.join(op.split(op.split(saspath)[0])[0], '*.pdb')
             pdb_file = glob.glob(pdb_search)[0]
@@ -2392,7 +2393,7 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     worst = all_data_iq[:, i_worst]
     if not N:
         average = all_data_iq[:, 1:].mean(axis=1)
-        average_label = r'Average of All Structures'
+        average_label = r'Average of All'
     else:
         # get the index for the best N structures
         tmp_df = x2rg_df.sort(key)
@@ -2402,7 +2403,7 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         # average the best N structures
         average = all_data_iq[:,best_N_df.index+1].mean(axis=1) # +1 b/c 0 is Q
 
-        average_label = r'Average of Best %d Structures' % N
+        average_label = r'Average of Best %d' % N
 
     # ax0.set_yscale('log')
     plt.axis('tight')
