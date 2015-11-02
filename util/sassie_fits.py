@@ -2422,10 +2422,10 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, '--', c=gp.qual_color(0))
 
     ax1.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst Structure'))
+             label=(r'Worst $R=%0.3f$' % worst_x2))
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-worst[:],
              c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst Structure'))
+             label=(r'Worst $R=%0.3f$' % worst_x2))
 
     ax1.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
              label=average_label)
@@ -2434,10 +2434,10 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
              label=average_label)
 
     ax1.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
-             label='Best Structure')
+             label='Best $R=%0.3f$' % best_x2)
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:],
              c=gp.qual_color(1), linewidth=2,
-             label='Best Structure')
+             label='Best $R=%0.3f$' % best_x2)
 
 
     ax1.set_ylabel(r'$I(Q)$')
