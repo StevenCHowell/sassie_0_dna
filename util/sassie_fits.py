@@ -2369,7 +2369,7 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     if sub_label:
         ax0.text(-0.03, -0.15, '(a)', verticalalignment='bottom',
                  horizontalalignment='left', transform=ax0.transAxes)
-        ax0.text(1.13, -0.15, '(b)', verticalalignment='bottom',
+        ax0.text(1.16, -0.15, '(b)', verticalalignment='bottom',
                  horizontalalignment='left', transform=ax0.transAxes)
 
     ax0.plot(x2rg_df['Rg'], x2rg_df[key], 'o', mec=gp.qual_color(0), mfc='none')
