@@ -2798,6 +2798,9 @@ def auto_crop_group(images):
 
 def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
              inset_loc=[], prefix='', i0=False, cutoff=None, show=False):
+    '''
+    Code for generating the figure used in the July 2015 grant proposal
+    '''
     n_total = len(x2rg_df)
     n_best = max(int(n_total * 0.1), 3)
     x2rg_best = x2rg_df.sort('x2')[:n_best]
@@ -2936,15 +2939,19 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
         plt.close()
 
-def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
+def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
-                show=False):
+                show=False, metric='i1_r'):
+    '''
+    code for generating the example figures used in the SASSIE method paper
+    '''
+
     import sassie.calculate.convergence_test as convergence_test
 
-    n_total = len(x2rg_df)
+    n_total = len(result_df)
     n_best = max(int(n_total * 0.1), 3)
-    x2rg_best = x2rg_df.sort('x2')[:n_best]
+    x2rg_best = result_df.sort(metric)[:n_best]
     plt.close()
     colors = gp.qual_color
 
@@ -2976,13 +2983,14 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
              verticalalignment='bottom', horizontalalignment='left',
              transform=ax1.transAxes)
-    ax1.plot(x2rg_df['Rg'], x2rg_df['x2'], 'o', mec=colors(0), mfc='none')
-    ax1.set_ylabel(r'$\chi^2$')
+    ax1.plot(result_df['Rg'], result_df[metric], 'o', mec=colors(0), mfc='none')
+    # ax1.set_ylabel(r'$\chi^2$')
+    ax1.set_ylabel(r'$R$-factor')
     ax1.set_xlabel(r'$R_g$')
-    ax1.set_yscale('log')
-    rg_range = [np.round(x2rg_df['Rg'].min()), np.round(x2rg_df['Rg'].max())]
+    # ax1.set_yscale('log')
+    rg_range = [np.round(result_df['Rg'].min()), np.round(result_df['Rg'].max())]
     ax1.set_xlim(rg_range)
-    # x2_range = [0.1, np.round(x2rg_df['x2'].max())]
+    # x2_range = [0.1, np.round(x2rg_df[metric].max())]
     # ax1.set_ylim(x2_range)
     # ax1.xaxis.labelpad = -1
     ax1.set_zorder(ax_c.get_zorder() + 1)  # put ax1 in front of ax
@@ -3005,21 +3013,21 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
                  ecolor=colors(0))
 
-    best_x2 = x2rg_df.x2.min()
+    best_discrep = result_df[metric].min()
     if 3 == all_data_iq.shape[1]:
         best = all_data_iq[:, 1]
     else:
-        best_series = x2rg_df[x2rg_df.x2 == best_x2]
+        best_series = result_df[result_df[metric] == best_discrep]
         i_best = best_series.index[0] + 1  # first column is the Q values
         best = all_data_iq[:, i_best]
     ax2.plot(all_data_iq[:, 0], best[:], c=colors(1), linewidth=2,
-             label=(r'Best $\chi^2$= %0.1f' % best_x2))
+             label=(r'Best $\chi^2$= %0.1f' % best_discrep))
 
-    worst_x2 = x2rg_df.x2.max()
+    worst_x2 = result_df[metric].max()
     if 3 == all_data_iq.shape[1]:
         worst = all_data_iq[:, 2]
     else:
-        worst_series = x2rg_df[x2rg_df.x2 == worst_x2]
+        worst_series = result_df[result_df[metric] == worst_x2]
         i_worst = worst_series.index[0] + 1  # first column is the Q values
         worst = all_data_iq[:, i_worst]
     ax2.plot(all_data_iq[:, 0], worst[:], c=colors(3), linewidth=2,
@@ -3050,7 +3058,7 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
         inset_image = np.ma.masked_where(mask, inset_image)
         ax_i.imshow(inset_image, interpolation='none')
         ax_i.axis('off')
-        ax_i.set_title('All versus Best', y=1.05)
+        # ax_i.set_title('All versus Best', y=1.05)
         ax_i.patch.set_visible(False)  # hide the 'canvas'
 
     # real-space convergence
@@ -3192,6 +3200,7 @@ def method_plot(x2rg_df, all_data_iq, goal_iq, density_plots,  example_plots,
             out_file = '%s_%s' % (prefix, out_file)
         fig_file_name = op.join(os.getcwd(), out_file)
         print 'View pub plot: \nevince %s &' % fig_file_name
+        print 'View pub plot: \neog %s &' % (fig_file_name[:-3] + 'png')
         plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
         # plt.show()
@@ -3228,7 +3237,7 @@ def save_output(all_data_files, all_result_dfs, all_data_iqs, all_goal_iqs,
         best_mc_dir = op.join(sassie_run_dir, best_series.iloc[0]['run'],
                               'monte_carlo')
         best_dcd = glob.glob(op.join(best_mc_dir, '*.dcd'))
-        assert len(best_dcd) == 1, 'ERROR: multiple dcd in %s' % best_mc_dir
+        assert len(best_dcd) == 1, 'ERROR: should be 1 dcd in %s' % best_mc_dir
         best_dcd = best_dcd[0]
         mol.read_single_dcd_step(best_dcd, int(best_series.iloc[0]['id']))
         mol.write_pdb(prefix + data_file + '_best.pdb', 0, 'w')
@@ -3236,7 +3245,7 @@ def save_output(all_data_files, all_result_dfs, all_data_iqs, all_goal_iqs,
         wrst_mc_dir = op.join(sassie_run_dir, wrst_series.iloc[0]['run'],
                               'monte_carlo')
         wrst_dcd = glob.glob(op.join(wrst_mc_dir, '*.dcd'))
-        assert len(wrst_dcd) == 1, 'ERROR: multiple dcd in %s' % wrst_mc_dir
+        assert len(wrst_dcd) == 1, 'ERROR: should be only 1 dcd in %s' % wrst_mc_dir
         wrst_dcd = wrst_dcd[0]
         mol.read_single_dcd_step(wrst_dcd, wrst_series.iloc[0]['id'])
         mol.write_pdb(prefix + data_file + '_wrst.pdb', 0, 'w')
