@@ -2354,7 +2354,7 @@ def write_filter_output(run_dirs, df_list, cutoff, result_df, data_iq_list,
 
 
 def plot_discrepancy(result_df, all_data_iq, goal_iq, data_file, prefix='',
-                     residual = r'$\chi^2$', key='i1_r', sub_label=True, N=None):
+                     residual = r'$R$-facator', key='i1_r', sub_label=True, N=None):
 
     n_total = len(result_df)
     n_best = max(int(n_total * 0.1), 3)
@@ -2939,7 +2939,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
-                show=False, key='i1_r'):
+                show=False, key='i1_r', N=None):
     '''
     code for generating the example figures used in the SASSIE method paper
     '''
