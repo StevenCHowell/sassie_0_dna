@@ -97,7 +97,7 @@ def load_foxs(saspath):
                                         ' for calculating the Rg')
             dcd_file = dcd_file[0]
             pdb_search = op.join(op.split(op.split(saspath)[0])[0], '*.pdb')
-            pdb_file = glob.glob(pdb_search)[0]
+            pdb_file = glob.glob(pdb_search)[-1]
             print '\ncalculating the Rg from this dcd: %s' % dcd_file
             print 'together with this pdb file: %s' % pdb_file
             rg = dcd_rg(pdb_file, dcd_file)
@@ -2353,16 +2353,17 @@ def write_filter_output(run_dirs, df_list, cutoff, result_df, data_iq_list,
                                    (index, this_rg, accept))
 
 
-def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
-                     residual = r'$\chi^2$', key='x2', sub_label=True, N=None):
+def plot_discrepancy(result_df, all_data_iq, goal_iq, data_file, prefix='',
+                     residual = r'$\chi^2$', key='i1_r', sub_label=True, N=None):
 
-    n_total = len(x2rg_df)
+    n_total = len(result_df)
     n_best = max(int(n_total * 0.1), 3)
-    x2rg_best = x2rg_df.sort(key)[:n_best]
+    x2rg_best = result_df.sort(key)[:n_best]
 
     plt.figure(figsize=(9, 4.5))
     gs = GridSpec(8, 2, hspace=0)
 
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (a) ~~~~~~~~~~~~~~~~~~~~ #
     ax0 = plt.subplot(gs[:, 0])
     ax0.text(0.01, 0.01, '%d structures' % n_total, verticalalignment='bottom',
              horizontalalignment='left', transform=ax0.transAxes)
@@ -2372,14 +2373,17 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         ax0.text(1.16, -0.15, '(b)', verticalalignment='bottom',
                  horizontalalignment='left', transform=ax0.transAxes)
 
-    ax0.plot(x2rg_df['Rg'], x2rg_df[key], 'o', mec=gp.qual_color(0), mfc='none')
+    ax0.plot(result_df['Rg'], result_df[key], 'o', mec=gp.qual_color(0), mfc='none')
     # plt.xlim(rg_range)
     plt.ylabel(residual)
     plt.xlabel(r'$R_g\,(\AA)$')
+    # ax0.set_yscale('log')
+    plt.axis('tight')
 
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (b) ~~~~~~~~~~~~~~~~~~~~ #
     # get the best, worst and average I(Q)
-    best_x2 = x2rg_df[key].min()
-    best_series = x2rg_df[x2rg_df[key] == best_x2]
+    best_discrep = result_df[key].min()
+    best_series = result_df[result_df[key] == best_discrep]
     i_best = best_series.index[0] + 1  # first column is the Q values
     if goal_iq[0, 0] < 0.00001:
         xlim_min = goal_iq[1, 0] * .9 # set reasonable xlim
@@ -2387,8 +2391,8 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         xlim_min = goal_iq[0, 0] * .9
 
     best = all_data_iq[:, i_best]
-    worst_x2 = x2rg_df[key].max()
-    worst_series = x2rg_df[x2rg_df[key] == worst_x2]
+    worst_discrep = result_df[key].max()
+    worst_series = result_df[result_df[key] == worst_discrep]
     i_worst = worst_series.index[0] + 1  # first column is the Q values
     worst = all_data_iq[:, i_worst]
     if not N:
@@ -2396,7 +2400,7 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         average_label = r'Average of All'
     else:
         # get the index for the best N structures
-        tmp_df = x2rg_df.sort(key)
+        tmp_df = result_df.sort(key)
         cutoff = tmp_df.iloc[N-1:N+1][key].mean()
         best_N_df = tmp_df.loc[tmp_df[key] < cutoff]
 
@@ -2404,13 +2408,6 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
         average = all_data_iq[:,best_N_df.index+1].mean(axis=1) # +1 b/c 0 is Q
 
         average_label = r'Average of Best %d' % N
-
-    # ax0.set_yscale('log')
-    plt.axis('tight')
-
-
-    ax_dummy = plt.subplot(gs[:, 1])
-
 
     ax1 = plt.subplot(gs[:-1, 1])
     ax2 = plt.subplot(gs[-1, 1])
@@ -2422,10 +2419,10 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, '--', c=gp.qual_color(0))
 
     ax1.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst $R=%0.3f$' % worst_x2))
+             label=(r'Worst $R=%0.3f$' % worst_discrep))
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-worst[:],
              c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst $R=%0.3f$' % worst_x2))
+             label=(r'Worst $R=%0.3f$' % worst_discrep))
 
     ax1.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
              label=average_label)
@@ -2434,10 +2431,10 @@ def plot_discrepancy(x2rg_df, all_data_iq, goal_iq, data_file, prefix='',
              label=average_label)
 
     ax1.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
-             label='Best $R=%0.3f$' % best_x2)
+             label='Best $R=%0.3f$' % best_discrep)
     ax2.plot(all_data_iq[:, 0], goal_iq[:, 1]-best[:],
              c=gp.qual_color(1), linewidth=2,
-             label='Best $R=%0.3f$' % best_x2)
+             label='Best $R=%0.3f$' % best_discrep)
 
 
     ax1.set_ylabel(r'$I(Q)$')
@@ -2942,7 +2939,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
-                show=False, metric='i1_r'):
+                show=False, key='i1_r'):
     '''
     code for generating the example figures used in the SASSIE method paper
     '''
@@ -2951,12 +2948,9 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     n_total = len(result_df)
     n_best = max(int(n_total * 0.1), 3)
-    x2rg_best = result_df.sort(metric)[:n_best]
+    x2rg_best = result_df.sort(key)[:n_best]
     plt.close()
     colors = gp.qual_color
-
-    # inset_fontsize = 11
-    # default_fontsize = 14
 
     fig = plt.figure(figsize=(12, 10))
     # # ~~ code for adding and positioning a suptitle ~~
@@ -2966,8 +2960,9 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     gs1 = GridSpec(4, 8, left=0.01, right=0.99, bottom=0.01, top=0.99,
                    wspace=0.3, hspace=0.3)
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (a) ~~~~~~~~~~~~~~~~~~~~ #
     ax1 = plt.subplot(gs1[:2, :4])
-    best_wrst_titles = [r'Best $\chi^2$ Model', r'Worst $\chi^2$ Model']
+    best_wrst_titles = [r'Best $R$-factor', r'Worst $R$-factor']
     inset_images = auto_crop_group([plt.imread(inset_files[0]),
                                     plt.imread(inset_files[1])])
     for (i, img) in enumerate(inset_images):
@@ -2983,24 +2978,50 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
              verticalalignment='bottom', horizontalalignment='left',
              transform=ax1.transAxes)
-    ax1.plot(result_df['Rg'], result_df[metric], 'o', mec=colors(0), mfc='none')
-    # ax1.set_ylabel(r'$\chi^2$')
+    ax1.plot(result_df['Rg'], result_df[key], 'o', mec=colors(0), mfc='none')
     ax1.set_ylabel(r'$R$-factor')
     ax1.set_xlabel(r'$R_g$')
     # ax1.set_yscale('log')
     rg_range = [np.round(result_df['Rg'].min()), np.round(result_df['Rg'].max())]
     ax1.set_xlim(rg_range)
-    # x2_range = [0.1, np.round(x2rg_df[metric].max())]
-    # ax1.set_ylim(x2_range)
-    # ax1.xaxis.labelpad = -1
+
+    # discrep_range = [0.1, np.round(x2rg_df[key].max())]
+    # ax1.set_ylim(discrep_range)
+
+    ax1.xaxis.labelpad = -1
+
     ax1.set_zorder(ax_c.get_zorder() + 1)  # put ax1 in front of ax
     ax1.patch.set_visible(False)  # hide the 'canvas'
 
-    if i0:
-        all_data_iq = all_data_iq[1:]
-        goal_iq = goal_iq[1:]
-
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (b) ~~~~~~~~~~~~~~~~~~~~ #
     # get the best, worst and average I(Q)
+    best_discrep = result_df[key].min()
+    best_series = result_df[result_df[key] == best_discrep]
+    i_best = best_series.index[0] + 1  # first column is the Q values
+    if goal_iq[0, 0] < 0.00001:
+        xlim_min = goal_iq[1, 0] * .9 # set reasonable xlim
+    else:
+        xlim_min = goal_iq[0, 0] * .9
+
+    best = all_data_iq[:, i_best]
+    worst_discrep = result_df[key].max()
+    worst_series = result_df[result_df[key] == worst_discrep]
+    i_worst = worst_series.index[0] + 1  # first column is the Q values
+    worst = all_data_iq[:, i_worst]
+    if not N:
+        average = all_data_iq[:, 1:].mean(axis=1)
+        average_label = r'Average of All'
+    else:
+        # get the index for the best N structures
+        tmp_df = result_df.sort(key)
+        cutoff = tmp_df.iloc[N-1:N+1][key].mean()
+        best_N_df = tmp_df.loc[tmp_df[key] < cutoff]
+
+        # average the best N structures
+        average = all_data_iq[:,best_N_df.index+1].mean(axis=1) # +1 b/c 0 is Q
+
+        average_label = r'Average of Best %d' % N
+
     ax2 = plt.subplot(gs1[:2, 4:])
     ax2.text(0.01, 0.015, '(b)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax2.transAxes)
@@ -3008,30 +3029,15 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
-             mec=colors(0), label='Experiment')
-    # label='exp', ms=8, mfc='none', color='b')
-    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
-                 ecolor=colors(0))
-
-    best_discrep = result_df[metric].min()
-    if 3 == all_data_iq.shape[1]:
-        best = all_data_iq[:, 1]
-    else:
-        best_series = result_df[result_df[metric] == best_discrep]
-        i_best = best_series.index[0] + 1  # first column is the Q values
-        best = all_data_iq[:, i_best]
-    ax2.plot(all_data_iq[:, 0], best[:], c=colors(1), linewidth=2,
-             label=(r'Best $\chi^2$= %0.1f' % best_discrep))
-
-    worst_x2 = result_df[metric].max()
-    if 3 == all_data_iq.shape[1]:
-        worst = all_data_iq[:, 2]
-    else:
-        worst_series = result_df[result_df[metric] == worst_x2]
-        i_worst = worst_series.index[0] + 1  # first column is the Q values
-        worst = all_data_iq[:, i_worst]
-    ax2.plot(all_data_iq[:, 0], worst[:], c=colors(3), linewidth=2,
-             label=(r'Worst $\chi^2$= %0.1f' % worst_x2))
+             mec=gp.qual_color(0), label='Experimental')
+    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
+                 ecolor=gp.qual_color(0))
+    ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
+             label=(r'Worst $R=%0.3f$' % worst_discrep))
+    ax2.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
+             label=average_label)
+    ax2.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
+             label='Best $R=%0.3f$' % best_discrep)
 
     plt.xlabel(r'$Q (\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
