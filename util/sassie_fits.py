@@ -2939,7 +2939,312 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
         plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
         plt.close()
 
+
 def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
+                pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
+                inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
+                show=False, key='i1_r', N=None, y_best_worst_label=[0.95,0.95],
+                crop=True):
+    '''
+    code for generating the example figures used in the SASSIE method paper
+    '''
+
+    import sassie.calculate.convergence_test as convergence_test
+
+    n_total = len(result_df)
+    n_best = max(int(n_total * 0.1), 3)
+    x2rg_best = result_df.sort(key)[:n_best]
+    plt.close()
+    colors = gp.qual_color
+
+    fig = plt.figure(figsize=(12, 10))
+    # # ~~ code for adding and positioning a suptitle ~~
+    # plt.suptitle(data_file, fontsize=14)
+    # plt.subplots_adjust(left=0.125, right = 0.9, bottom = 0.1, top = 0.9,
+    # wspace = 0.2, hspace = 0.2)
+
+    gs1 = GridSpec(4, 8, left=0.01, right=0.99, bottom=0.01, top=0.99,
+                   wspace=0.3, hspace=0.3)
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (a) ~~~~~~~~~~~~~~~~~~~~ #
+    ax1 = plt.subplot(gs1[:2, :4])
+    best_wrst_titles = [r'Best $R$-factor', r'Worst $R$-factor']
+    inset_images = auto_crop_group([plt.imread(inset_files[0]),
+                                    plt.imread(inset_files[1])])
+    for (i, img) in enumerate(inset_images):
+        ax_c = plt_inset.add_inset(ax1, inset_loc[i], axisbg='None')
+        mask = np.tile(np.atleast_3d(np.any(img != 255, axis=2)),
+                       (1, 1, img.shape[2]))  # this should mask the white
+        img = np.ma.masked_where(mask, img)
+        ax_c.imshow(img, interpolation='none')
+        ax_c.axis('off')
+        ax_c.set_title(best_wrst_titles[i], y=y_best_worst_label[i])
+        ax_c.patch.set_visible(False)  # hide the 'canvas'
+
+    ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
+             verticalalignment='bottom', horizontalalignment='left',
+             transform=ax1.transAxes)
+    ax1.plot(result_df['Rg'], result_df[key], 'o', mec=colors(0), mfc='none')
+    ax1.set_ylabel(r'$R$-factor')
+    ax1.set_xlabel(r'$R_g$')
+    # ax1.set_yscale('log')
+    rg_range = [np.floor(result_df['Rg'].min()), np.ceil(result_df['Rg'].max())]
+    ax1.set_xlim(rg_range)
+
+    discrep_range = np.array([result_df[key].min(), result_df[key].max()])
+    discrep_diff = discrep_range[1] - discrep_range[0]
+    y_range = discrep_range + 0.05 * discrep_diff * np.array([-1, 1]) # zoomout 5%
+    ax1.set_ylim(y_range)
+
+    ax1.xaxis.labelpad = -1
+
+    ax1.set_zorder(ax_c.get_zorder() + 1)  # put ax1 in front of ax
+    ax1.patch.set_visible(False)  # hide the 'canvas'
+
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (b) ~~~~~~~~~~~~~~~~~~~~ #
+    # get the best, worst and average I(Q)
+    best_discrep = result_df[key].min()
+    best_series = result_df[result_df[key] == best_discrep]
+    i_best = best_series.index[0] + 1  # first column is the Q values
+    if goal_iq[0, 0] < 0.00001:
+        xlim_min = goal_iq[1, 0] * .9 # set reasonable xlim
+    else:
+        xlim_min = goal_iq[0, 0] * .9
+
+    best = all_data_iq[:, i_best]
+    worst_discrep = result_df[key].max()
+    worst_series = result_df[result_df[key] == worst_discrep]
+    i_worst = worst_series.index[0] + 1  # first column is the Q values
+    worst = all_data_iq[:, i_worst]
+    if not N:
+        average = all_data_iq[:, 1:].mean(axis=1)
+        average_label = r'Average of All'
+    else:
+        # get the index for the best N structures
+        tmp_df = result_df.sort(key)
+        cutoff = tmp_df.iloc[N-1:N+1][key].mean()
+        best_N_df = tmp_df.loc[tmp_df[key] < cutoff]
+
+        # average the best N structures
+        average = all_data_iq[:,best_N_df.index+1].mean(axis=1) # +1 b/c 0 is Q
+
+        average_label = r'Average of Best %d' % N
+
+    ax2 = plt.subplot(gs1[:2, 4:])
+    ax2.text(0.01, 0.015, '(b)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax2.transAxes)
+                # fontsize=default_fontsize)
+
+    # plot errorbar in two parts to get label order correct
+    ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
+             mec=gp.qual_color(0), label='Experimental')
+    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+                 ecolor=gp.qual_color(0))
+    ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
+             label=(r'Worst $R=%0.4f$' % worst_discrep))
+    ax2.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
+             label=average_label)
+    ax2.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
+             label='Best $R=%0.4f$' % best_discrep)
+
+    plt.xlabel(r'$Q$ $(\AA^{-1})$')
+    plt.ylabel(r'$I(Q)$')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.axis('tight')
+    gp.zoomout(ax2, 0.1)
+    ax2.get_yaxis().set_ticks([])
+    ax2.xaxis.labelpad = -5
+    ax2.yaxis.labelpad = -1
+    lg = plt.legend(loc='center left', scatterpoints=1, numpoints=1)
+                    # prop={'size': default_fontsize})
+    lg.draw_frame(False)
+
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (c) ~~~~~~~~~~~~~~~~~~~~ #
+    # convergence plots
+    ax_c = plt.subplot(gs1[2:, :4])
+    ax_c.text(0.01, 0.015, '(c)', verticalalignment='bottom',
+              horizontalalignment='left', transform=ax_c.transAxes)
+    if all_density_plot:
+        inset_image = auto_crop(plt.imread(all_density_plot))
+        ax_i = plt_inset.add_inset(ax_c, [0.4, 0.05, 0.6, 0.6], axisbg='None')
+        mask = np.tile(np.atleast_3d(np.any(inset_image != 255, axis=2)),
+                       (1, 1, inset_image.shape[2]))  # this should mask the white
+        inset_image = np.ma.masked_where(mask, inset_image)
+        ax_i.imshow(inset_image, interpolation='none')
+        ax_i.axis('off')
+        # ax_i.set_title('All versus Best', y=1.05)
+        ax_i.patch.set_visible(False)  # hide the 'canvas'
+
+    # real-space convergence
+    list_new_voxels = []
+    list_occupied_voxels = []
+    convergence_test.count_spatial_voxels(pdb_file_name, dcd_file_names,
+                                          list_new_voxels, list_occupied_voxels)
+    n_structures = sum([len(new_voxels) for new_voxels in list_new_voxels])
+    occupied_voxels = np.zeros((n_structures, 2))
+    occupied_voxels[:, 0] = np.arange(n_structures)
+    for i in xrange(len(dcd_file_names)):
+        rows = list_occupied_voxels[i][:, 0]
+        occupied_voxels[rows, 1] = list_occupied_voxels[i][:, 1]
+    ax_c.plot(occupied_voxels[:, 0], occupied_voxels[:, 1],
+              label='Real-Space Convergence')
+    ax_c.set_ylim((0, occupied_voxels[-1,1]))
+    ax_c.set_xlabel('Number of Structures')
+    # Make the y-axis label and tick labels match the line color.
+    ax_c.set_ylabel('Number of Occupied Spatial Voxels', color=colors(0))
+    for tl in ax_c.get_yticklabels():
+        tl.set_color(colors(0))
+
+    # reciprocal-space convergence
+    ax_c2 = ax_c.twinx()
+    iq_low = []
+    iq_high = []
+    iq_all = []
+    list_new_grids = []
+    list_occupied_grids = []
+    n_q, n_spec = convergence_test.load_iq(sas_folders, 'dat', iq_low, iq_high,
+                                           iq_all)
+    convergence_test.count_sas_grids(sas_folders, iq_low, iq_high, iq_all, n_q,
+                                     n_spec, list_new_grids,
+                                     list_occupied_grids, 100)
+    total_spec = n_spec.sum()
+    occupied_grids = np.zeros((total_spec, len(sas_folders)+1))
+    occupied_grids[:, 0] = np.arange(total_spec)
+    for i in xrange(len(sas_folders)):
+        rows = list_occupied_grids[i][:, 0]
+        occupied_grids[rows, 1] = list_occupied_grids[i][:, 1]
+    ax_c2.plot(occupied_grids[1:, 0], occupied_grids[1:, 1], color=colors(1),
+               label='SAXS Convergence')
+    ax_c2.set_ylim((0, occupied_grids[-1, 1]))
+    # Make the y-axis label and tick labels match the line color.
+    ax_c2.set_ylabel('Number of Occupied SAXS Grids', color=colors(1))
+    for tl in ax_c2.get_yticklabels():
+        tl.set_color(colors(1))
+
+    ax_c.set_xlim((0, occupied_voxels[-1, 0]))
+    ax_c.set_zorder(ax_i.get_zorder() + 1)  # put ax in front of ax_i
+    ax_c.patch.set_visible(False)  # hide the 'canvas'
+
+    # ~~~~~~~~~~~~~~~~~~~~ Frames (d)--(k) ~~~~~~~~~~~~~~~~~~ #
+    # best fit w/ density plot
+    gs2 = GridSpec(2, 4, left=0.57, right=1.0, bottom=0.0, top=0.47,
+                   wspace=0.0, hspace=0.0)
+    ax3 = plt.subplot(gs2[0, 0])
+    ax3.text(-0.01, 0.05, '(d)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax3.transAxes)
+                # fontsize=default_fontsize)
+    ax4 = plt.subplot(gs2[1, 0])
+    ax4.text(-0.01, 0.05, '(e)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax4.transAxes)
+                # fontsize=default_fontsize)
+
+
+    if crop:
+        img1, img2, ex1a, ex1b, ex2a, ex2b, ex3a, ex3b = (
+            auto_crop_group([plt.imread(density_plots[0]),
+                             plt.imread(density_plots[1]),
+                             plt.imread(example_plots[0]),
+                             plt.imread(example_plots[1]),
+                             plt.imread(example_plots[2]),
+                             plt.imread(example_plots[3]),
+                             plt.imread(example_plots[4]),
+                             plt.imread(example_plots[5])]))
+    else:
+        img1 = plt.imread(density_plots[0])
+        img2 = plt.imread(density_plots[0])
+        ex1a = plt.imread(example_plots[0])
+        ex1b = plt.imread(example_plots[0])
+        ex2a = plt.imread(example_plots[0])
+        ex2b = plt.imread(example_plots[0])
+        ex3a = plt.imread(example_plots[0])
+        ex3b = plt.imread(example_plots[0])
+
+    # img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
+                                    # plt.imread(density_plots[1])])
+    ax3.imshow(img1)
+    ax4.imshow(img2)
+
+    # example 1
+    ax5 = plt.subplot(gs2[0, 1])
+    ax5.text(0.1, 0.05, '(f)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax5.transAxes)
+    ax6 = plt.subplot(gs2[1, 1])
+    ax6.text(0.1, 0.05, '(g)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax6.transAxes)
+
+    # ex1a, ex1b = auto_crop_group([plt.imread(example_plots[0]),
+                                    # plt.imread(example_plots[1])])
+    ax5.imshow(ex1a)
+    ax6.imshow(ex1b)
+
+    # example 2
+    ax7 = plt.subplot(gs2[0, 2])
+    ax7.text(0.1, 0.05, '(h)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax7.transAxes)
+    ax8 = plt.subplot(gs2[1, 2])
+    ax8.text(0.1, 0.05, '(i)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax8.transAxes)
+
+    # ex2a, ex2b = auto_crop_group([plt.imread(example_plots[2]),
+                                    # plt.imread(example_plots[3])])
+    ax7.imshow(ex2a)
+    ax8.imshow(ex2b)
+
+    # example 3
+    ax9 = plt.subplot(gs2[0, 3])
+    ax9.text(0.1, 0.05, '(j)', verticalalignment='bottom',
+             horizontalalignment='left', transform=ax9.transAxes)
+    ax10 = plt.subplot(gs2[1, 3])
+    ax10.text(0.1, 0.05, '(k)', verticalalignment='bottom',
+              horizontalalignment='left', transform=ax10.transAxes)
+
+    # ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
+                                    # plt.imread(example_plots[5])])
+    ax9.imshow(ex3a)
+    ax10.imshow(ex3b)
+
+    ax3.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax3.axis('off')
+    ax4.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax4.axis('off')
+    ax5.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax5.axis('off')
+    ax6.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax6.axis('off')
+    ax7.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax7.axis('off')
+    ax8.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax8.axis('off')
+    ax9.tick_params(axis='both', which='both', bottom='off', top='off',
+                    labelbottom='off', right='off', left='off', labelleft='off')
+    ax9.axis('off')
+    ax10.tick_params(axis='both', which='both', bottom='off', top='off',
+                     labelbottom='off', right='off', left='off', labelleft='off')
+    ax10.axis('off')
+
+    if show:
+        plt.show()
+    else:
+        out_file = 'result.eps'
+        if prefix:
+            out_file = '%s_%s' % (prefix, out_file)
+        fig_file_name = op.join(os.getcwd(), out_file)
+        print 'View pub plot: \nevince %s &' % fig_file_name
+        print 'View pub plot: \neog %s &' % (fig_file_name[:-3] + 'png')
+        plt.savefig(fig_file_name[:-3] + 'png', dpi=400, bbox_inches='tight')
+        plt.savefig(fig_file_name, dpi=400, bbox_inches='tight')
+        # plt.show()
+        plt.close()
+        print 'pause'
+
+
+def method_plot_v2(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
                 show=False, key='i1_r', N=None, y_best_worst_label=[0.95,0.95],
@@ -3124,9 +3429,9 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax_c.set_zorder(ax_i.get_zorder() + 1)  # put ax in front of ax_i
     ax_c.patch.set_visible(False)  # hide the 'canvas'
 
-    # ~~~~~~~~~~~~~~~~~~~~ Frames (d)--(k) ~~~~~~~~~~~~~~~~~~ #
+    # ~~~~~~~~~~~~~~~~~~~~ Frames (d)--(i) ~~~~~~~~~~~~~~~~~~ #
     # best fit w/ density plot
-    gs2 = GridSpec(2, 4, left=0.57, right=1.0, bottom=0.0, top=0.47,
+    gs2 = GridSpec(2, 3, left=0.57, right=1.0, bottom=0.0, top=0.47,
                    wspace=0.0, hspace=0.0)
     ax3 = plt.subplot(gs2[0, 0])
     ax3.text(-0.01, 0.05, '(d)', verticalalignment='bottom',
@@ -3145,9 +3450,7 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                          plt.imread(example_plots[0]),
                          plt.imread(example_plots[1]),
                          plt.imread(example_plots[2]),
-                         plt.imread(example_plots[3]),
-                         plt.imread(example_plots[4]),
-                         plt.imread(example_plots[5])]))
+                         plt.imread(example_plots[3])]))
 
     # img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
                                   # plt.imread(density_plots[1])])
@@ -3180,19 +3483,6 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax7.imshow(ex2a)
     ax8.imshow(ex2b)
 
-    # example 3
-    ax9 = plt.subplot(gs2[0, 3])
-    ax9.text(0.1, 0.05, '(j)', verticalalignment='bottom',
-             horizontalalignment='left', transform=ax9.transAxes)
-    ax10 = plt.subplot(gs2[1, 3])
-    ax10.text(0.1, 0.05, '(k)', verticalalignment='bottom',
-             horizontalalignment='left', transform=ax10.transAxes)
-
-    # ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
-                                  # plt.imread(example_plots[5])])
-    ax9.imshow(ex3a)
-    ax10.imshow(ex3b)
-
     ax3.tick_params(axis='both', which='both', bottom='off', top='off',
                     labelbottom='off', right='off', left='off', labelleft='off')
     ax3.axis('off')
@@ -3211,12 +3501,6 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax8.tick_params(axis='both', which='both', bottom='off', top='off',
                     labelbottom='off', right='off', left='off', labelleft='off')
     ax8.axis('off')
-    ax9.tick_params(axis='both', which='both', bottom='off', top='off',
-                    labelbottom='off', right='off', left='off', labelleft='off')
-    ax9.axis('off')
-    ax10.tick_params(axis='both', which='both', bottom='off', top='off',
-                    labelbottom='off', right='off', left='off', labelleft='off')
-    ax10.axis('off')
 
     if show:
         plt.show()
