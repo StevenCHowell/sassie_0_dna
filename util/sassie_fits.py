@@ -2783,12 +2783,15 @@ def auto_crop_group(images):
         white_cols[k] = [i for i in xrange(c[k])
                          if img[:, i].sum() == val_white_col]
 
+    # identify common rows and columns that have all white pixels
     crop_rows = [i for i in white_rows[0] for wr in white_rows[1:] if i in wr]
     crop_cols = [i for i in white_cols[0] for wc in white_cols[1:] if i in wc]
 
-    for (k, img) in enumerate(images):
-        images[k] = np.delete(np.delete(img, crop_cols, axis=1),
-                              crop_rows[k], axis=0)
+    for k in xrange(len(images)):
+        if crop_cols:
+            images[k] = np.delete(images[k], crop_cols, axis=1)
+        if crop_rows:
+            images[k] = np.delete(images[k], crop_rows, axis=0)
 
     return images
 
@@ -2939,7 +2942,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
-                show=False, key='i1_r', N=None):
+                show=False, key='i1_r', N=None, y_best_worst_label=[0.95,0.95]):
     '''
     code for generating the example figures used in the SASSIE method paper
     '''
@@ -2972,7 +2975,7 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
         img = np.ma.masked_where(mask, img)
         ax_c.imshow(img, interpolation='none')
         ax_c.axis('off')
-        ax_c.set_title(best_wrst_titles[i], y=0.95)
+        ax_c.set_title(best_wrst_titles[i], y=y_best_worst_label[i])
         ax_c.patch.set_visible(False)  # hide the 'canvas'
 
     ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
@@ -2982,11 +2985,13 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax1.set_ylabel(r'$R$-factor')
     ax1.set_xlabel(r'$R_g$')
     # ax1.set_yscale('log')
-    rg_range = [np.round(result_df['Rg'].min()), np.round(result_df['Rg'].max())]
+    rg_range = [np.floor(result_df['Rg'].min()), np.ceil(result_df['Rg'].max())]
     ax1.set_xlim(rg_range)
 
-    # discrep_range = [0.1, np.round(x2rg_df[key].max())]
-    # ax1.set_ylim(discrep_range)
+    discrep_range = np.array([result_df[key].min(), result_df[key].max()])
+    discrep_diff = discrep_range[1] - discrep_range[0]
+    y_range = discrep_range + 0.05 * discrep_diff * np.array([-1, 1]) # zoomout 5%
+    ax1.set_ylim(y_range)
 
     ax1.xaxis.labelpad = -1
 
@@ -3033,13 +3038,13 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
                  ecolor=gp.qual_color(0))
     ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
-             label=(r'Worst $R=%0.3f$' % worst_discrep))
+             label=(r'Worst $R=%0.4f$' % worst_discrep))
     ax2.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
              label=average_label)
     ax2.plot(all_data_iq[:, 0], best[:], c=gp.qual_color(1), linewidth=2,
-             label='Best $R=%0.3f$' % best_discrep)
+             label='Best $R=%0.4f$' % best_discrep)
 
-    plt.xlabel(r'$Q (\AA^{-1})$')
+    plt.xlabel(r'$Q$ $(\AA^{-1})$')
     plt.ylabel(r'$I(Q)$')
     plt.yscale('log')
     plt.xscale('log')
@@ -3052,6 +3057,7 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                     # prop={'size': default_fontsize})
     lg.draw_frame(False)
 
+    # ~~~~~~~~~~~~~~~~~~~~ Frame (c) ~~~~~~~~~~~~~~~~~~~~ #
     # convergence plots
     ax_c = plt.subplot(gs1[2:, :4])
     ax_c.text(0.01, 0.015, '(c)', verticalalignment='bottom',
