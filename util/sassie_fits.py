@@ -2942,7 +2942,8 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
 def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                 pdb_file_name, dcd_file_names, sas_folders, all_density_plot=[],
                 inset_files=[], inset_loc=[], prefix='', i0=False, cutoff=None,
-                show=False, key='i1_r', N=None, y_best_worst_label=[0.95,0.95]):
+                show=False, key='i1_r', N=None, y_best_worst_label=[0.95,0.95],
+                crop=True):
     '''
     code for generating the example figures used in the SASSIE method paper
     '''
@@ -3123,59 +3124,72 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax_c.set_zorder(ax_i.get_zorder() + 1)  # put ax in front of ax_i
     ax_c.patch.set_visible(False)  # hide the 'canvas'
 
+    # ~~~~~~~~~~~~~~~~~~~~ Frames (d)--(k) ~~~~~~~~~~~~~~~~~~ #
     # best fit w/ density plot
     gs2 = GridSpec(2, 4, left=0.57, right=1.0, bottom=0.0, top=0.47,
                    wspace=0.0, hspace=0.0)
     ax3 = plt.subplot(gs2[0, 0])
-    ax3.text(0.01, 0.05, '(d)', verticalalignment='bottom',
+    ax3.text(-0.01, 0.05, '(d)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax3.transAxes)
              # fontsize=default_fontsize)
     ax4 = plt.subplot(gs2[1, 0])
-    ax4.text(0.01, 0.09, '(e)', verticalalignment='bottom',
+    ax4.text(-0.01, 0.05, '(e)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax4.transAxes)
              # fontsize=default_fontsize)
 
-    img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
-                                  plt.imread(density_plots[1])])
+
+
+    img1, img2, ex1a, ex1b, ex2a, ex2b, ex3a, ex3b = (
+        auto_crop_group([plt.imread(density_plots[0]),
+                         plt.imread(density_plots[1]),
+                         plt.imread(example_plots[0]),
+                         plt.imread(example_plots[1]),
+                         plt.imread(example_plots[2]),
+                         plt.imread(example_plots[3]),
+                         plt.imread(example_plots[4]),
+                         plt.imread(example_plots[5])]))
+
+    # img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
+                                  # plt.imread(density_plots[1])])
     ax3.imshow(img1)
     ax4.imshow(img2)
 
     # example 1
     ax5 = plt.subplot(gs2[0, 1])
-    ax5.text(0.01, 0.05, '(f)', verticalalignment='bottom',
+    ax5.text(0.1, 0.05, '(f)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax5.transAxes)
     ax6 = plt.subplot(gs2[1, 1])
-    ax6.text(0.01, 0.09, '(g)', verticalalignment='bottom',
+    ax6.text(0.1, 0.05, '(g)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax6.transAxes)
 
-    ex1a, ex1b = auto_crop_group([plt.imread(example_plots[0]),
-                                  plt.imread(example_plots[1])])
+    # ex1a, ex1b = auto_crop_group([plt.imread(example_plots[0]),
+                                  # plt.imread(example_plots[1])])
     ax5.imshow(ex1a)
     ax6.imshow(ex1b)
 
     # example 2
     ax7 = plt.subplot(gs2[0, 2])
-    ax7.text(0.01, 0.05, '(h)', verticalalignment='bottom',
+    ax7.text(0.1, 0.05, '(h)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax7.transAxes)
     ax8 = plt.subplot(gs2[1, 2])
-    ax8.text(0.01, 0.09, '(i)', verticalalignment='bottom',
+    ax8.text(0.1, 0.05, '(i)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax8.transAxes)
 
-    ex2a, ex2b = auto_crop_group([plt.imread(example_plots[2]),
-                                  plt.imread(example_plots[3])])
+    # ex2a, ex2b = auto_crop_group([plt.imread(example_plots[2]),
+                                  # plt.imread(example_plots[3])])
     ax7.imshow(ex2a)
     ax8.imshow(ex2b)
 
     # example 3
     ax9 = plt.subplot(gs2[0, 3])
-    ax9.text(0.01, 0.05, '(j)', verticalalignment='bottom',
+    ax9.text(0.1, 0.05, '(j)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax9.transAxes)
     ax10 = plt.subplot(gs2[1, 3])
-    ax10.text(0.01, 0.09, '(k)', verticalalignment='bottom',
+    ax10.text(0.1, 0.05, '(k)', verticalalignment='bottom',
              horizontalalignment='left', transform=ax10.transAxes)
 
-    ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
-                                  plt.imread(example_plots[5])])
+    # ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
+                                  # plt.imread(example_plots[5])])
     ax9.imshow(ex3a)
     ax10.imshow(ex3b)
 
