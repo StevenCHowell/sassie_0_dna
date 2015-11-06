@@ -2980,7 +2980,7 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
         ax_c.set_title(best_wrst_titles[i], y=y_best_worst_label[i])
         ax_c.patch.set_visible(False)  # hide the 'canvas'
 
-    ax1.text(0.01, 0.015, '(a)   %d Structures' % n_total,
+    ax1.text(0.01, 0.015, '(a)  %d Structures' % n_total,
              verticalalignment='bottom', horizontalalignment='left',
              transform=ax1.transAxes)
     ax1.plot(result_df['Rg'], result_df[key], 'o', mec=colors(0), mfc='none')
