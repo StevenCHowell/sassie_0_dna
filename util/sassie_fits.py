@@ -3151,13 +3151,13 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
                              plt.imread(example_plots[5])]))
     else:
         img1 = plt.imread(density_plots[0])
-        img2 = plt.imread(density_plots[0])
+        img2 = plt.imread(density_plots[1])
         ex1a = plt.imread(example_plots[0])
-        ex1b = plt.imread(example_plots[0])
-        ex2a = plt.imread(example_plots[0])
-        ex2b = plt.imread(example_plots[0])
-        ex3a = plt.imread(example_plots[0])
-        ex3b = plt.imread(example_plots[0])
+        ex1b = plt.imread(example_plots[1])
+        ex2a = plt.imread(example_plots[2])
+        ex2b = plt.imread(example_plots[3])
+        ex3a = plt.imread(example_plots[4])
+        ex3b = plt.imread(example_plots[5])
 
     # img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
                                     # plt.imread(density_plots[1])])
