@@ -3151,8 +3151,8 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # img1, img2 = auto_crop_group([plt.imread(density_plots[0]),
                                   # plt.imread(density_plots[1])])
-    ax3.imshow(img1, aspect='auto')
-    ax4.imshow(img2, aspect='auto')
+    ax3.imshow(img1)
+    ax4.imshow(img2)
 
     # example 1
     ax5 = plt.subplot(gs2[0, 1])
@@ -3164,8 +3164,8 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # ex1a, ex1b = auto_crop_group([plt.imread(example_plots[0]),
                                   # plt.imread(example_plots[1])])
-    ax5.imshow(ex1a, aspect='auto')
-    ax6.imshow(ex1b, aspect='auto')
+    ax5.imshow(ex1a)
+    ax6.imshow(ex1b)
 
     # example 2
     ax7 = plt.subplot(gs2[0, 2])
@@ -3177,8 +3177,8 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # ex2a, ex2b = auto_crop_group([plt.imread(example_plots[2]),
                                   # plt.imread(example_plots[3])])
-    ax7.imshow(ex2a, aspect='auto')
-    ax8.imshow(ex2b, aspect='auto')
+    ax7.imshow(ex2a)
+    ax8.imshow(ex2b)
 
     # example 3
     ax9 = plt.subplot(gs2[0, 3])
@@ -3190,8 +3190,8 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # ex3a, ex3b = auto_crop_group([plt.imread(example_plots[4]),
                                   # plt.imread(example_plots[5])])
-    ax9.imshow(ex3a, aspect='auto')
-    ax10.imshow(ex3b, aspect='auto')
+    ax9.imshow(ex3a)
+    ax10.imshow(ex3b)
 
     ax3.tick_params(axis='both', which='both', bottom='off', top='off',
                     labelbottom='off', right='off', left='off', labelleft='off')
