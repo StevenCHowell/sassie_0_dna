@@ -1,0 +1,20 @@
+#!wing
+#!version=5.0
+##################################################################
+# Wing IDE project file                                          #
+##################################################################
+[project attributes]
+proj.directory-list = [{'dirloc': loc('.'),
+                        'excludes': (),
+                        'filter': u'*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
+proj.file-list = [loc('../../../experiments/paper_tetranucleosome/1307nsls/iqdata/exp_setup.py'),
+                  loc('../../../experiments/paper_tetranucleosome/1307nsls/iqdata/gui.py'),
+                  loc('../../../experiments/paper_tetranucleosome/1307nsls/iqdata/proc.py')]
+proj.file-type = 'shared'
+proj.launch-config = {loc('../../../experiments/paper_tetranucleosome/1307nsls/iqdata/analyze.sh'): (''\
+        'project',
+        (u'"x007 x008" "x005 x006 x013" wtTEK010c060.iq 0 "x007 06 03 04" "x008 02 04" "x006 06" "x013 01 02 03 04 06 09 15 16 18 19 20 21 22"',
+         ''))}

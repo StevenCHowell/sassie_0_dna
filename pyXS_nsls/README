@@ -1,0 +1,36 @@
+This free software is written by Lin Yang for users at beamline X9 of NSLS. Use at your own risk.
+Thanks to Kevin Yager and Ian Berke for suggestions and bug fixes.
+
+(1) This package depends on the following software packages:
+
+	python
+	numpy
+	python image library (PIL)
+	matplotlib
+	scipy (for line profile extraction)
+	SWIG (for compiling the RQconv module)
+	pygtk (for the solution scattering GUI only)
+
+(2) This package also include a C program that needs to be compiled for your particular OS. 
+Simply type the following under the directory pyXS:
+
+	python setup.py build_ext --inplace
+
+or using mingw under windows:
+
+	python setup.py build_ext --inplace --compile=mingw32
+
+This should generate a new file _RQconv.so (_RQconv.pyd under Windows). 
+
+NOTE: compiling using gcc-4 might not work under windows (python is compiled using gcc-3?)
+The solution is to edit Lib\distutils\cygwinccompiler.py under the python directory
+and remove the -mno-cygwin flag manually.
+
+(3) Older versions of PIL have problem correctly reading TIFF files that have Big Endian byte 
+order. You will know if your scattering data appear scrambled. Update PIL.
+
+(4) The binaries are generated using Python 2.7.
+
+Send your questions/feedback to lyang@bnl.gov .
+
+

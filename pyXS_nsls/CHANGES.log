@@ -1,0 +1,42 @@
+Winter 2009
+
+Intial code
+
+Summer 2010
+
+1. Data2D.merge()
+2. handling of mask since data collected by the PILATUS detector may
+contain zero intensity 
+
+Spring 2011
+
+1. updated calculations for q - pixel position conversion 
+2. labels on figures 
+3. ExpPara.flip for WAXS data
+4. revised code for Data2d mask, based on suggestions by Kevin Yager. 
+5. Major revision in handling of solution scattering data. Subtract dark
+current before azimuthal average. Scale and merge SAXS/WAXS before buffer
+scattering subtraction. Partly based on suggestions by Ian Berke.
+6. Option of background subtraction for solution scattering based on 
+WAXS intensity (water).
+7. Flat field correction.
+8. Correction for incident angle onto the detector.
+9. Template proc.py and disp.py files in Example directory.
+
+Summer 2012
+
+1. added gui.py for solution scattering
+2. updated handling of GID data in Data2D; added examples
+3. revised conv_to_Iq to better deal with non-uniform q-grid, no longer
+split intensity from one pixel into two bins in the I(q) histogram
+
+Fall 2012
+
+1. updated roi calculation and line profile extraction
+
+Spring 2013
+
+Updated slnXS.py to handle generic solution/powder scattering data
+
+last updated Apr 12, 2013
+

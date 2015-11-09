@@ -1,0 +1,22 @@
+#!wing
+#!version=5.0
+##################################################################
+# Wing IDE project file                                          #
+##################################################################
+[project attributes]
+proj.directory-list = [{'dirloc': loc('.'),
+                        'excludes': (),
+                        'filter': u'*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True},
+                       {'dirloc': loc('../../../xraylab/1406NSLSx9'),
+                        'excludes': (),
+                        'filter': u'*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
+proj.file-type = 'shared'
+proj.launch-config = {loc('../../../xraylab/1406NSLSx9/proc.py'): ('project',
+        (u'"/home/gwdata/1406NSLSx9/x111-DiBTEK010C050-01.60s /home/gwdata/1406NSLSx9/x111-DiBTEK010C050-02.60s /home/gwdata/1406NSLSx9/x111-DiBTEK010C050-03.60s /home/gwdata/1406NSLSx9/x111-DiBTEK010C050-04.60s /home/gwdata/1406NSLSx9/x111-DiBTEK010C050-05.60s /home/gwdata/1406NSLSx9/x111-DiBTEK010C050-06.60s " "/home/gwdata/1406NSLSx9/x109-TEK010-01.60s /home/gwdata/1406NSLSx9/x109-TEK010-02.60s /home/gwdata/1406NSLSx9/x109-TEK010-03.60s /home/gwdata/1406NSLSx9/x109-TEK010-04.60s /home/gwdata/1406NSLSx9/x112-TEK010-01.60s /home/gwdata/1406NSLSx9/x112-TEK010-02.60s /home/gwdata/1406NSLSx9/x112-TEK010-03.60s /home/gwdata/1406NSLSx9/x112-TEK010-04.60s " 0 diBtek010c050.iq -show\n',
+         ''))}
