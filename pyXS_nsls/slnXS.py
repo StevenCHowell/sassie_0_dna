@@ -63,8 +63,8 @@ WAXS_THRESH=300
 # this is the scaling factor for indivudual curves that belong to the same sample
 # they are offset for clarity in the plots
 #s or set it to 1 to identify outliers
-#s VOFFSET=1.5
-VOFFSET= 1
+#s VOFFSET=1.5 # useful to identify scans that differ from the mean
+VOFFSET= 1 # useful to identify scans that differ from the group
 
 #s this method allows saving the figures
 def clrsave(outpath, dpi=300):
@@ -278,6 +278,7 @@ class Data1d:
         to evaluate the consistency between them
         """
         print "averaging data with %s:" % self.label ,
+        # added by Steven Howell, September 2015
         # replace the error in each image with the max of
         # 1. standard error of the mean pixel value (previous error)
         # 2. 1% of the intensity
@@ -325,7 +326,7 @@ class Data1d:
             iq_exposures[i+1, :] = d1.data
             self.trans += d1.trans
             self.data  += d1.data
-            self.err = np.sqrt(self.err**2 + d1.err**2) # changed this to add in quadrature
+            self.err = np.sqrt(self.err**2 + d1.err**2) #s changed this to add in quadrature
             #s self.err += d1.err
             self.comments += "# averaged with \n%s" % d1.comments.replace("# ","## ")
             if plot_data:
@@ -350,7 +351,7 @@ class Data1d:
             0. the propagated error of the pixels (using Lin's error definition)
             1. the standard error from the variance between exposures
         '''
-        # take the standard deviation (ddof=1 as numpy default is not standard)
+        #s take the standard deviation (ddof=1 as numpy default is not standard)
         err_exposures = np.std(iq_exposures, axis=0, dtype=np.float64, ddof=1)
         err_exposures /= np.sqrt(n_exposures)
         err = np.max([self.err, err_exposures], axis=0) # [0. 1.]
