@@ -2414,7 +2414,7 @@ def plot_discrepancy(result_df, all_data_iq, goal_iq, data_file, prefix='',
     # plot errorbar in two parts to get label order correct
     ax1.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
              mec=gp.qual_color(0), label='Experimental')
-    ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+    ax1.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  ecolor=gp.qual_color(0))
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1]*0, '--', c=gp.qual_color(0))
 
@@ -2653,7 +2653,7 @@ def plot_x2_components(rf_data, mt_data, prefix=None, show=False,
     ax1.plot(rf_data[:, 0], rf_data[:, 1], 'o', ms=8, mfc='none',
              mec=colors(0), label='exp')
     # label='exp', ms=8, mfc='none', color='b')
-    ax1.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt="none",
+    ax1.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt=None,
                  ecolor=colors(0))
     ax1.plot(mt_data[:, 0], mt_data[:, 1], '-', mfc='none', ms=8,
              c=colors(1), linewidth=2, label=(r'best %s= %0.1f' % (residual,
@@ -2697,7 +2697,7 @@ def plot_x2_components(rf_data, mt_data, prefix=None, show=False,
     ax3.plot(rf_data[:, 0], rf_data[:, 1], 'o', ms=8, mfc='none',
              mec=colors(0), label='exp')
     # label='exp', ms=8, mfc='none', color='b')
-    ax3.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt="none",
+    ax3.errorbar(rf_data[:, 0], rf_data[:, 1], rf_data[:, 2], fmt=None,
                  ecolor=colors(0))
     ax3.plot(mt_data[:, 0], mt_data[:, 1], '-', mfc='none', ms=8,
              c=colors(1), linewidth=2, label=(r'best %s= %0.1f' % (residual,
@@ -2861,7 +2861,7 @@ def pub_plot(x2rg_df, all_data_iq, goal_iq, density_plots, inset_files=[],
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
              mec=colors(0), label='exp')
     # label='exp', ms=8, mfc='none', color='b')
-    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  ecolor=colors(0))
 
     best_x2 = x2rg_df.x2.min()
@@ -3037,7 +3037,7 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
              mec=gp.qual_color(0), label='Mock Experiment')
-    # ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+    # ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  # ecolor=gp.qual_color(0))
     ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
              label=(r'Worst $R=%0.4f$' % worst_discrep))
@@ -3341,7 +3341,7 @@ def method_plot_v2(result_df, all_data_iq, goal_iq, density_plots,  example_plot
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
              mec=gp.qual_color(0), label='Mock Experiment')
-    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt=None,
                  ecolor=gp.qual_color(0))
     ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
              label=(r'Worst $R=%0.4f$' % worst_discrep))
