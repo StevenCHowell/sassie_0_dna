@@ -3036,9 +3036,9 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
 
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
-             mec=gp.qual_color(0), label='Experimental')
-    ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
-                 ecolor=gp.qual_color(0))
+             mec=gp.qual_color(0), label='Mock Experiment')
+    # ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
+                 # ecolor=gp.qual_color(0))
     ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
              label=(r'Worst $R=%0.4f$' % worst_discrep))
     ax2.plot(all_data_iq[:, 0], average[:], c=gp.qual_color(2), linewidth=2,
@@ -3340,7 +3340,7 @@ def method_plot_v2(result_df, all_data_iq, goal_iq, density_plots,  example_plot
 
     # plot errorbar in two parts to get label order correct
     ax2.plot(goal_iq[:, 0], goal_iq[:, 1], 'o', ms=8, mfc='none',
-             mec=gp.qual_color(0), label='Experimental')
+             mec=gp.qual_color(0), label='Mock Experiment')
     ax2.errorbar(goal_iq[:, 0], goal_iq[:, 1], goal_iq[:, 2], fmt="none",
                  ecolor=gp.qual_color(0))
     ax2.plot(all_data_iq[:, 0], worst[:], c=gp.qual_color(3), linewidth=2,
