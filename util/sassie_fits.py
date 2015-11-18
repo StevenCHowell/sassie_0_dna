@@ -3065,7 +3065,9 @@ def method_plot(result_df, all_data_iq, goal_iq, density_plots,  example_plots,
     ax_c.text(0.01, 0.015, '(c)', verticalalignment='bottom',
               horizontalalignment='left', transform=ax_c.transAxes)
     if all_density_plot:
-        inset_image = auto_crop(plt.imread(all_density_plot))
+        inset_image = plt.imread(all_density_plot)
+        if crop:
+            inset_image = auto_crop(inset_image)
         ax_i = plt_inset.add_inset(ax_c, [0.4, 0.05, 0.6, 0.6], axisbg='None')
         mask = np.tile(np.atleast_3d(np.any(inset_image != 255, axis=2)),
                        (1, 1, inset_image.shape[2]))  # this should mask the white
