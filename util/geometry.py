@@ -600,7 +600,7 @@ def rotate(axis, theta):
         (R[0, 0], R[0, 1]) = (ct, st)
         (R[1, 0], R[1, 1]) = (-st, ct)
     else:
-        assert True, "ERROR!!! did not recognize rotation axis"
+        assert True, "ERROR!!! invalid rotation axis: {}".format(axis)
     return R
 
 
