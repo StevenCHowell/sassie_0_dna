@@ -4,18 +4,20 @@
 # Created: 10/09/2014
 # $Id$
 
+import errno
 import glob
-import shutil
 import os
+import shutil
 import subprocess
 import time
-import sassie.sasmol.sasmol as sasmol
+
+import multiprocessing as mp
 import numpy as np
 import os.path as op
-import multiprocessing as mp
-import x_dna.util.basis_to_python as b2p
 import pandas as pd
-import errno
+import sasmol.sasmol as sasmol
+import sassie.util.basis_to_python as b2p
+
 
 # import sys
 # import logging
@@ -161,7 +163,6 @@ def append_bk(folder):
 
 
 class cd:
-
     """
     Context manager for changing the current working directory
     http://stackoverflow.com/questions/431684
@@ -307,7 +308,8 @@ def main(inputs):
                 shutil.move(rg_file, rg_out)
             else:
                 cmd = 'tail -n +2 %s >> %s' % (rg_file, rg_out)
-                subprocess.call(cmd, shell=True)
+                return_code = subprocess.call(cmd, shell=True)
+                assert not return_code, 'ERROR running command: %s' % cmd
                 os.remove(rg_file)
 
     print 'finished %d foxs calculations\n' % first_last[-1][1]
