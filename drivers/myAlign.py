@@ -7,17 +7,17 @@
 # $Id$
 #
 '''
-This script loads a pdb structure file of DNA, and creates a '*.patches' file
-with the psfgen patches needed to use psfgen to create the structure.
-After running this script, the patches can be pasted into a psfgen file.
+This driver serves as a wrapper tool the align method used to align a
+pdb/dcd to the coordinates of a goal pdb structure.
 '''
 
-import sassie.sasmol.sasmol as sasmol
-import x_dna.util.align2 as a2
 import logging
 import sys
-import os.path as op
-import numpy as np
+import os
+import sassie.sasmol.sasmol as sasmol
+# import sassie.tools.align2 as a2
+# import sassie_0_dna.util.align2 as a2
+
 
 
 class inputs():
@@ -36,43 +36,45 @@ def parse():
         #epilog = 'no epilog found'
     )
 
-    parser.add_argument("-g",  "--goal",    help="goal pdb")
-    parser.add_argument(
-        "-r",  "--ref",     help="reference pdb containing info for moving pdb/dcd")
-    parser.add_argument("-m",  "--move",    help="pdb/dcd to align")
-    parser.add_argument("-o",  "--out",     help="output dcd file")
-    parser.add_argument(
-        "-ms", "--move_seg_chain", help="segname or chain to match")
-    parser.add_argument(
-        "-gs", "--goal_seg_chain", help="segname or chain to match")
-    parser.add_argument(
-        "-msc", "--move_seg_or_chain", help="matching a segname or chain")
-    parser.add_argument(
-        "-gsc", "--goal_seg_or_chain", help="matching a segname or chain")
-    parser.add_argument("-p",  "--path",    help="output path")
-    parser.add_argument(
-        "-gmn", "--goal_min",    help="minimun residue to match on goal molecule")
-    parser.add_argument(
-        "-gmx", "--goal_max",    help="maximum residue to match on goal molecule")
-    parser.add_argument(
-        "-mmn", "--move_min",    help="minimun residue to match on move molecule")
-    parser.add_argument(
-        "-mmx", "--move_max",    help="miximum residue to match on move molecule")
-    parser.add_argument("-ba", "--basis_atoms",  help="basis_atoms to match")
+    parser.add_argument("-g", "--goal", help="goal pdb")
+    parser.add_argument("-r", "--ref",
+                        help="pdb with atom info for pdb/dcd that is moving")
+    parser.add_argument("-m", "--move", help="pdb/dcd to be moved/aligned")
+    parser.add_argument("-o", "--out", help="output dcd file name")
+    parser.add_argument("-ms", "--move_seg_chain",
+                        help="segname or chain to match")
+    parser.add_argument("-gs", "--goal_seg_chain",
+                        help="segname or chain to match")
+    parser.add_argument("-msc", "--move_seg_or_chain",
+                        help="matching a segname or chain")
+    parser.add_argument("-gsc", "--goal_seg_or_chain",
+                        help="matching a segname or chain")
+    parser.add_argument("-p", "--path", help="output path")
+    parser.add_argument("-gmn", "--goal_min",
+                        help="minimun residue to match on goal molecule")
+    parser.add_argument("-gmx", "--goal_max",
+                        help="maximum residue to match on goal molecule")
+    parser.add_argument("-mmn", "--move_min",
+                        help="minimun residue to match on move molecule")
+    parser.add_argument("-mmx", "--move_max",
+                        help="miximum residue to match on move molecule")
+    parser.add_argument("-ba", "--basis_atoms", help="basis_atoms to match")
 
     return parser.parse_args()
 
 
 def align(inputs):
     '''
-    the inputs object should contain the following attributes
-    goal:    goal pdb
-    ref:     reference pdb containing molecule info for moving pdb/dcd
-    move:    pdb/dcd to align
-    out:     output dcd file
-    path:    output path
-    goal_filter:     goal basis filter
-    move_filter:     move basis filter
+    input:
+    ------
+        inputs: object should contain the following attributes
+            goal:    goal pdb
+            ref:     reference pdb containing molecule info for moving pdb/dcd
+            move:    pdb/dcd to align
+            out:     output dcd file
+            path:    output path
+            goal_filter:     goal basis filter
+            move_filter:     move basis filter
 
     note: inputs.ref and inputs.move can ofter be the same pdb
     '''
@@ -90,8 +92,10 @@ def align(inputs):
         goal_segname = inputs.goal_seg_chain
         goal_res_max = inputs.goal_max
         goal_res_min = inputs.goal_min
-        goal_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (
-            goal_seg_or_ch, goal_segname, basis_atoms, goal_res_min, goal_res_max)
+        goal_filter = ('((%s[i] == "%s") and (name[i] == "%s") and '
+                       '(resid[i] >= %s) and (resid[i] <= %s))' % (
+                           goal_seg_or_ch, goal_segname, basis_atoms,
+                           goal_res_min, goal_res_max))
 
     try:
         move_filter = inputs.move_filter
@@ -101,13 +105,18 @@ def align(inputs):
         move_segname = inputs.move_seg_chain
         move_res_max = inputs.move_max
         move_res_min = inputs.move_min
-        move_filter = '((%s[i] == "%s") and (name[i] == "%s") and (resid[i] >= %s) and (resid[i] <= %s))' % (
-            move_seg_or_ch, move_segname, basis_atoms, move_res_min, move_res_max)
+        move_filter = ('((%s[i] == "%s") and (name[i] == "%s") and '
+                       '(resid[i] >= %s) and (resid[i] <= %s))' % (
+                           move_seg_or_ch, move_segname, basis_atoms,
+                           move_res_min, move_res_max))
 
     # check input
-    assert op.exists(aa_move_file), 'ERROR: no such file - %s' % aa_move_file
-    assert op.exists(aa_move_pdb), 'ERROR: no such file - %s' % aa_move_pdb
-    assert op.exists(aa_goal_pdb), 'ERROR: no such file - %s' % aa_goal_pdb
+    assert os.path.exists(aa_move_file), ('ERROR: no such file - %s' %
+                                          aa_move_file)
+    assert os.path.exists(aa_move_pdb), ('ERROR: no such file - %s' %
+                                         aa_move_pdb)
+    assert os.path.exists(aa_goal_pdb), ('ERROR: no such file - %s' %
+                                         aa_goal_pdb)
 
     # create the SasMol objects
     sub_goal = sasmol.SasMol(0)
