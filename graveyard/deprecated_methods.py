@@ -4,7 +4,6 @@
 # Author:  Steven C. Howell
 # Purpose: Store the methods removed from the cgDNA_move.py module
 # Created: 28 August 2014
-# $Id$
 #
 
 import sys

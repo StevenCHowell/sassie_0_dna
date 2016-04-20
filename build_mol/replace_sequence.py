@@ -2,7 +2,7 @@
 # Author:  Steven C. Howell
 # Purpose: Replace DNA sequence with another sequence
 # Created: 04/24/2014
-# $Id$
+
 '''
 This script loads a pdb structure file of DNA, replaces the DNA sequence,
 then saves the result as a new pdb.  The pdb input should just be the DNA

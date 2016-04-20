@@ -2,7 +2,6 @@
 # Author:  Steven C. Howell
 # Purpose: script for running SASSIE minimizer with command line input
 # Created: 9 September 2014
-# $Id$
 
 import os
 import sys

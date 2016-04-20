@@ -3,9 +3,7 @@
 # Author:  Steven C. Howell
 # Purpose: Align several structures using an align basis
 # Created: 6 February 2015
-#
-# $Id$
-#
+
 '''
 This driver serves as a wrapper tool the align method used to align a
 pdb/dcd to the coordinates of a goal pdb structure.

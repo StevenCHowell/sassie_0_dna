@@ -1,4 +1,3 @@
-# $Id$
 '''
     SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 

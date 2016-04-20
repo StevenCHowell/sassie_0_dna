@@ -2,9 +2,9 @@
 # Author:  Steven C. Howell
 # Purpose: setup file for building the fortran collision calculator
 # Created: May 2014
-# $Id$
-# Note: copied from setup_electrostatics.py
 #
+# Note: copied from setup_electrostatics.py
+
 '''
     SASSIE  Copyright (C) 2011 Joseph E. Curtis
     This program comes with ABSOLUTELY NO WARRANTY;

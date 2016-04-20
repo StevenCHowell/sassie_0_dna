@@ -2,7 +2,6 @@
 # Auther: Steven C. Howell
 # Purpose: Run crysol in parrallel with consolidated output
 # Created: 10/09/2014
-# $Id$
 
 import sys
 import os

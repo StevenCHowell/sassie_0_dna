@@ -1,5 +1,5 @@
 '''
-    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import sassie.sasmol.sasmol as sasmol
 #	07/29/2011	--	adapted to use sasop & sasmath classes		:	jc
 # LC      1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#                                                                      *      **
+
 '''
         ALIGN2 is the module that overlaps molecules from a dcd/pdb file
 	onto another molecule over a given basis.  The two molecule types
@@ -44,7 +44,7 @@ import sassie.sasmol.sasmol as sasmol
         GUI through the graphical_align.py script.
 
 	REFERENCE:
-    	
+
 	W. Kabsch
     	Acta Crystallog. sect. A  32  922-923  (1976)
 
@@ -84,9 +84,9 @@ def unpack_variables(variables):
 
 def align(variables, txtOutput):
     '''
-    ALIGN is the function to read in variables from GUI input and 
+    ALIGN is the function to read in variables from GUI input and
     overlap the molecules in a dcd/pdb file onto the coordinates of
-    a reference pdb structure over a given basis. 
+    a reference pdb structure over a given basis.
 
             runname: 	        project name
             path:                   input/output filepath

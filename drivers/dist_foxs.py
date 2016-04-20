@@ -2,7 +2,6 @@
 # Auther: Steven C. Howell
 # Purpose: Check that there is no overlap then run foxs (parrallel)
 # Created: 05/2015
-# $Id$
 
 import glob
 import shutil
@@ -31,7 +30,7 @@ class inputs():
 def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
          max_q=0.2, num_points=50):
     '''
-    FOXS is the function to read in structures from a DCD/PDB file and 
+    FOXS is the function to read in structures from a DCD/PDB file and
     calculate SAXS profiles using the binary program foxs.exe
 
     INPUT:  variable descriptions:
@@ -42,7 +41,7 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
         pdb_full_name:   name of pdb file for loading atom info
         foxs_exe:   foxs executable path+filename
         output:     output object
-        basis:      basis for calculating the scattering (default = all) 
+        basis:      basis for calculating the scattering (default = all)
         max_q:      pmaximum q value (default = 0.2)
         num_points: number of points in the profile
 
@@ -53,7 +52,7 @@ def foxs(sub_dir, dcd_name, first_last, pdb_full_name, foxs_exe, basis='all',
 
     REFERENCE:
     D. Schneidman-Duhovny, et al. Biophysical Journal 2013. 105 (4), 962-974
-    D. Schneidman-Duhovny, et al. NAR 2010. 38 Suppl:W540-4 
+    D. Schneidman-Duhovny, et al. NAR 2010. 38 Suppl:W540-4
     '''
 
     # start multiple runs to calculate scattering in each subfolder

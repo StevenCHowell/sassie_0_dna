@@ -5,8 +5,6 @@
 # Purpose: Output the electrostatics of the DNA during run
 # Created: 20 October 2014
 #
-# $Id$
-#
 # 0000000011111111112222222222333333333344444444445555555555666666666677777777778
 # 2345678901234567890123456789012345678901234567890123456789012345678901234567890
 
@@ -569,7 +567,7 @@ def coulomb_energy(r, switchd, nbcutoff):
 
 def determine_cutoff():
     '''
-    used to determine what distance to use for the coulomb 
+    used to determine what distance to use for the coulomb
     energy cutoff
     '''
     import matplotlib.pyplot as plt

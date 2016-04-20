@@ -3,9 +3,7 @@
 # Author:  Steven C. Howell
 # Purpose: Prepare PDB for modeling
 # Created: 24 April 2014
-#
-# $Id$
-#
+
 '''
 This script creates a separate pdb for each chain of 'aa_pdb'
 It also creates a sequence file for the residue sequence of that chain

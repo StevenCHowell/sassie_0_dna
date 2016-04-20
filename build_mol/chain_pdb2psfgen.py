@@ -4,8 +4,7 @@
 # Purpose: Replace DNA sequence with another sequence
 # Created: 24 April 2014
 #
-# $Id$
-#
+
 '''
 This script loads a pdb structure file of DNA, and creates a '*.patches' file
 with the psfgen patches needed to use psfgen to create the structure.

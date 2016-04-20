@@ -4,13 +4,11 @@
 # Author:  Steven C. Howell
 # Purpose: generate modified DNA or DNA-protein structures
 # Created: 1 Decemeber 2013
-
-# $Id$
 #
 # 0000000011111111112222222222333333333344444444445555555555666666666677777777778
 # 2345678901234567890123456789012345678901234567890123456789012345678901234567890
 '''
-    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1446,7 +1444,7 @@ def combine_output(runname, refpdb, txtOutput, ofile, aa_dcdfiles, debug,
                    keep_cg_files, cg_dna_dcdfiles, rigid_dcdfiles,
                    rigid_move_masks):
     '''
-    this method serves to combine the un-minimized output structures into one 
+    this method serves to combine the un-minimized output structures into one
     complete dcd file
     '''
     output_log_file = open(runname + '/dna_mc/combine_output.log', 'w')
@@ -1555,15 +1553,15 @@ def get_cg_parameters(flex_resids, dna_resids, dna_segnames, infile, refpdb,
                       debug=False, i_loop=0, pkl_file=False):
     '''
     This method is designed to generate the coarse-grained run parameters then
-    save them to a pickle file for future use.  If the pickle file already 
-    exists, it will load that file then compare the new input to see if all 
-    parameters meet the current input.  If there are critical differences, it 
-    will re-generate the parameters and update the pickle file.  This process 
+    save them to a pickle file for future use.  If the pickle file already
+    exists, it will load that file then compare the new input to see if all
+    parameters meet the current input.  If there are critical differences, it
+    will re-generate the parameters and update the pickle file.  This process
     drastically improves the load time when running the same setup many times.
-    To force the program to regenerate the parameters, set 
+    To force the program to regenerate the parameters, set
     variables['rm_pkl'][0] = True
-    to force the removal of the pickle file.  This should occur when 
-    re-coarse-graining after a minimization.  
+    to force the removal of the pickle file.  This should occur when
+    re-coarse-graining after a minimization.
     '''
     try:
         bp_per_bead_val0 = bp_per_bead[0]

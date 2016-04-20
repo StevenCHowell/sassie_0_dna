@@ -2,7 +2,6 @@
 # Author:  Steven C. Howell
 # Purpose: script for calculating DNA dihedral angles and generating plots
 # Created: 22 September 2014
-# $Id: $
 
 import sys
 import os

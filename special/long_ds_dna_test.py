@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# $Id$
 # time using FORTRAN double loop, N=1000, iters=1000 (so 1*10^6 steps): 958.887075186 seconds
 # time using python double loop, N=1000, iters=1000 (so 1*10^6 steps):
 
@@ -322,7 +321,7 @@ def move2origin(coor4):
 
 def align2z(coor4):
     '''
-    function designed to align the axis connecting the first 2 coordinates of an array 
+    function designed to align the axis connecting the first 2 coordinates of an array
     of (1,4) coodinate vectors to the z-axis
     '''
     A = np.eye(4, dtype=np.float)
@@ -521,7 +520,7 @@ def checkMag(vec):
 
 
 def energyBend(lpl, u, l):
-    ''' 
+    '''
     this function finds the E/kT for N beads connected by N-1 rods
     lpl is the persistence length divided by the rod length: lp/l
     u contains the N-1 unit vectors representing each rod
@@ -830,7 +829,7 @@ if __name__ == "__main__":
 
 
 '''
-to do: 
+to do:
 reproduce one of the figures from D. Tree's paper (to verify the model is programmed the way they did)
 if the model is fine and good for the length scale of interest then go to the mapping
 plotting the energies 9
