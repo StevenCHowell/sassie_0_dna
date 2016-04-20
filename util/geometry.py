@@ -15,7 +15,7 @@
 # import argparse #http://docs.python.org/dev/library/argparse.html
 import numpy as np
 from scipy.optimize import curve_fit
-import sassie.sasmol.sasmol as sasmol
+import sasmol.sasmol as sasmol
 
 # import logging
 # LOGGER = logging.getLogger(__name__) #add module name manually
@@ -245,11 +245,9 @@ def angle_btwn_v1_v2(v1, v2):
     --------
     >>> v1 = np.array([0,0,1])
     >>> v2 = np.array([1,0,0])
-    >>> R = rotate_v2_to_v1(v1, v2)
-    >>> print R
-    [[ 0.  0. -1.]
-     [ 0.  1.  0.]
-     [ 1.  0.  0.]]
+    >>> theta_deg, theta_rad = angle_btwn_v1_v2(v1, v2)
+    >>> print theta_deg
+    90
     >>> np.dot(R, v2) - v1
     array([ 0.,  0.,  0.])
 
