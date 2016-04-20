@@ -3,7 +3,6 @@
 # Auther: Steven C. Howell
 # Purpose: Run TAMD in parrallel with consolidated output
 # Created: 18 April 2016
-# $Id$
 
 import errno
 import glob
@@ -18,9 +17,10 @@ import numpy as np
 import os.path as op
 import pandas as pd
 
-import sassie.sasmol.sasmol as sasmol
-import x_dna.util.basis_to_python as b2p
+import sasmol.sasmol as sasmol
+# import sassie.util.basis_to_python as b2p
 
+# LOGGER = logging.getLogger(__name__) #add module name manually
 
 class cd:
     '''
@@ -39,17 +39,20 @@ class cd:
         os.chdir(self.savedPath)
 
 
-class inputs(object):
+class TamdInputs(object):
 
     def __init__(self, parent=None):
-        inputs.charmm_exe = '/home/schowell/bin/charmm.exe'
-        self.n_cpus = 56
+        default_path = './'
+        self.charmm_exe = '/home/schowell/bin/charmm.exe'
+        self.n_cpus = 4
         self.run_name = 'tamd_run_0'
 
-        inputs.dcd_fname = '4x167_80bp_n4_10d.dcd'
-        inputs.dcd_path = './'
-        inputs.pdb_fname = 'c11_min.pdb'
-        inputs.pdb_path = './'
+        self.dcd_fname = 'tamd_test.dcd'
+        self.dcd_path = default_path
+        self.inp_fname = 'quick.inp'
+        self.inp_path = default_path
+        self.pdb_fname = 'tamd_test.pdb'
+        self.pdb_path = default_path
 
 
 def append_bk(folder):
@@ -320,5 +323,36 @@ def tail(f, n=10):
 
 
 if __name__ == '__main__':
-    # main(ARGS)
-    NotImplemented
+
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+    test_path = 'script_test'
+    inputs = TamdInputs()
+    inputs.dcd_path = test_path
+    inputs.pdb_path = test_path
+    inputs.inp_path = test_path
+
+    inputs.inp_fname = 'quick.inp'
+
+    try:
+        dcd_full_fname = op.join(inputs.dcd_path, inputs.dcd_fname)
+        op.exists(dcd_full_fname)
+    except:
+        logging.error('No such file: {}'.format(dcd_full_fname))
+
+    try:
+        inp_full_fname = op.join(inputs.dcd_path, inputs.dcd_fname)
+        op.exists(inp_full_fname)
+    except:
+        logging.error('No such file: {}'.format(inp_full_fname))
+
+    try:
+        pdb_full_fname = op.join(inputs.dcd_path, inputs.dcd_fname)
+        op.exists(pdb_full_fname)
+    except:
+        logging.error('No such file: {}'.format(pdb_full_fname))
+
+
+
+    logging.info('\m/ >.< \m/')
+
