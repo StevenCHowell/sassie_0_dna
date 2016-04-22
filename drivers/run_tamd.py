@@ -15,7 +15,6 @@ import time
 import multiprocessing as mp
 import numpy as np
 import os.path as op
-import pandas as pd
 
 import sasmol.sasmol as sasmol
 # import sassie.util.basis_to_python as b2p
@@ -113,28 +112,25 @@ def run_in_parallel(inputs):
     mkdir_p(tamd_path)
 
     # check the input
-    try:
-        dcd_full_fname = op.join(dcd_path, dcd_fname)
-        op.exists(dcd_full_fname)
-    except:
+    dcd_full_fname = op.join(dcd_path, dcd_fname)
+    if not op.exists(dcd_full_fname):
         logging.error('No such file: {}'.format(dcd_full_fname))
+        raise IOError('No such file: {}'.format(dcd_full_fname))
 
-    try:
-        inp_full_fname = op.join(inp_path, inp_fname)
-        op.exists(inp_full_fname)
-    except:
+    inp_full_fname = op.join(inp_path, inp_fname)
+    if not op.exists(inp_full_fname):
         logging.error('No such file: {}'.format(inp_full_fname))
+        raise IOError('No such file: {}'.format(inp_full_fname))
 
-    try:
-        pdb_full_fname = op.join(pdb_path, pdb_fname)
-        op.exists(pdb_full_fname)
-    except:
+    pdb_full_fname = op.join(pdb_path, pdb_fname)
+    if not op.exists(pdb_full_fname):
         logging.error('No such file: {}'.format(pdb_full_fname))
+        raise IOError('No such file: {}'.format(pdb_full_fname))
 
-    try:
-        op.exists(tamd_exe)
-    except:
+    # import pdb; pdb.set_trace()
+    if not op.exists(tamd_exe):
         logging.error('No such file: {}'.format(tamd_exe))
+        raise IOError('No such file: {}'.format(tamd_exe))
 
     # split the dcd into subfolders
     sub_dirs = split_dcd_to_pdbs(pdb_full_fname, dcd_full_fname, tamd_path)
@@ -250,10 +246,10 @@ def tamd(sub_dir, inp_fname, tamd_exe):
 
     '''
     with cd(sub_dir):
-        try:
-            op.exists(inp_fname)
-        except:
+        if not op.exists(inp_fname):
             logging.error('missing input file: {}'.format(op.join(os.getcwd(),
+                                                                  inp_fname)))
+            raise IOError('missing input file: {}'.format(op.join(os.getcwd(),
                                                                   inp_fname)))
 
         # run the calculation
@@ -279,6 +275,14 @@ if __name__ == '__main__':
     # inputs = TamdInputs(inp_path='script_test', inp_fname='quick.inp',
                         # n_cpus=1, dcd_fname='hiv1_gag_ab_cluster_30A.dcd',
                         # pdb_path='script_test')
+
+    inputs = TamdInputs(
+        inp_fname='quick.inp',
+        n_cpus=1,
+        dcd_fname='hiv1_gag_ab_cluster_30A.dcd',
+        pdb_fname='hiv1_gag_ab.pdb',
+        # charmm_exe='/share/apps/local/bin/charmm.exe',
+    )
 
     run_in_parallel(inputs)
 
