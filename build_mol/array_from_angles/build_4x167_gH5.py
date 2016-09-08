@@ -13,10 +13,10 @@ import sassie.sasmol.sasmol as sasmol
 import numpy as np
 # import time
 # import string, os, locale, sys, random
-import x_dna.util.tetramer_angles as ta
-import x_dna.util.geometry as geometry
-import x_dna.drivers.myAlign as align
-import x_dna.util.basis_to_python as b2p
+# import x_dna.util.tetramer_angles as ta
+# import x_dna.util.geometry as geometry
+# import x_dna.drivers.myAlign as align
+# import x_dna.util.basis_to_python as b2p
 
 
 class inputs():
@@ -313,7 +313,7 @@ def align_gH5_to_c11():
     tic = time.time()
     not_dna = sasmol.SasMol(0)
     not_dna_mask = ((dna_mask-1) * -1 )
-    error = c11.copy_molecule_using_mask(not_dna, not_dna_mask, 0)   
+    error = c11.copy_molecule_using_mask(not_dna, not_dna_mask, 0)
     pro_filter2 = "(name[i] == 'CA')"
     error, pro_mask2 = not_dna.get_subset_mask(pro_filter2)
     pro2 = sasmol.SasMol(0)
@@ -337,16 +337,16 @@ def construct_ncp_array(ncp, phi, dxyz, dna_segnames, ncp_dna_resids,
                         dyad_resids, ref_atom_resid, link_vars, pre_suf_vars,
                         save_name=None, adjust_ncp=None):
     '''
-    given a list of sasmol objects, this will combine them into one 
+    given a list of sasmol objects, this will combine them into one
     sasmol object
 
     inputs:
-        ncp          : template ncp, either a sasmol object or filename for a pdb 
+        ncp          : template ncp, either a sasmol object or filename for a pdb
         phi          : orientation angles
         dxyz         : translation distances
         dna_segnames : ...
 
-        save_name : optional input for what to save the result as 
+        save_name : optional input for what to save the result as
 
     outputs:
         array     : resulting ncp array
