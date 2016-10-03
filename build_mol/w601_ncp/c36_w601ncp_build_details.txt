@@ -1,0 +1,7 @@
+The initial nucleosome core particle model was generated using psfgen, a plug-in of VMD [1], and based on the PDB-ID 1KX5 X-ray Structure of the nucleosome core particle solved at 1.9 \AA resolution [2].  Using NAMD [3] with the CHARMM36 force fields,[4] we prepared this model for simulations by performing 2000 energy minimization steps followed by 200 MD steps (0.2 ps) then another 2000 energy minimization steps.  Note that the CHARMM36 force fields more accurately represents the experimentally measured distribution of B1 to BII DNA, a behavior not captured by the CHARMM27 force fields.
+
+
+[1] W. Humphrey, A. Dalke, K. Schulten, J. Mol. Graphics 1996, 14, 33.
+[2] C. A. Davey, D. F. Sargent, K. Luger, A. W. Maeder, T. J. Richmond, J. Mol. Biol. 2002, 319, 1097.
+[3] J. C. Phillips, R. Braun, W. Wang, J. Gumbart, E. Tajkhorshid, E. Villa, C. Chipot, R. D. Skeel, L. Kale, K. Schulten, J. Comput. Chem. 2005, 26, 1781.
+[4] K. Hart, N. Foloppe, C. M. Baker, E. J. Denning, L. Nilsson, A. D. MacKerell, J. Chem. Theory Comput. 2012, 8, 348.
